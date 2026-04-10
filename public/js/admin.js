@@ -1067,31 +1067,31 @@ async function deleteKeyword(keywordId) {
     }
 }
 
-// function renderKeywords() {
-//     const container = document.getElementById("keywordsList");
-//     if (!container) return;
+function renderKeywords() {
+    const container = document.getElementById("keywordsList");
+    if (!container) return;
     
-//     const keywords = window.keywords || [];
+    const keywords = window.keywords || [];
     
-//     if (keywords.length === 0) {
-//         container.innerHTML = '<div class="empty-state">Нет ключевых слов</div>';
-//         return;
-//     }
+    if (keywords.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет ключевых слов</div>';
+        return;
+    }
     
-//     container.innerHTML = keywords.map(k => `
-//         <div class="keyword-item">
-//             <div class="keyword-info">
-//                 <span class="keyword-name">${escapeHtml(k.name)}</span>
-//                 <span class="keyword-type">${escapeHtml(k.type)}</span>
-//             </div>
-//             <div class="keyword-actions">
-//                 <button class="delete-keyword-btn" onclick="deleteKeyword('${k.id}')">
-//                     <i class="fas fa-trash"></i>
-//                 </button>
-//             </div>
-//         </div>
-//     `).join('');
-// }
+    container.innerHTML = keywords.map(k => `
+        <div class="keyword-item">
+            <div class="keyword-info">
+                <span class="keyword-name">${escapeHtml(k.name)}</span>
+                <span class="keyword-type">${escapeHtml(k.type)}</span>
+            </div>
+            <div class="keyword-actions">
+                <button class="delete-keyword-btn" onclick="deleteKeyword('${k.id}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
 
 function updateKeywordSelect() {
     const select = document.getElementById("postKeyword");
