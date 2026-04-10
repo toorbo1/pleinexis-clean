@@ -18,7 +18,6 @@ async function ensureTables() {
     try {
         console.log('🔄 Проверка и создание таблиц...');
         
-        // 1. Товары
         await client.query(`
             CREATE TABLE IF NOT EXISTS products (
                 id TEXT PRIMARY KEY,
@@ -36,9 +35,6 @@ async function ensureTables() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ products готов');
-
-        // 2. Товары на модерации
         await client.query(`
             CREATE TABLE IF NOT EXISTS pending_products (
                 id TEXT PRIMARY KEY,
@@ -55,9 +51,6 @@ async function ensureTables() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ pending_products готов');
-
-        // 3. Ключевые слова
         await client.query(`
             CREATE TABLE IF NOT EXISTS keywords (
                 id TEXT PRIMARY KEY,
@@ -65,9 +58,6 @@ async function ensureTables() {
                 type TEXT
             )
         `);
-        console.log('✅ keywords готов');
-
-        // 4. Игры
         await client.query(`
             CREATE TABLE IF NOT EXISTS game_blocks (
                 id TEXT PRIMARY KEY,
@@ -78,9 +68,6 @@ async function ensureTables() {
                 sort_order INTEGER DEFAULT 0
             )
         `);
-        console.log('✅ game_blocks готов');
-
-        // 5. Приложения
         await client.query(`
             CREATE TABLE IF NOT EXISTS app_blocks (
                 id TEXT PRIMARY KEY,
@@ -91,9 +78,6 @@ async function ensureTables() {
                 sort_order INTEGER DEFAULT 0
             )
         `);
-        console.log('✅ app_blocks готов');
-
-        // 6. Администраторы
         await client.query(`
             CREATE TABLE IF NOT EXISTS admins (
                 id TEXT PRIMARY KEY,
@@ -103,9 +87,6 @@ async function ensureTables() {
                 hired_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ admins готов');
-
-        // 7. Диалоги поддержки
         await client.query(`
             CREATE TABLE IF NOT EXISTS support_dialogs (
                 id TEXT PRIMARY KEY,
@@ -114,9 +95,6 @@ async function ensureTables() {
                 last_message_time TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ support_dialogs готов');
-
-        // 8. Сообщения
         await client.query(`
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
@@ -127,9 +105,6 @@ async function ensureTables() {
                 timestamp TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ messages готов');
-
-        // 9. Заявки на вывод
         await client.query(`
             CREATE TABLE IF NOT EXISTS withdraw_requests (
                 id TEXT PRIMARY KEY,
@@ -144,11 +119,8 @@ async function ensureTables() {
                 date TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ withdraw_requests готов');
 
-        // ========== НАЧАЛЬНЫЕ ДАННЫЕ ==========
-        
-        // Ключевые слова
+        // Начальные данные (ключевые слова, игры, приложения, админ)
         const keywordsCount = await client.query('SELECT COUNT(*) FROM keywords');
         if (parseInt(keywordsCount.rows[0].count) === 0) {
             await client.query(`
@@ -164,10 +136,8 @@ async function ensureTables() {
                 ('9', 'Roblox', 'Robux'),
                 ('10', 'Valorant', 'VP')
             `);
-            console.log('✅ Начальные keywords добавлены');
         }
 
-        // Игры
         const gamesCount = await client.query('SELECT COUNT(*) FROM game_blocks');
         if (parseInt(gamesCount.rows[0].count) === 0) {
             await client.query(`
@@ -183,10 +153,8 @@ async function ensureTables() {
                 ('9', 'Crimson Desert', 'fas fa-dragon', 9),
                 ('10', 'Танки', 'fas fa-tank', 10)
             `);
-            console.log('✅ Начальные game_blocks добавлены');
         }
 
-        // Приложения
         const appsCount = await client.query('SELECT COUNT(*) FROM app_blocks');
         if (parseInt(appsCount.rows[0].count) === 0) {
             await client.query(`
@@ -200,22 +168,18 @@ async function ensureTables() {
                 ('7', 'Netflix', 'fas fa-tv', 7),
                 ('8', 'Discord', 'fab fa-discord', 8)
             `);
-            console.log('✅ Начальные app_blocks добавлены');
         }
 
-        // Администратор
         const adminsCount = await client.query('SELECT COUNT(*) FROM admins');
         if (parseInt(adminsCount.rows[0].count) === 0) {
             await client.query(`
                 INSERT INTO admins (id, username, is_owner, hired_by) VALUES
                 ('1', 'Admin', TRUE, 'system')
             `);
-            console.log('✅ Начальный admin добавлен');
         }
 
         console.log('🎉 Все таблицы готовы!');
         return true;
-        
     } catch (error) {
         console.error('❌ Ошибка создания таблиц:', error.message);
         return false;
@@ -232,7 +196,6 @@ app.get('/api/products', async (req, res) => {
         const { rows } = await pool.query('SELECT * FROM products ORDER BY created_at DESC');
         res.json(rows);
     } catch (error) {
-        console.error('GET /api/products error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
@@ -255,7 +218,6 @@ app.post('/api/products', async (req, res) => {
             sales: 0,
             created_at: new Date()
         };
-        
         await pool.query(
             `INSERT INTO products (id, title, price, seller, keyword, image_url, description, discount, original_price, type, contact, sales, created_at)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
@@ -275,10 +237,8 @@ app.put('/api/products/:id', async (req, res) => {
         const fields = req.body;
         const keys = Object.keys(fields);
         if (keys.length === 0) return res.status(400).json({ error: 'Нет данных' });
-        
         const setClause = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
         const values = [id, ...keys.map(k => fields[k])];
-        
         await pool.query(`UPDATE products SET ${setClause} WHERE id = $1`, values);
         res.json({ success: true });
     } catch (error) {
@@ -312,7 +272,6 @@ app.post('/api/pending-products', async (req, res) => {
             ...req.body,
             created_at: new Date()
         };
-        
         await pool.query(
             `INSERT INTO pending_products (id, title, price, seller, keyword, image_url, description, discount, original_price, type, contact, created_at)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
@@ -340,7 +299,6 @@ app.post('/api/approve-product/:id', async (req, res) => {
         const { id } = req.params;
         const { rows } = await pool.query('SELECT * FROM pending_products WHERE id = $1', [id]);
         if (rows.length === 0) return res.status(404).json({ error: 'Товар не найден' });
-        
         const p = rows[0];
         await pool.query(
             `INSERT INTO products (id, title, price, seller, keyword, image_url, description, discount, original_price, type, contact, sales, created_at)
@@ -371,6 +329,21 @@ app.post('/api/keywords', async (req, res) => {
         const id = Date.now().toString();
         await pool.query('INSERT INTO keywords (id, name, type) VALUES ($1, $2, $3)', [id, name, type || 'Стандарт']);
         res.json({ id, name, type: type || 'Стандарт' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// НОВЫЙ PUT ДЛЯ КЛЮЧЕВЫХ СЛОВ
+app.put('/api/keywords/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, type } = req.body;
+        await pool.query(
+            'UPDATE keywords SET name = COALESCE($1, name), type = COALESCE($2, type) WHERE id = $3',
+            [name, type, id]
+        );
+        res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -484,20 +457,15 @@ app.delete('/api/app-blocks/:id', async (req, res) => {
 });
 
 // ----- АДМИНИСТРАТОРЫ -----
-// ===== АДМИНИСТРАТОРЫ (ДОБАВИТЬ В server.js) =====
-
-// GET /api/admins
 app.get('/api/admins', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM admins ORDER BY hired_at');
         res.json(rows);
     } catch (error) {
-        console.error('GET /api/admins error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST /api/admins
 app.post('/api/admins', async (req, res) => {
     try {
         const { id, username, is_owner, hired_by, hired_at } = req.body;
@@ -509,18 +477,15 @@ app.post('/api/admins', async (req, res) => {
         );
         res.json({ success: true });
     } catch (error) {
-        console.error('POST /api/admins error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
 
-// DELETE /api/admins/:id
 app.delete('/api/admins/:id', async (req, res) => {
     try {
         await pool.query('DELETE FROM admins WHERE id = $1 AND is_owner = false', [req.params.id]);
         res.json({ success: true });
     } catch (error) {
-        console.error('DELETE /api/admins/:id error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
@@ -545,17 +510,9 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     console.log('🚀 Запуск сервера Плейнексис...');
-    console.log('📦 Версия: 2.0');
-    console.log('🔗 DATABASE_URL:', process.env.DATABASE_URL ? '✅ установлена' : '❌ не установлена');
-    
-    const tablesCreated = await ensureTables();
-    if (!tablesCreated) {
-        console.error('❌ Не удалось создать таблицы, но сервер продолжит работу');
-    }
-    
+    await ensureTables();
     app.listen(PORT, () => {
         console.log(`✅ HTTP сервер запущен на порту ${PORT}`);
-        console.log(`📍 http://localhost:${PORT}`);
     });
 }
 
