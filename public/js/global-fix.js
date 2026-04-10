@@ -1,4 +1,5 @@
-// global-fix.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
+// global-fix.js - ИСПРАВЛЕННАЯ ВЕРСИЯ (игры в 2 строки, приложения восстановлены)
+
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
 
@@ -45,44 +46,58 @@
         }
     };
 
+    // ========== ИГРЫ - В 2 СТРОКИ ==========
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
             const response = await fetch('/api/game-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки игр');
-            const blocks = await response.json();
+            let blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков игр`);
             
             const wrapper = document.getElementById('gamesScrollWrapper');
-            console.log('gamesScrollWrapper найден:', !!wrapper);
-            
             if (wrapper) {
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
-                    console.log('⚠️ Блоков игр нет');
                 } else {
-                    // Отладочный вывод
-                    console.log('Блоки игр для отображения:', blocks.map(b => b.name));
+                    // Разделяем на две строки
+                    const midIndex = Math.ceil(blocks.length / 2);
+                    const firstRow = blocks.slice(0, midIndex);
+                    const secondRow = blocks.slice(midIndex);
                     
-                    let html = '<div class="games-row">';
-                    for (const block of blocks) {
-                        html += `
-                            <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                <div class="game-icon">
-                                    ${block.image_url ? 
-                                        `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
-                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                         <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
-                                        `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
-                                    }
+                    wrapper.innerHTML = `
+                        <div class="games-row">
+                            ${firstRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
+                                            `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
-                                <div class="game-name">${escapeHtml(block.name)}</div>
-                            </div>
-                        `;
-                    }
-                    html += '</div>';
-                    wrapper.innerHTML = html;
-                    console.log('✅ Блоки игр отображены');
+                            `).join('')}
+                        </div>
+                        <div class="games-row-second">
+                            ${secondRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
+                                            `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    console.log('✅ Блоки игр отображены в 2 строки');
                 }
             } else {
                 console.error('❌ gamesScrollWrapper НЕ НАЙДЕН в DOM!');
@@ -96,12 +111,13 @@
         }
     };
 
+    // ========== ПРИЛОЖЕНИЯ - В 2 СТРОКИ ==========
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
         try {
             const response = await fetch('/api/app-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки приложений');
-            const blocks = await response.json();
+            let blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков приложений`);
             
             const wrapper = document.getElementById('appsScrollWrapper');
@@ -109,25 +125,47 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
                 } else {
-                    let html = '<div class="apps-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 8px;">';
-                    for (const block of blocks) {
-                        html += `
-                            <div class="game-card" style="width: 100px; flex-shrink: 0;" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                <div class="game-icon">
-                                    ${block.image_url ? 
-                                        `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;"
-                                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                         <i class="${block.icon || 'fab fa-android'}" style="display: none; font-size: 32px;"></i>` : 
-                                        `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
-                                    }
+                    // Разделяем на две строки
+                    const midIndex = Math.ceil(blocks.length / 2);
+                    const firstRow = blocks.slice(0, midIndex);
+                    const secondRow = blocks.slice(midIndex);
+                    
+                    wrapper.innerHTML = `
+                        <div class="games-row">
+                            ${firstRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;"
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fab fa-android'}" style="display: none; font-size: 32px;"></i>` : 
+                                            `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
-                                <div class="game-name">${escapeHtml(block.name)}</div>
-                            </div>
-                        `;
-                    }
-                    html += '</div>';
-                    wrapper.innerHTML = html;
+                            `).join('')}
+                        </div>
+                        <div class="games-row-second">
+                            ${secondRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;"
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fab fa-android'}" style="display: none; font-size: 32px;"></i>` : 
+                                            `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    console.log('✅ Блоки приложений отображены в 2 строки');
                 }
+            } else {
+                console.error('❌ appsScrollWrapper НЕ НАЙДЕН в DOM!');
             }
             
             window.appBlocks = blocks;
@@ -204,8 +242,6 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
-        // Если DOM уже загружен, ждем немного
         setTimeout(init, 100);
     }
 })();
-

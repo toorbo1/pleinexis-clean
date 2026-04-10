@@ -1134,3 +1134,73 @@ html::-webkit-scrollbar-thumb:hover {
     overflow: visible !important;
     width: 100%;
 }
+/* Стили для двух строк игр и приложений */
+.games-row,
+.games-row-second {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px;
+    margin-bottom: 16px;
+}
+
+.games-row-second {
+    margin-top: 0;
+}
+
+/* Контейнер скролла - убираем горизонтальный скролл */
+.games-scroll-container {
+    overflow-x: visible !important;
+}
+
+.games-scroll-wrapper {
+    overflow: visible !important;
+    display: block !important;
+}
+
+/* Карточки игр */
+.game-card {
+    width: 100px;
+    flex-shrink: 0;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+}
+
+.game-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+.game-icon img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.game-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Скрываем кнопки скролла для игр и приложений */
+.games-header .scroll-btn {
+    display: none !important;
+}
