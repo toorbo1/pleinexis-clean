@@ -150,7 +150,44 @@ const API = {
     async getAdmins() {
         return await this.request('/api/admins');
     },
-    
+    // api.js - добавить эти методы в объект API
+
+async updateKeyword(id, data) {
+    return await this.request(`/api/keywords/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+},
+async getGameBlocks() {
+    return await this.request('/api/game-blocks');
+},
+async createGameBlock(block) {
+    return await this.request('/api/game-blocks', { method: 'POST', body: JSON.stringify(block) });
+},
+async updateGameBlock(id, block) {
+    return await this.request(`/api/game-blocks/${id}`, { method: 'PUT', body: JSON.stringify(block) });
+},
+async deleteGameBlock(id) {
+    return await this.request(`/api/game-blocks/${id}`, { method: 'DELETE' });
+},
+async getAppBlocks() {
+    return await this.request('/api/app-blocks');
+},
+async createAppBlock(block) {
+    return await this.request('/api/app-blocks', { method: 'POST', body: JSON.stringify(block) });
+},
+async updateAppBlock(id, block) {
+    return await this.request(`/api/app-blocks/${id}`, { method: 'PUT', body: JSON.stringify(block) });
+},
+async deleteAppBlock(id) {
+    return await this.request(`/api/app-blocks/${id}`, { method: 'DELETE' });
+},
+async getAdmins() {
+    return await this.request('/api/admins');
+},
+async createAdmin(admin) {
+    return await this.request('/api/admins', { method: 'POST', body: JSON.stringify(admin) });
+},
+async deleteAdmin(id) {
+    return await this.request(`/api/admins/${id}`, { method: 'DELETE' });
+},
     async test() {
         return await this.request('/api/test');
     }

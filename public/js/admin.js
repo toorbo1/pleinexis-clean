@@ -1,4 +1,4 @@
-// admin.js - ПОЛНАЯ АДМИН-ПАНЕЛЬ (РАБОЧАЯ ВЕРСИЯ)
+// admin.js - ПОЛНАЯ АДМИН-ПАНЕЛЬ (РАБОЧАЯ ВЕРСИЯ С API)
 
 let keywords = [];
 let gameBlocks = [];
@@ -36,15 +36,18 @@ async function updateAdminStats() {
         const productsCount = document.getElementById("adminProductsCount");
         if (productsCount) productsCount.innerText = products.length;
     } catch(e) { console.error(e); }
+    
     const pendingCount = document.getElementById("adminPendingCount");
     if (pendingCount) pendingCount.innerText = pendingProducts.length;
+    
     const adminsCount = document.getElementById("adminAdminsCount");
     if (adminsCount) adminsCount.innerText = admins.length;
+    
     const dialogsCount = document.getElementById("adminDialogsCount");
     if (dialogsCount) dialogsCount.innerText = adminDialogs.length;
 }
 
-// ========== АДМИНИСТРАТОРЫ ==========
+// ========== АДМИНИСТРАТОРЫ (ЧЕРЕЗ API) ==========
 async function loadAdmins() {
     try {
         admins = await API.getAdmins();
@@ -114,6 +117,10 @@ async function fireAdmin(adminId) {
     }
 }
 
+function isUserAdmin(username) {
+    return admins.some(a => a.username === username);
+}
+
 // ========== МОДЕРАЦИЯ ТОВАРОВ ==========
 async function loadPendingProducts() {
     try {
@@ -166,7 +173,7 @@ async function rejectProduct(productId) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== БЛОКИ ИГР ==========
+// ========== БЛОКИ ИГР (ЧЕРЕЗ API) ==========
 async function loadGameBlocks() {
     try {
         gameBlocks = await API.getGameBlocks();
@@ -234,7 +241,7 @@ async function editGameBlock(id) {
     if (!block) return;
     const newName = prompt("Введите новое название:", block.name);
     if (!newName || !newName.trim()) return;
-    const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
+    const newImageUrl = prompt("Введите URL нового фото:", block.image_url || "");
     try {
         await API.updateGameBlock(id, { name: newName.trim(), image_url: newImageUrl?.trim() || null });
         await loadGameBlocks();
@@ -242,7 +249,7 @@ async function editGameBlock(id) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== БЛОКИ ПРИЛОЖЕНИЙ ==========
+// ========== БЛОКИ ПРИЛОЖЕНИЙ (ЧЕРЕЗ API) ==========
 async function loadAppBlocks() {
     try {
         appBlocks = await API.getAppBlocks();
@@ -310,7 +317,7 @@ async function editAppBlock(id) {
     if (!block) return;
     const newName = prompt("Введите новое название:", block.name);
     if (!newName || !newName.trim()) return;
-    const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
+    const newImageUrl = prompt("Введите URL нового фото:", block.image_url || "");
     try {
         await API.updateAppBlock(id, { name: newName.trim(), image_url: newImageUrl?.trim() || null });
         await loadAppBlocks();
@@ -318,7 +325,7 @@ async function editAppBlock(id) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== КЛЮЧЕВЫЕ СЛОВА ==========
+// ========== КЛЮЧЕВЫЕ СЛОВА (ЧЕРЕЗ API) ==========
 async function loadKeywords() {
     try {
         keywords = await API.getKeywords();
@@ -370,12 +377,7 @@ async function editKeyword(keywordId) {
     if (!newName || !newName.trim()) return;
     const newType = prompt("Введите новый тип:", keyword.type);
     try {
-        const response = await fetch(`/api/keywords/${keywordId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newName.trim(), type: (newType && newType.trim()) || "Стандарт" })
-        });
-        if (!response.ok) throw new Error('Ошибка обновления');
+        await API.updateKeyword(keywordId, { name: newName.trim(), type: (newType && newType.trim()) || "Стандарт" });
         await loadKeywords();
         showToast("✅ Ключевое слово обновлено!", "success");
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
@@ -500,16 +502,9 @@ async function editProduct(productId) {
 // ========== СЛАЙДЕРЫ ==========
 function openSliderEditor() {
     const modal = document.getElementById("sliderEditorModal");
-    if (modal) {
-        renderSliderEditorContent();
-        modal.classList.add("active");
-    }
+    if (modal) { renderSliderEditorContent(); modal.classList.add("active"); }
 }
-
-function closeSliderEditor() {
-    const modal = document.getElementById("sliderEditorModal");
-    if (modal) modal.classList.remove("active");
-}
+function closeSliderEditor() { const modal = document.getElementById("sliderEditorModal"); if (modal) modal.classList.remove("active"); }
 
 function renderSliderEditorContent() {
     const container = document.getElementById("sliderEditorContent");
@@ -518,20 +513,16 @@ function renderSliderEditorContent() {
     const slidesData = [];
     sliders.forEach((slider, index) => {
         const images = slider.querySelectorAll('.mini-slide-img');
-        const imageUrls = Array.from(images).map(img => img.src);
-        slidesData.push({ index, images: imageUrls });
+        slidesData.push({ index, images: Array.from(images).map(img => img.src) });
     });
-    if (slidesData.length === 0) {
-        container.innerHTML = '<div class="empty-state">Слайды не найдены</div>';
-        return;
-    }
+    if (slidesData.length === 0) { container.innerHTML = '<div class="empty-state">Слайды не найдены</div>'; return; }
     container.innerHTML = slidesData.map(slide => `
         <div class="slider-editor-card">
             <div class="slider-editor-header"><h4>Слайд ${slide.index + 1}</h4><button class="add-slide-image-btn" onclick="addSlideImage(${slide.index})"><i class="fas fa-plus"></i> Добавить изображение</button></div>
             <div class="slider-editor-images" id="sliderEditorImages_${slide.index}">
                 ${slide.images.map((img, imgIndex) => `
                     <div class="slider-image-item">
-                        <img src="${escapeHtml(img)}" alt="slide ${imgIndex + 1}">
+                        <img src="${escapeHtml(img)}">
                         <div class="slider-image-actions">
                             <input type="text" class="image-url-input" value="${escapeHtml(img)}" onchange="updateSlideImage(${slide.index}, ${imgIndex}, this.value)">
                             <button class="remove-image-btn" onclick="removeSlideImage(${slide.index}, ${imgIndex})"><i class="fas fa-trash"></i></button>
@@ -548,17 +539,9 @@ function addSlideImage(sliderIndex) {
     if (!newUrl) return;
     const slider = document.querySelector(`.mini-slider[data-slider="${sliderIndex}"]`);
     if (slider) {
-        const imagesContainer = slider.querySelector('.mini-slider-images');
-        const newImg = document.createElement('img');
-        newImg.className = 'mini-slide-img';
-        newImg.src = newUrl;
-        imagesContainer.appendChild(newImg);
-        const dotsContainer = slider.querySelector('.mini-slider-dots');
-        if (dotsContainer) {
-            const newDot = document.createElement('div');
-            newDot.className = 'mini-dot';
-            dotsContainer.appendChild(newDot);
-        }
+        slider.querySelector('.mini-slider-images').appendChild(Object.assign(document.createElement('img'), { className: 'mini-slide-img', src: newUrl }));
+        const dots = slider.querySelector('.mini-slider-dots');
+        if (dots) dots.appendChild(Object.assign(document.createElement('div'), { className: 'mini-dot' }));
         if (typeof initMiniSliders === 'function') initMiniSliders();
     }
     renderSliderEditorContent();
@@ -576,7 +559,7 @@ function updateSlideImage(sliderIndex, imageIndex, newUrl) {
 }
 
 function removeSlideImage(sliderIndex, imageIndex) {
-    if (confirm("Удалить это изображение?")) {
+    if (confirm("Удалить изображение?")) {
         const slider = document.querySelector(`.mini-slider[data-slider="${sliderIndex}"]`);
         if (slider) {
             const images = slider.querySelectorAll('.mini-slide-img');
@@ -590,63 +573,37 @@ function removeSlideImage(sliderIndex, imageIndex) {
     }
 }
 
-// ========== ЧАТ ПОДДЕРЖКИ (АДМИН) ==========
+// ========== ЧАТ ПОДДЕРЖКИ ==========
 function loadAdminDialogs() {
     const stored = localStorage.getItem("apex_admin_dialogs");
-    if (stored) {
-        adminDialogs = JSON.parse(stored);
-    } else {
-        adminDialogs = [{
-            id: "admin_dialog_1",
-            userName: "Гость",
-            userId: "guest",
-            messages: [{ sender: "guest", text: "Здравствуйте! У меня проблема с оплатой", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: new Date(Date.now() - 3600000).toISOString() }],
-            lastMessageTime: new Date(Date.now() - 3600000).toISOString()
-        }];
-        saveAdminDialogs();
-    }
+    adminDialogs = stored ? JSON.parse(stored) : [];
     renderAdminDialogsList();
     updateAdminStats();
 }
-
 function saveAdminDialogs() { localStorage.setItem("apex_admin_dialogs", JSON.stringify(adminDialogs)); }
 
 function renderAdminDialogsList(searchTerm = '') {
     const container = document.getElementById("adminDialogsList");
     if (!container) return;
-    let filtered = adminDialogs;
-    if (searchTerm) filtered = adminDialogs.filter(d => d.userName.toLowerCase().includes(searchTerm.toLowerCase()));
-    if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-dialogs"><i class="fas fa-comments"></i><p>Нет диалогов</p></div>';
-        return;
-    }
-    container.innerHTML = filtered.map(dialog => {
-        const lastMsg = dialog.messages[dialog.messages.length - 1];
-        const preview = lastMsg ? (lastMsg.sender === "support" ? "Поддержка: " + lastMsg.text : lastMsg.text) : "Нет сообщений";
-        const shortPreview = preview.length > 40 ? preview.substring(0, 40) + '...' : preview;
-        return `
-            <div class="admin-dialog-item ${adminCurrentDialogId === dialog.id ? 'active' : ''}" onclick="openAdminDialog('${dialog.id}')">
-                <div class="admin-dialog-avatar"><i class="fas fa-user-circle"></i></div>
-                <div class="admin-dialog-info"><div class="admin-dialog-name">${escapeHtml(dialog.userName)}</div><div class="admin-dialog-preview">${escapeHtml(shortPreview)}</div></div>
-                <div class="admin-dialog-time">${lastMsg ? lastMsg.time : ''}</div>
-            </div>
-        `;
-    }).join('');
+    let filtered = searchTerm ? adminDialogs.filter(d => d.userName.toLowerCase().includes(searchTerm.toLowerCase())) : adminDialogs;
+    if (filtered.length === 0) { container.innerHTML = '<div class="empty-dialogs"><i class="fas fa-comments"></i><p>Нет диалогов</p></div>'; return; }
+    container.innerHTML = filtered.map(dialog => `
+        <div class="admin-dialog-item ${adminCurrentDialogId === dialog.id ? 'active' : ''}" onclick="openAdminDialog('${dialog.id}')">
+            <div class="admin-dialog-avatar"><i class="fas fa-user-circle"></i></div>
+            <div class="admin-dialog-info"><div class="admin-dialog-name">${escapeHtml(dialog.userName)}</div><div class="admin-dialog-preview">${escapeHtml(dialog.messages[dialog.messages.length-1]?.text.substring(0,40) || '')}</div></div>
+            <div class="admin-dialog-time">${dialog.messages[dialog.messages.length-1]?.time || ''}</div>
+        </div>
+    `).join('');
 }
 
 function openAdminDialog(dialogId) {
     const dialog = adminDialogs.find(d => d.id === dialogId);
     if (!dialog) return;
     adminCurrentDialogId = dialogId;
-    dialog.messages.forEach(m => { if (m.sender !== "support") m.read = true; });
-    saveAdminDialogs();
     const sidebar = document.getElementById("adminChatSidebar");
     const chatWindow = document.getElementById("adminChatWindow");
     if (sidebar) sidebar.classList.add("hide");
-    if (chatWindow) {
-        chatWindow.style.display = "flex";
-        chatWindow.classList.add("active");
-    }
+    if (chatWindow) { chatWindow.style.display = "flex"; chatWindow.classList.add("active"); }
     const partnerName = document.getElementById("adminChatPartnerName");
     if (partnerName) partnerName.textContent = dialog.userName;
     renderAdminMessages(dialogId);
@@ -657,10 +614,7 @@ function closeAdminChat() {
     const sidebar = document.getElementById("adminChatSidebar");
     const chatWindow = document.getElementById("adminChatWindow");
     if (sidebar) sidebar.classList.remove("hide");
-    if (chatWindow) {
-        chatWindow.style.display = "none";
-        chatWindow.classList.remove("active");
-    }
+    if (chatWindow) { chatWindow.style.display = "none"; chatWindow.classList.remove("active"); }
     adminCurrentDialogId = null;
 }
 
@@ -668,25 +622,17 @@ function renderAdminMessages(dialogId) {
     const dialog = adminDialogs.find(d => d.id === dialogId);
     const area = document.getElementById("adminChatMessagesArea");
     if (!area || !dialog) return;
-    if (dialog.messages.length === 0) {
-        area.innerHTML = '<div class="empty-messages"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>';
-        return;
-    }
-    let html = '';
-    let lastDate = null;
-    dialog.messages.forEach((msg) => {
+    if (dialog.messages.length === 0) { area.innerHTML = '<div class="empty-messages">Нет сообщений</div>'; return; }
+    let html = '', lastDate = null;
+    dialog.messages.forEach(msg => {
         const isOut = msg.sender === "support";
         const msgDate = new Date(msg.timestamp);
-        const today = new Date();
-        const isToday = msgDate.toDateString() === today.toDateString();
+        const isToday = msgDate.toDateString() === new Date().toDateString();
         if (lastDate !== msgDate.toDateString()) {
             lastDate = msgDate.toDateString();
-            const dateStr = isToday ? 'Сегодня' : msgDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-            html += `<div class="date-divider"><span>${dateStr}</span></div>`;
+            html += `<div class="date-divider"><span>${isToday ? 'Сегодня' : msgDate.toLocaleDateString('ru-RU')}</span></div>`;
         }
-        let messageText = escapeHtml(msg.text);
-        messageText = messageText.replace(/\n/g, '<br>');
-        html += `<div class="message-group ${isOut ? 'outgoing' : 'incoming'}"><div class="message-content"><div class="message-bubble ${isOut ? 'out' : 'in'}">${messageText}</div><div class="message-time">${msg.time}</div></div></div>`;
+        html += `<div class="message-group ${isOut ? 'outgoing' : 'incoming'}"><div class="message-content"><div class="message-bubble ${isOut ? 'out' : 'in'}">${escapeHtml(msg.text).replace(/\n/g, '<br>')}</div><div class="message-time">${msg.time}</div></div></div>`;
     });
     area.innerHTML = html;
     area.scrollTop = area.scrollHeight;
@@ -698,10 +644,9 @@ function sendAdminMessage() {
     if (!text || !adminCurrentDialogId) return;
     const dialogIndex = adminDialogs.findIndex(d => d.id === adminCurrentDialogId);
     if (dialogIndex === -1) return;
-    const now = new Date();
-    const newMsg = { sender: "support", text: text, time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: now.toISOString() };
+    const newMsg = { sender: "support", text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: new Date().toISOString() };
     adminDialogs[dialogIndex].messages.push(newMsg);
-    adminDialogs[dialogIndex].lastMessageTime = now.toISOString();
+    adminDialogs[dialogIndex].lastMessageTime = new Date().toISOString();
     saveAdminDialogs();
     renderAdminMessages(adminCurrentDialogId);
     renderAdminDialogsList();
@@ -750,9 +695,13 @@ function showAdminSection(sectionId) {
 // ========== ВХОД В АДМИНКУ ==========
 function toggleAdminPanel() {
     const currentUser = localStorage.getItem("apex_user") || "Гость";
-    if (!admins.some(a => a.username === currentUser)) {
+    if (!isUserAdmin(currentUser)) {
         const password = prompt("Введите пароль администратора:");
         if (password === ADMIN_PASSWORD) {
+            if (!admins.find(a => a.username === currentUser)) {
+                admins.push({ id: "admin_" + Date.now(), username: currentUser, is_owner: admins.length === 0, hired_by: "system", hired_at: new Date().toISOString() });
+                saveAdmins();
+            }
             showAdminUI();
         } else { alert("Неверный пароль!"); }
     } else {
@@ -780,7 +729,10 @@ function showAdminUI() {
 }
 
 // ========== ВСПОМОГАТЕЛЬНЫЕ ==========
-function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+}
 
 function showToast(message, type = 'success') {
     let toast = document.getElementById('adminToast');
