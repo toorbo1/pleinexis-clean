@@ -209,33 +209,3 @@
     }
 })();
 
-// В global-fix.js добавьте:
-window.renderHomeGameBlocks = function() {
-    const blocks = window.gameBlocks || [];
-    const wrapper = document.getElementById('gamesScrollWrapper');
-    if (!wrapper) return;
-    
-    if (blocks.length === 0) {
-        wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
-        return;
-    }
-    
-    let html = '<div class="games-row">';
-    blocks.forEach(block => {
-        html += `
-            <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                <div class="game-icon">
-                    ${block.image_url ? 
-                        `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
-                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                         <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
-                        `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
-                    }
-                </div>
-                <div class="game-name">${escapeHtml(block.name)}</div>
-            </div>
-        `;
-    });
-    html += '</div>';
-    wrapper.innerHTML = html;
-};
