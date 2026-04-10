@@ -167,18 +167,18 @@
         }
     };
 
-    // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
-    window.openProductDetailById = async function(id) {
-        console.log('🔍 Открываем товар:', id);
-        try {
-            const response = await fetch(`/api/products/${id}`);
-            if (!response.ok) throw new Error('Товар не найден');
-            const p = await response.json();
-            alert(`📦 ${p.title}\n💰 ${p.price}\n👤 ${p.seller}\n\n📝 ${p.description || 'Нет описания'}`);
-        } catch(e) { 
-            alert('Товар не найден'); 
-        }
-    };
+    // // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
+    // window.openProductDetailById = async function(id) {
+    //     console.log('🔍 Открываем товар:', id);
+    //     try {
+    //         const response = await fetch(`/api/products/${id}`);
+    //         if (!response.ok) throw new Error('Товар не найден');
+    //         const p = await response.json();
+    //         alert(`📦 ${p.title}\n💰 ${p.price}\n👤 ${p.seller}\n\n📝 ${p.description || 'Нет описания'}`);
+    //     } catch(e) { 
+    //         alert('Товар не найден'); 
+    //     }
+    // };
 
     // ОТКРЫТИЕ СТРАНИЦЫ ПО КЛЮЧЕВОМУ СЛОВУ
     window.openKeywordPage = async function(keyword) {

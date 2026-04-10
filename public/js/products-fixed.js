@@ -101,22 +101,22 @@ window.filterProducts = function() {
     }
 };
 
-// ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
-window.openProductDetailById = async function(productId) {
-    console.log('🔍 Открываем товар:', productId);
+// // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
+// window.openProductDetailById = async function(productId) {
+//     console.log('🔍 Открываем товар:', productId);
     
-    // Всегда берем свежие данные с сервера
-    const products = await API.getProducts();
-    const product = products.find(p => p.id === productId);
+//     // Всегда берем свежие данные с сервера
+//     const products = await API.getProducts();
+//     const product = products.find(p => p.id === productId);
     
-    if (!product) {
-        alert('Товар не найден');
-        return;
-    }
+//     if (!product) {
+//         alert('Товар не найден');
+//         return;
+//     }
     
-    // Показываем информацию
-    alert(`📦 ${product.title}\n💰 ${product.price}\n👤 ${product.seller}\n\n📝 ${product.description?.substring(0, 200)}...`);
-};
+//     // Показываем информацию
+//     alert(`📦 ${product.title}\n💰 ${product.price}\n👤 ${product.seller}\n\n📝 ${product.description?.substring(0, 200)}...`);
+// };
 
 // СОЗДАНИЕ ТОВАРА (ДЛЯ СТРАНИЦЫ ТОВАРОВ)
 window.createNewProduct = async function() {
