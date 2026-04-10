@@ -1,6 +1,8 @@
 {
   "name": "pleinexis",
   "version": "1.0.0",
+  "description": "Цифровой маркетплейс",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
