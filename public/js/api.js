@@ -55,12 +55,12 @@ const API = {
         return await this.request('/api/pending-products');
     },
     
-    async createPendingProduct(product) {
-        return await this.request('/api/pending-products', {
-            method: 'POST',
-            body: JSON.stringify(product)
-        });
-    },
+async createPendingProduct(product) {
+    return await this.request('/api/pending-products', {
+        method: 'POST',
+        body: JSON.stringify(product)
+    });
+},
     
     async approveProduct(id) {
         return await this.request(`/api/approve-product/${id}`, {

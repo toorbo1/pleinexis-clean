@@ -217,16 +217,11 @@ async function createNewProduct() {
     };
     
     try {
-        const result = await API.createProduct(productData);
-        console.log('Товар создан:', result);
-        showToast('✅ Товар опубликован!', 'success');
-        
+        const result = await API.createPendingProduct(productData);
+        showToast('✅ Товар отправлен на модерацию!', 'success');
         cancelCreateProduct();
         await renderUserProductsList();
-        if (typeof window.loadProducts === 'function') await window.loadProducts();
-        
     } catch(error) {
-        console.error(error);
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }

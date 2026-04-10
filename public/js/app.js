@@ -238,7 +238,12 @@ async function showPage(pageId) {
     
     else if (pageId === 'home') {
         if (mainBottomNav) mainBottomNav.style.display = 'flex';
-        
+            if (mainBottomNav) mainBottomNav.style.display = 'flex';
+    await Promise.all([
+        window.loadProducts?.(),
+        window.loadGameBlocks?.(),
+        window.loadAppBlocks?.()
+    ]);
         // ⭐ ПРИ ВОЗВРАТЕ НА ГЛАВНУЮ ОБНОВЛЯЕМ ТОВАРЫ ⭐
         if (typeof loadProducts === 'function') {
             await loadProducts();

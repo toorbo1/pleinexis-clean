@@ -609,7 +609,30 @@ app.get('/api/test', async (req, res) => {
         });
     }
 });
+// ===== ОБНОВЛЕНИЕ БЛОКА ИГР (PUT уже есть, но добавим для конкретных полей) =====
+// (у вас уже есть PUT /api/game-blocks/:id, он работает)
 
+// ===== ПОЛУЧЕНИЕ ОДНОГО БЛОКА ИГР =====
+app.get('/api/game-blocks/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM game_blocks WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Блок не найден' });
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ===== ОБНОВЛЕНИЕ БЛОКА ПРИЛОЖЕНИЙ =====
+app.get('/api/app-blocks/:id', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM app_blocks WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Блок не найден' });
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 // ===== ФРОНТЕНД =====
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
