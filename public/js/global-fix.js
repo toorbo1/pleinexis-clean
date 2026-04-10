@@ -42,65 +42,39 @@
         }
     };
 
-    window.loadGameBlocks = async function() {
-        console.log('🔄 loadGameBlocks: запрос к API...');
+window.renderHomeGameBlocks = async function() {
+    const wrapper = document.getElementById('gamesScrollWrapper');
+    if (!wrapper) {
+        console.warn('gamesScrollWrapper не найден');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/game-blocks');
+        const blocks = await res.json();
         
-        const wrapper = document.getElementById('gamesScrollWrapper');
-        console.log('🔍 gamesScrollWrapper найден:', wrapper ? 'ДА' : 'НЕТ');
-        
-        if (!wrapper) {
-            console.error('❌ gamesScrollWrapper НЕ СУЩЕСТВУЕТ!');
-            return [];
-        }
-        
-        try {
-            const response = await fetch('/api/game-blocks?_=' + Date.now());
-            if (!response.ok) throw new Error('Ошибка загрузки игр');
-            let blocks = await response.json();
-            console.log(`✅ Загружено ${blocks.length} блоков игр с сервера:`, blocks);
-            
-            if (!blocks.length) {
-                wrapper.innerHTML = '<div class="empty-state">⚠️ Нет блоков игр. Добавьте через админ-панель!</div>';
-                return [];
-            }
-            
-            // Фильтруем блоки без фото
-            const validBlocks = blocks.filter(b => b.image_url);
-            console.log(`📸 Блоков с фото: ${validBlocks.length} из ${blocks.length}`);
-            
-            if (validBlocks.length === 0) {
-                wrapper.innerHTML = '<div class="empty-state">⚠️ У блоков игр нет фото! Добавьте URL фото в админ-панели.</div>';
-                return blocks;
-            }
-            
-            wrapper.innerHTML = `
-                <div class="horizontal-scroll-container">
-                    ${blocks.map(block => {
-                        const imgUrl = block.image_url || 'https://picsum.photos/id/42/400/500';
-                        return `
-                            <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                <div class="vertical-card-inner">
-                                    <img class="vertical-card-img" 
-                                         src="${escapeHtml(imgUrl)}" 
-                                         alt="${escapeHtml(block.name)}"
-                                         onerror="this.src='https://picsum.photos/id/42/400/500'">
-                                    <div class="vertical-card-title">
-                                        <span>${escapeHtml(block.name)}</span>
-                                    </div>
-                                </div>
+        wrapper.innerHTML = blocks.length ? `
+            <div class="horizontal-scroll-container">
+                ${blocks.map(b => `
+                    <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(b.name)}')">
+                        <div class="vertical-card-inner">
+                            <img class="vertical-card-img" src="${escapeHtml(b.image_url)}" 
+                                 alt="${escapeHtml(b.name)}"
+                                 onerror="this.src='https://picsum.photos/id/42/400/500'">
+                            <div class="vertical-card-title">
+                                <span>${escapeHtml(b.name)}</span>
                             </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            console.log('✅ Блоки игр отображены');
-            return blocks;
-        } catch(e) { 
-            console.error('loadGameBlocks error:', e);
-            wrapper.innerHTML = '<div class="empty-state">❌ Ошибка загрузки игр</div>';
-            return []; 
-        }
-    };
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : '<div class="empty-state">Нет блоков игр</div>';
+    } catch (e) {
+        console.error('Ошибка загрузки игр:', e);
+        wrapper.innerHTML = '<div class="empty-state">Ошибка загрузки</div>';
+    }
+};
+
 
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
@@ -219,3 +193,9 @@
         setTimeout(init, 100);
     }
 })();
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof window.renderHomeGameBlocks === 'function') {
+        window.renderHomeGameBlocks();
+        window.renderHomeAppBlocks();
+    }
+});
