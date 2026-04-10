@@ -117,14 +117,14 @@ function renderDialogsList(searchTerm = '') {
     const container = document.getElementById("dialogsList");
     if (!container) return;
     
-    if (dialogs.length === 0) {
+    if (!dialogs || dialogs.length === 0) {
         container.innerHTML = '<div class="empty-dialogs"><i class="fas fa-comments"></i><p>Нет диалогов</p></div>';
         return;
     }
     
     let filtered = dialogs;
     if (searchTerm) {
-        filtered = dialogs.filter(d => d.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        filtered = dialogs.filter(d => d.name && d.name.toLowerCase().includes(searchTerm.toLowerCase()));
     }
     
     if (filtered.length === 0) {
@@ -133,8 +133,17 @@ function renderDialogsList(searchTerm = '') {
     }
     
     container.innerHTML = filtered.map(dialog => {
-        const lastMsg = dialog.messages[dialog.messages.length - 1];
-        const preview = lastMsg.user === currentUser ? "Вы: " + lastMsg.text : lastMsg.text;
+        const lastMsg = dialog.messages && dialog.messages[dialog.messages.length - 1];
+        let preview = '';
+        let time = '';
+        
+        if (lastMsg) {
+            preview = lastMsg.user === currentUser ? "Вы: " + lastMsg.text : lastMsg.text;
+            time = lastMsg.time || '';
+        } else {
+            preview = 'Нет сообщений';
+        }
+        
         const shortPreview = preview.length > 45 ? preview.substring(0, 45) + '...' : preview;
         
         return `
@@ -145,8 +154,8 @@ function renderDialogsList(searchTerm = '') {
                 </div>
                 <div class="dialog-info">
                     <div class="dialog-name">
-                        <span>${escapeHtml(dialog.name)}</span>
-                        <span class="dialog-date">${lastMsg.time}</span>
+                        <span>${escapeHtml(dialog.name || 'Unknown')}</span>
+                        <span class="dialog-date">${time}</span>
                     </div>
                     <div class="dialog-preview">${escapeHtml(shortPreview)}</div>
                 </div>
