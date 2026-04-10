@@ -926,6 +926,32 @@
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
 
+// Запасной вариант - жестко заданные блоки
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const wrapper = document.getElementById('gamesScrollWrapper');
+        if (wrapper && wrapper.innerHTML.includes('Нет игр') || wrapper.innerHTML === '') {
+            console.log('🔄 Использую запасной вариант блоков');
+            wrapper.innerHTML = `
+                <div class="games-row">
+                    <div class="game-card" onclick="openKeywordPage('Steam')">
+                        <div class="game-icon"><i class="fab fa-steam" style="font-size: 32px;"></i></div>
+                        <div class="game-name">Steam</div>
+                    </div>
+                    <div class="game-card" onclick="openKeywordPage('Discord')">
+                        <div class="game-icon"><i class="fab fa-discord" style="font-size: 32px;"></i></div>
+                        <div class="game-name">Discord</div>
+                    </div>
+                    <div class="game-card" onclick="openKeywordPage('Roblox')">
+                        <div class="game-icon"><i class="fab fa-fort-awesome" style="font-size: 32px;"></i></div>
+                        <div class="game-name">Roblox</div>
+                    </div>
+                </div>
+            `;
+        }
+    }, 2000);
+});
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Финальная инициализация');
     
