@@ -1165,20 +1165,28 @@ html::-webkit-scrollbar-thumb:hover {
     border-radius: 10px;
 }
 
-/* Вертикальная карточка 4:5 */
 .vertical-card {
     flex: 0 0 auto;
     width: 140px;
     cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    /* Убираем анимацию */
+    transition: none;
 }
 
 .vertical-card:hover {
-    transform: translateY(-5px);
+    /* Убираем поднятие карточки */
+    transform: none;
 }
 
 .vertical-card:active {
-    transform: scale(0.98);
+    /* Убираем эффект нажатия */
+    transform: none;
+}
+
+.vertical-card:hover .vertical-card-img {
+    /* Убираем увеличение фото */
+    transform: none;
+    transition: none;
 }
 
 .vertical-card-inner {
