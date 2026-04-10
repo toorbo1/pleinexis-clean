@@ -47,107 +47,90 @@
         }
     };
 
-// ЗАГРУЗКА ИГР С СЕРВЕРА (БЕЗ КЕША)
-window.loadGameBlocks = async function() {
-    console.log('🔄 loadGameBlocks: запрос к API...');
-    try {
-        const response = await fetch('/api/game-blocks?_=' + Date.now());
-        if (!response.ok) throw new Error('Ошибка загрузки игр');
-        const blocks = await response.json();
-        console.log(`✅ Загружено ${blocks.length} блоков игр`);
-        
-        // Сохраняем в глобальную переменную
-        window.gameBlocks = blocks;
-        
-        const wrapper = document.getElementById('gamesScrollWrapper');
-        if (wrapper) {
-            if (!blocks.length) {
-                wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
-            } else {
-                // Отображаем все блоки в один ряд (без разделения на две строки)
-                wrapper.innerHTML = `
-                    <div class="games-row">
-                        ${blocks.map(block => `
-                            <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                <div class="game-icon">
-                                    ${block.image_url ? 
-                                        `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                         <i class="${block.icon || 'fas fa-gamepad'}" style="display: none;"></i>` : 
-                                        `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
-                                    }
+    // ЗАГРУЗКА ИГР С СЕРВЕРА (БЕЗ КЕША) - ИСПРАВЛЕНО
+    window.loadGameBlocks = async function() {
+        console.log('🔄 loadGameBlocks: запрос к API...');
+        try {
+            const response = await fetch('/api/game-blocks?_=' + Date.now());
+            if (!response.ok) throw new Error('Ошибка загрузки игр');
+            const blocks = await response.json();
+            console.log(`✅ Загружено ${blocks.length} блоков игр`);
+            
+            window.gameBlocks = blocks;
+            
+            const wrapper = document.getElementById('gamesScrollWrapper');
+            if (wrapper) {
+                if (!blocks.length) {
+                    wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
+                } else {
+                    wrapper.innerHTML = `
+                        <div class="games-row">
+                            ${blocks.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
-                                <div class="game-name">${escapeHtml(block.name)}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                            `).join('')}
+                        </div>
+                    `;
+                }
             }
+            
+            return blocks;
+        } catch(e) { 
+            console.error('loadGameBlocks error:', e); 
+            return []; 
         }
-        
-        return blocks;
-    } catch(e) { 
-        console.error('loadGameBlocks error:', e); 
-        return []; 
-    }
-};
+    };
 
-// ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА (БЕЗ КЕША) - без скролла
-window.loadAppBlocks = async function() {
-    console.log('🔄 loadAppBlocks: запрос к API...');
-    try {
-        const response = await fetch('/api/app-blocks?_=' + Date.now());
-        if (!response.ok) throw new Error('Ошибка загрузки приложений');
-        const blocks = await response.json();
-        console.log(`✅ Загружено ${blocks.length} блоков приложений`);
-        
-        // Сохраняем в глобальную переменную
-        window.appBlocks = blocks;
-        
-        const wrapper = document.getElementById('appsScrollWrapper');
-        if (wrapper) {
-            if (!blocks.length) {
-                wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
-            } else {
-                // Отображаем в один ряд, НО без горизонтального скролла
-                // Используем flex-wrap wrap для переноса на следующую строку
-                wrapper.innerHTML = `
-                    <div class="apps-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 8px;">
-                        ${blocks.map(block => `
-                            <div class="game-card" style="width: 100px; flex-shrink: 0;" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                <div class="game-icon">
-                                    ${block.image_url ? 
-                                        `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                         <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
-                                        `<i class="${block.icon || 'fab fa-android'}"></i>`
-                                    }
+    // ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА (БЕЗ КЕША) - БЕЗ СКРОЛЛА
+    window.loadAppBlocks = async function() {
+        console.log('🔄 loadAppBlocks: запрос к API...');
+        try {
+            const response = await fetch('/api/app-blocks?_=' + Date.now());
+            if (!response.ok) throw new Error('Ошибка загрузки приложений');
+            const blocks = await response.json();
+            console.log(`✅ Загружено ${blocks.length} блоков приложений`);
+            
+            window.appBlocks = blocks;
+            
+            const wrapper = document.getElementById('appsScrollWrapper');
+            if (wrapper) {
+                if (!blocks.length) {
+                    wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
+                } else {
+                    // Без горизонтального скролла - перенос на следующую строку
+                    wrapper.innerHTML = `
+                        <div class="apps-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 8px;">
+                            ${blocks.map(block => `
+                                <div class="game-card" style="width: 100px; flex-shrink: 0;" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fab fa-android'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
-                                <div class="game-name">${escapeHtml(block.name)}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
+                            `).join('')}
+                        </div>
+                    `;
+                }
             }
+            
+            return blocks;
+        } catch(e) { 
+            console.error('loadAppBlocks error:', e); 
+            return []; 
         }
-        
-        return blocks;
-    } catch(e) { 
-        console.error('loadAppBlocks error:', e); 
-        return []; 
-    }
-};
-
-    // // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
-    // window.openProductDetailById = async function(id) {
-    //     console.log('🔍 Открываем товар:', id);
-    //     try {
-    //         const response = await fetch(`/api/products/${id}`);
-    //         if (!response.ok) throw new Error('Товар не найден');
-    //         const p = await response.json();
-    //         alert(`📦 ${p.title}\n💰 ${p.price}\n👤 ${p.seller}\n\n📝 ${p.description || 'Нет описания'}`);
-    //     } catch(e) { 
-    //         alert('Товар не найден'); 
-    //     }
-    // };
+    };
 
     // ОТКРЫТИЕ СТРАНИЦЫ ПО КЛЮЧЕВОМУ СЛОВУ
     window.openKeywordPage = async function(keyword) {
