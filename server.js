@@ -227,7 +227,7 @@ app.delete('/api/app-blocks/:id', async (req, res) => {
 async function loadGameBlocks() {  
     try {
         const response = await fetch('/api/game-blocks');
-        if (!response.ok) throw new Error('Ошибка загрузки');
+        if (!response.ok) throw new Error('Ошибка загрузки');    
         gameBlocks = await response.json();
         renderGamesBlocks();
         renderHomeGameBlocks();
