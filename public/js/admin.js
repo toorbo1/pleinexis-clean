@@ -14,12 +14,29 @@ const ADMIN_PASSWORD = "admin123";
 
 async function initAdmin() {
     console.log("initAdmin started");
+    
+    // Сначала загружаем администраторов
+    await loadAdmins();
+    
+    // Проверяем, админ ли текущий пользователь
+    const currentUser = localStorage.getItem("apex_user") || "Гость";
+    const isAdmin = admins.some(a => a.username === currentUser);
+    
+    if (!isAdmin) {
+        console.log("User is not admin, showing error");
+        const container = document.querySelector(".admin-container");
+        if (container) {
+            container.innerHTML = '<div style="text-align: center; padding: 50px; color: red;">⛔ Доступ запрещён. Вы не администратор.</div>';
+        }
+        return;
+    }
+    
+    // Загружаем остальные данные
     await loadKeywords();
     await loadPendingProducts();
     await loadAdminProducts();
     await loadGameBlocks();
     await loadAppBlocks();
-    await loadAdmins();
     await loadAdminDialogs();
     await renderGamesBlocks();
     await renderAppsBlocks();
@@ -28,6 +45,8 @@ async function initAdmin() {
     setupAdminChatListeners();
     renderAdminNavButtons();
     updateAdminStats();
+    
+    console.log("initAdmin completed");
 }
 
 function updateAdminStats() {
@@ -206,18 +225,88 @@ function updateAppKeywordSelect() {
 
 // ==================== 2. АДМИНИСТРАТОРЫ ====================
 
+// Загрузка списка администраторов с сервера
 async function loadAdmins() {
     try {
         const response = await fetch('/api/admins');
         if (!response.ok) throw new Error('Ошибка загрузки');
         admins = await response.json();
+        console.log('✅ Загружены администраторы:', admins);
         renderAdminsList();
         updateAdminStats();
+        return admins;
     } catch(e) {
         console.error('Ошибка загрузки админов:', e);
-        admins = [];
+        // Если сервер не отвечает, используем localStorage как запасной вариант
+        const stored = localStorage.getItem("apex_admins");
+        if (stored) {
+            admins = JSON.parse(stored);
+        } else {
+            admins = [
+                { id: "admin_1", username: "Admin", is_owner: true, hired_by: "system", hired_at: new Date().toISOString() }
+            ];
+        }
+        return admins;
     }
 }
+// ГЛАВНАЯ ФУНКЦИЯ ВХОДА В АДМИНКУ
+async function toggleAdminPanel() {
+    console.log("toggleAdminPanel called");
+    
+    const currentUser = localStorage.getItem("apex_user") || "Гость";
+    console.log("Current user:", currentUser);
+    
+    // Загружаем список администраторов
+    await loadAdmins();
+    
+    // Проверяем, является ли пользователь администратором
+    const isAdmin = admins.some(a => a.username === currentUser);
+    console.log("Is admin:", isAdmin);
+    
+    if (!isAdmin) {
+        // Запрашиваем пароль
+        const password = prompt("Введите пароль администратора:");
+        console.log("Password entered:", password ? "yes" : "no");
+        
+        if (password === ADMIN_PASSWORD) {
+            // Добавляем пользователя в админы
+            const newAdmin = {
+                id: "admin_" + Date.now(),
+                username: currentUser,
+                is_owner: admins.length === 0,
+                hired_by: "system",
+                hired_at: new Date().toISOString()
+            };
+            
+            admins.push(newAdmin);
+            
+            // Сохраняем в localStorage (как запасной вариант)
+            localStorage.setItem("apex_admins", JSON.stringify(admins));
+            
+            // Пытаемся сохранить на сервере
+            try {
+                await fetch('/api/admins', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newAdmin)
+                });
+                console.log("Admin saved to server");
+            } catch(e) {
+                console.error("Could not save to server:", e);
+            }
+            
+            alert("✅ Вы стали администратором!");
+            showAdminUI();
+        } else {
+            alert("❌ Неверный пароль!");
+        }
+    } else {
+        // Уже админ - открываем админку
+        console.log("Opening admin panel");
+        showAdminUI();
+    }
+}
+
 
 function renderAdminsList() {
     const container = document.getElementById("adminsList");
@@ -1163,31 +1252,49 @@ function toggleAdminPanel() {
     }
 }
 
+// Показать интерфейс администратора
 function showAdminUI() {
+    console.log("showAdminUI called");
+    
+    // Меняем стиль кнопки
     const adminBtn = document.getElementById("adminToggleBtn");
     if (adminBtn) {
-        adminBtn.style.background = "var(--accent-primary)";
+        adminBtn.style.background = "#3b82f6";
+        adminBtn.style.color = "white";
         adminBtn.innerHTML = '<i class="fas fa-user-shield"></i>';
     }
     
+    // Добавляем кнопку в нижнюю навигацию, если её нет
     const bottomNav = document.getElementById("bottomNav");
-    if (bottomNav && !document.getElementById("adminNavBtn")) {
+    const navContainer = document.getElementById("navContainer");
+    
+    if (navContainer && !document.getElementById("adminNavBtn")) {
         const adminNavBtn = document.createElement("button");
         adminNavBtn.className = "nav-item";
         adminNavBtn.id = "adminNavBtn";
         adminNavBtn.setAttribute("data-nav", "admin");
-        adminNavBtn.innerHTML = '<div class="nav-icon"></div><div class="nav-label">Админ</div>';
+        adminNavBtn.innerHTML = '<div class="nav-icon"><i class="fas fa-user-shield"></i></div><div class="nav-label">Админ</div>';
+        navContainer.appendChild(adminNavBtn);
         
-        const navContainer = document.getElementById("navContainer");
-        if (navContainer) {
-            navContainer.appendChild(adminNavBtn);
-        }
-        
+        // Переинициализируем навигацию
         if (window.initBlobNavigation) window.initBlobNavigation();
-        alert("Добро пожаловать в админ-панель!");
-        initAdmin();
     }
+    
+    // Открываем админ-панель
+    if (typeof navigate === 'function') {
+        navigate("admin");
+    } else if (typeof showPage === 'function') {
+        showPage("admin");
+    }
+    
+    // Инициализируем админку
+    setTimeout(() => {
+        initAdmin();
+    }, 100);
+    
+    alert("🔐 Добро пожаловать в админ-панель!");
 }
+
 
 // ==================== 10. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
 

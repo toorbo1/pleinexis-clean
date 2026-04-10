@@ -484,11 +484,43 @@ app.delete('/api/app-blocks/:id', async (req, res) => {
 });
 
 // ----- АДМИНИСТРАТОРЫ -----
+// ===== АДМИНИСТРАТОРЫ (ДОБАВИТЬ В server.js) =====
+
+// GET /api/admins
 app.get('/api/admins', async (req, res) => {
     try {
         const { rows } = await pool.query('SELECT * FROM admins ORDER BY hired_at');
         res.json(rows);
     } catch (error) {
+        console.error('GET /api/admins error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST /api/admins
+app.post('/api/admins', async (req, res) => {
+    try {
+        const { id, username, is_owner, hired_by, hired_at } = req.body;
+        await pool.query(
+            `INSERT INTO admins (id, username, is_owner, hired_by, hired_at)
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (username) DO NOTHING`,
+            [id, username, is_owner || false, hired_by || 'system', hired_at || new Date().toISOString()]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('POST /api/admins error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE /api/admins/:id
+app.delete('/api/admins/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM admins WHERE id = $1 AND is_owner = false', [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('DELETE /api/admins/:id error:', error.message);
         res.status(500).json({ error: error.message });
     }
 });
