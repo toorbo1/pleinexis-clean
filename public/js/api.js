@@ -22,11 +22,9 @@ const API = {
         }
     },
     
-    // Товары
+    // ========== ТОВАРЫ ==========
     async getProducts() {
-        const products = await this.request('/api/products');
-        console.log('📦 API getProducts:', products.length, 'товаров');
-        return products;
+        return await this.request('/api/products');
     },
     
     async getProduct(id) {
@@ -53,7 +51,7 @@ const API = {
         });
     },
     
-    // Товары на модерации
+    // ========== ТОВАРЫ НА МОДЕРАЦИИ ==========
     async getPendingProducts() {
         return await this.request('/api/pending-products');
     },
@@ -78,7 +76,7 @@ const API = {
         });
     },
     
-    // Ключевые слова
+    // ========== КЛЮЧЕВЫЕ СЛОВА ==========
     async getKeywords() {
         return await this.request('/api/keywords');
     },
@@ -90,13 +88,20 @@ const API = {
         });
     },
     
+    async updateKeyword(id, data) {
+        return await this.request(`/api/keywords/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    },
+    
     async deleteKeyword(id) {
         return await this.request(`/api/keywords/${id}`, {
             method: 'DELETE'
         });
     },
     
-    // Блоки игр
+    // ========== БЛОКИ ИГР ==========
     async getGameBlocks() {
         return await this.request('/api/game-blocks');
     },
@@ -121,7 +126,7 @@ const API = {
         });
     },
     
-    // Блоки приложений
+    // ========== БЛОКИ ПРИЛОЖЕНИЙ ==========
     async getAppBlocks() {
         return await this.request('/api/app-blocks');
     },
@@ -146,48 +151,25 @@ const API = {
         });
     },
     
-    // Администраторы
+    // ========== АДМИНИСТРАТОРЫ ==========
     async getAdmins() {
         return await this.request('/api/admins');
     },
-    // api.js - добавить эти методы в объект API
-
-async updateKeyword(id, data) {
-    return await this.request(`/api/keywords/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-},
-async getGameBlocks() {
-    return await this.request('/api/game-blocks');
-},
-async createGameBlock(block) {
-    return await this.request('/api/game-blocks', { method: 'POST', body: JSON.stringify(block) });
-},
-async updateGameBlock(id, block) {
-    return await this.request(`/api/game-blocks/${id}`, { method: 'PUT', body: JSON.stringify(block) });
-},
-async deleteGameBlock(id) {
-    return await this.request(`/api/game-blocks/${id}`, { method: 'DELETE' });
-},
-async getAppBlocks() {
-    return await this.request('/api/app-blocks');
-},
-async createAppBlock(block) {
-    return await this.request('/api/app-blocks', { method: 'POST', body: JSON.stringify(block) });
-},
-async updateAppBlock(id, block) {
-    return await this.request(`/api/app-blocks/${id}`, { method: 'PUT', body: JSON.stringify(block) });
-},
-async deleteAppBlock(id) {
-    return await this.request(`/api/app-blocks/${id}`, { method: 'DELETE' });
-},
-async getAdmins() {
-    return await this.request('/api/admins');
-},
-async createAdmin(admin) {
-    return await this.request('/api/admins', { method: 'POST', body: JSON.stringify(admin) });
-},
-async deleteAdmin(id) {
-    return await this.request(`/api/admins/${id}`, { method: 'DELETE' });
-},
+    
+    async createAdmin(admin) {
+        return await this.request('/api/admins', {
+            method: 'POST',
+            body: JSON.stringify(admin)
+        });
+    },
+    
+    async deleteAdmin(id) {
+        return await this.request(`/api/admins/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    // ========== ТЕСТ ==========
     async test() {
         return await this.request('/api/test');
     }

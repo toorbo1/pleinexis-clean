@@ -677,189 +677,131 @@ function showAdminSection(sectionId) {
 
 // ==================== 6. БЛОКИ ИГР И ПРИЛОЖЕНИЙ ====================
 
-function loadGameBlocks() {
-  const stored = localStorage.getItem("apex_game_blocks");
-  if (stored) {
-    gameBlocks = JSON.parse(stored);
-  } else {
-    gameBlocks = [
-      { id: "1", name: "Другие игры", keywordId: "", icon: "fas fa-gamepad", imageUrl: "" },
-      { id: "2", name: "Roblox", keywordId: "", icon: "fab fa-fort-awesome", imageUrl: "" },
-      { id: "3", name: "Valorant", keywordId: "", icon: "fas fa-crosshairs", imageUrl: "" },
-      { id: "4", name: "Minecraft", keywordId: "", icon: "fas fa-cube", imageUrl: "" },
-      { id: "5", name: "Counter-Strike", keywordId: "", icon: "fas fa-skull", imageUrl: "" },
-      { id: "6", name: "Arena Breakout", keywordId: "", icon: "fas fa-crosshairs", imageUrl: "" },
-      { id: "7", name: "Rust", keywordId: "", icon: "fas fa-tree", imageUrl: "" },
-      { id: "8", name: "PUBG", keywordId: "", icon: "fas fa-plane", imageUrl: "" },
-      { id: "9", name: "Crimson Desert", keywordId: "", icon: "fas fa-dragon", imageUrl: "" },
-      { id: "10", name: "Танки", keywordId: "", icon: "fas fa-tank", imageUrl: "" }
-    ];
-    localStorage.setItem("apex_game_blocks", JSON.stringify(gameBlocks));
-  }
-  renderGamesBlocks();
-  renderHomeGameBlocks();
+// ВАЖНО: УДАЛИТЕ старые функции loadGameBlocks, renderGamesBlocks, renderHomeGameBlocks, addGameBlock, deleteGameBlock, editGameBlock
+// и замените их на эти:
+
+async function loadGameBlocks() {
+    try {
+        gameBlocks = await API.getGameBlocks();
+        renderGamesBlocks();
+        renderHomeGameBlocks();
+        updateGameKeywordSelect();
+        console.log('✅ Загружено блоков игр:', gameBlocks.length);
+    } catch (error) {
+        console.error('Ошибка загрузки блоков игр:', error);
+        gameBlocks = [];
+    }
 }
 
 function renderGamesBlocks() {
-  const container = document.getElementById("gamesBlocksList");
-  if (!container) return;
-  
-  if (gameBlocks.length === 0) {
-    container.innerHTML = "<div style='color: var(--text-muted);'>Нет блоков игр</div>";
-    return;
-  }
-  
-  container.innerHTML = gameBlocks.map(block => `
-    <div class="game-block-item">
-      <div class="game-block-info">
-        <div class="game-block-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div>
-          <div class="game-block-name">${escapeHtml(block.name)}</div>
-          <div class="game-block-keyword">${block.keywordId ? '🔗 Привязан к ключевому слову' : '📌 Без привязки'}</div>
-          ${block.imageUrl ? `<div class="game-block-keyword">📷 Фото установлено</div>` : ''}
-        </div>
-      </div>
-      <div class="game-block-actions">
-        <button class="edit-game-btn" onclick="editGameBlock('${block.id}')"><i class="fas fa-edit"></i></button>
-        <button class="delete-game-btn" onclick="deleteGameBlock('${block.id}')"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderHomeGameBlocks() {
-  const container = document.getElementById("gamesScrollWrapper");
-  if (!container) return;
-  
-  if (gameBlocks.length === 0) {
-    container.innerHTML = '<div style="color: var(--text-muted); padding: 20px;">Нет блоков</div>';
-    return;
-  }
-  
-  const midIndex = Math.ceil(gameBlocks.length / 2);
-  const firstRow = gameBlocks.slice(0, midIndex);
-  const secondRow = gameBlocks.slice(midIndex);
-  
-  const firstRowHtml = firstRow.map(block => {
-    let keywordName = block.name;
-    let hasKeyword = false;
-    if (block.keywordId && block.keywordId !== "") {
-      const kw = keywords.find(k => k.id === block.keywordId);
-      if (kw) {
-        keywordName = kw.name;
-        hasKeyword = true;
-      }
-    }
-    return `
-      <div class="game-card" onclick="openKeywordPage('${escapeHtml(keywordName)}')">
-        <div class="game-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div class="game-name">${escapeHtml(block.name)}</div>
-        ${hasKeyword ? `<div class="game-keyword-badge">🔗 ${escapeHtml(keywordName)}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-  
-  const secondRowHtml = secondRow.map(block => {
-    let keywordName = block.name;
-    let hasKeyword = false;
-    if (block.keywordId && block.keywordId !== "") {
-      const kw = keywords.find(k => k.id === block.keywordId);
-      if (kw) {
-        keywordName = kw.name;
-        hasKeyword = true;
-      }
-    }
-    return `
-      <div class="game-card" onclick="openKeywordPage('${escapeHtml(keywordName)}')">
-        <div class="game-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div class="game-name">${escapeHtml(block.name)}</div>
-        ${hasKeyword ? `<div class="game-keyword-badge">🔗 ${escapeHtml(keywordName)}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-  
-  container.innerHTML = `
-    <div class="games-row">${firstRowHtml}</div>
-    <div class="games-row-second">${secondRowHtml}</div>
-  `;
-}
-
-function addGameBlock() {
-  const name = document.getElementById("newGameName")?.value.trim();
-  const keywordId = document.getElementById("newGameKeyword")?.value;
-  const icon = document.getElementById("newGameIcon")?.value;
-  const imageUrl = document.getElementById("newGameImageUrl")?.value.trim();
-  
-  if (!name) {
-    alert("Введите название блока");
-    return;
-  }
-  
-  const newBlock = {
-    id: Date.now().toString(),
-    name: name,
-    keywordId: keywordId || "",
-    icon: icon || "fas fa-gamepad",
-    imageUrl: imageUrl || ""
-  };
-  
-  gameBlocks.push(newBlock);
-  localStorage.setItem("apex_game_blocks", JSON.stringify(gameBlocks));
-  renderGamesBlocks();
-  renderHomeGameBlocks();
-  updateGameKeywordSelect();
-  
-  document.getElementById("newGameName").value = "";
-  document.getElementById("newGameKeyword").value = "";
-  document.getElementById("newGameIcon").value = "fas fa-gamepad";
-  document.getElementById("newGameImageUrl").value = "";
-  
-  showToast("✅ Блок игры добавлен!", "success");
-}
-
-function deleteGameBlock(id) {
-  if (confirm("Удалить этот блок?")) {
-    gameBlocks = gameBlocks.filter(b => b.id !== id);
-    localStorage.setItem("apex_game_blocks", JSON.stringify(gameBlocks));
-    renderGamesBlocks();
-    renderHomeGameBlocks();
-    showToast("✅ Блок удален", "success");
-  }
-}
-
-function editGameBlock(id) {
-  const block = gameBlocks.find(b => b.id === id);
-  if (!block) return;
-  
-  const newName = prompt("Введите новое название:", block.name);
-  if (newName && newName.trim()) {
-    block.name = newName.trim();
+    const container = document.getElementById("gamesBlocksList");
+    if (!container) return;
     
-    const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.imageUrl || "");
-    if (newImageUrl !== null) {
-      block.imageUrl = newImageUrl.trim();
+    if (gameBlocks.length === 0) {
+        container.innerHTML = "<div style='color: var(--text-muted);'>Нет блоков игр</div>";
+        return;
     }
     
-    localStorage.setItem("apex_game_blocks", JSON.stringify(gameBlocks));
-    renderGamesBlocks();
-    renderHomeGameBlocks();
-    showToast("✅ Блок обновлен!", "success");
-  }
+    container.innerHTML = gameBlocks.map(block => `
+        <div class="game-block-item">
+            <div class="game-block-info">
+                <div class="game-block-icon">
+                    ${block.image_url ? 
+                        `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}">` : 
+                        `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                    }
+                </div>
+                <div>
+                    <div class="game-block-name">${escapeHtml(block.name)}</div>
+                    <div class="game-block-keyword">${block.keyword_id ? '🔗 Привязан к ключевому слову' : '📌 Без привязки'}</div>
+                    ${block.image_url ? `<div class="game-block-keyword">📷 Фото установлено</div>` : ''}
+                </div>
+            </div>
+            <div class="game-block-actions">
+                <button class="edit-game-btn" onclick="editGameBlock('${block.id}')"><i class="fas fa-edit"></i></button>
+                <button class="delete-game-btn" onclick="deleteGameBlock('${block.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function addGameBlock() {
+    const name = document.getElementById("newGameName")?.value.trim();
+    const keywordId = document.getElementById("newGameKeyword")?.value;
+    const icon = document.getElementById("newGameIcon")?.value;
+    const imageUrl = document.getElementById("newGameImageUrl")?.value.trim();
+    
+    if (!name) {
+        alert("Введите название блока");
+        return;
+    }
+    
+    const newBlock = {
+        id: Date.now().toString(),
+        name: name,
+        keyword_id: keywordId || null,
+        icon: icon || "fas fa-gamepad",
+        image_url: imageUrl || null,
+        sort_order: gameBlocks.length
+    };
+    
+    try {
+        await API.createGameBlock(newBlock);
+        await loadGameBlocks();
+        renderHomeGameBlocks();
+        
+        document.getElementById("newGameName").value = "";
+        document.getElementById("newGameKeyword").value = "";
+        document.getElementById("newGameIcon").value = "fas fa-gamepad";
+        document.getElementById("newGameImageUrl").value = "";
+        
+        showToast("✅ Блок игры добавлен!", "success");
+    } catch (error) {
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
+
+async function deleteGameBlock(id) {
+    if (confirm("Удалить этот блок?")) {
+        try {
+            await API.deleteGameBlock(id);
+            await loadGameBlocks();
+            renderHomeGameBlocks();
+            showToast("✅ Блок удален", "success");
+        } catch (error) {
+            showToast("❌ Ошибка: " + error.message, "error");
+        }
+    }
+}
+
+async function editGameBlock(id) {
+    const block = gameBlocks.find(b => b.id === id);
+    if (!block) return;
+    
+    const newName = prompt("Введите новое название:", block.name);
+    if (newName && newName.trim()) {
+        block.name = newName.trim();
+        
+        const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
+        if (newImageUrl !== null) {
+            block.image_url = newImageUrl.trim() || null;
+        }
+        
+        try {
+            await API.updateGameBlock(id, {
+                name: block.name,
+                keyword_id: block.keyword_id,
+                icon: block.icon,
+                image_url: block.image_url,
+                sort_order: block.sort_order
+            });
+            await loadGameBlocks();
+            renderHomeGameBlocks();
+            showToast("✅ Блок обновлен!", "success");
+        } catch (error) {
+            showToast("❌ Ошибка: " + error.message, "error");
+        }
+    }
 }
 
 function loadAppBlocks() {
