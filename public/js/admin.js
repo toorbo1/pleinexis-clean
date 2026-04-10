@@ -676,20 +676,24 @@ function showAdminSection(sectionId) {
 }
 
 // ==================== 6. БЛОКИ ИГР И ПРИЛОЖЕНИЙ ====================
-
-// ВАЖНО: УДАЛИТЕ старые функции loadGameBlocks, renderGamesBlocks, renderHomeGameBlocks, addGameBlock, deleteGameBlock, editGameBlock
-// и замените их на эти:
+// ==================== БЛОКИ ИГР И ПРИЛОЖЕНИЙ (ИСПРАВЛЕННЫЕ) ====================
 
 async function loadGameBlocks() {
     try {
-        gameBlocks = await API.getGameBlocks();
+        const response = await fetch('/api/game-blocks?_=' + Date.now());
+        if (!response.ok) throw new Error('Ошибка загрузки игр');
+        gameBlocks = await response.json();
+        window.gameBlocks = gameBlocks;
         renderGamesBlocks();
-        renderHomeGameBlocks();
+        if (typeof renderHomeGameBlocks === 'function') {
+            renderHomeGameBlocks();
+        }
         updateGameKeywordSelect();
         console.log('✅ Загружено блоков игр:', gameBlocks.length);
     } catch (error) {
         console.error('Ошибка загрузки блоков игр:', error);
         gameBlocks = [];
+        window.gameBlocks = [];
     }
 }
 
@@ -697,18 +701,20 @@ function renderGamesBlocks() {
     const container = document.getElementById("gamesBlocksList");
     if (!container) return;
     
-    if (gameBlocks.length === 0) {
+    const blocks = window.gameBlocks || gameBlocks || [];
+    
+    if (blocks.length === 0) {
         container.innerHTML = "<div style='color: var(--text-muted);'>Нет блоков игр</div>";
         return;
     }
     
-    container.innerHTML = gameBlocks.map(block => `
+    container.innerHTML = blocks.map(block => `
         <div class="game-block-item">
             <div class="game-block-info">
                 <div class="game-block-icon">
                     ${block.image_url ? 
-                        `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}">` : 
-                        `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                        `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 12px;">` : 
+                        `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
                     }
                 </div>
                 <div>
@@ -732,7 +738,7 @@ async function addGameBlock() {
     const imageUrl = document.getElementById("newGameImageUrl")?.value.trim();
     
     if (!name) {
-        alert("Введите название блока");
+        showToast("Введите название блока", "error");
         return;
     }
     
@@ -742,87 +748,122 @@ async function addGameBlock() {
         keyword_id: keywordId || null,
         icon: icon || "fas fa-gamepad",
         image_url: imageUrl || null,
-        sort_order: gameBlocks.length
+        sort_order: (window.gameBlocks || gameBlocks || []).length
     };
     
+    console.log('📤 Отправка блока игры:', newBlock);
+    
     try {
-        await API.createGameBlock(newBlock);
-        await loadGameBlocks(); // Это обновит и админку, и через глобальную переменную главную страницу
+        const response = await fetch('/api/game-blocks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newBlock)
+        });
         
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка создания');
+        }
+        
+        // Очищаем форму
         document.getElementById("newGameName").value = "";
         document.getElementById("newGameKeyword").value = "";
         document.getElementById("newGameIcon").value = "fas fa-gamepad";
         document.getElementById("newGameImageUrl").value = "";
         
+        // Перезагружаем списки
+        await loadGameBlocks();
+        
         showToast("✅ Блок игры добавлен!", "success");
         
-        // Обновляем главную страницу через глобальную функцию
+        // Обновляем главную страницу
         if (typeof window.loadGameBlocks === 'function') {
             await window.loadGameBlocks();
         }
+        
     } catch (error) {
+        console.error('Ошибка:', error);
         showToast("❌ Ошибка: " + error.message, "error");
     }
 }
 
 async function deleteGameBlock(id) {
-    if (confirm("Удалить этот блок?")) {
-        try {
-            await API.deleteGameBlock(id);
-            await loadGameBlocks();
-            
-            showToast("✅ Блок удален", "success");
-            
-            // Обновляем главную страницу через глобальную функцию
-            if (typeof window.loadGameBlocks === 'function') {
-                await window.loadGameBlocks();
-            }
-        } catch (error) {
-            showToast("❌ Ошибка: " + error.message, "error");
+    if (!confirm("Удалить этот блок?")) return;
+    
+    try {
+        const response = await fetch(`/api/game-blocks/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка удаления');
         }
+        
+        await loadGameBlocks();
+        showToast("✅ Блок удален", "success");
+        
+        if (typeof window.loadGameBlocks === 'function') {
+            await window.loadGameBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
     }
 }
 
 async function editGameBlock(id) {
-    const block = gameBlocks.find(b => b.id === id);
+    const blocks = window.gameBlocks || gameBlocks || [];
+    const block = blocks.find(b => b.id === id);
     if (!block) return;
     
     const newName = prompt("Введите новое название:", block.name);
-    if (newName && newName.trim()) {
-        block.name = newName.trim();
+    if (!newName || !newName.trim()) return;
+    
+    const newImageUrl = prompt("Введите URL фото (оставьте пустым для использования иконки):", block.image_url || "");
+    
+    const updatedBlock = {
+        name: newName.trim(),
+        keyword_id: block.keyword_id,
+        icon: block.icon,
+        image_url: newImageUrl?.trim() || null,
+        sort_order: block.sort_order
+    };
+    
+    try {
+        const response = await fetch(`/api/game-blocks/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedBlock)
+        });
         
-        const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
-        if (newImageUrl !== null) {
-            block.image_url = newImageUrl.trim() || null;
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка обновления');
         }
         
-        try {
-            await API.updateGameBlock(id, {
-                name: block.name,
-                keyword_id: block.keyword_id,
-                icon: block.icon,
-                image_url: block.image_url,
-                sort_order: block.sort_order
-            });
-            await loadGameBlocks();
-            
-            showToast("✅ Блок обновлен!", "success");
-            
-            // Обновляем главную страницу через глобальную функцию
-            if (typeof window.loadGameBlocks === 'function') {
-                await window.loadGameBlocks();
-            }
-        } catch (error) {
-            showToast("❌ Ошибка: " + error.message, "error");
+        await loadGameBlocks();
+        showToast("✅ Блок обновлен!", "success");
+        
+        if (typeof window.loadGameBlocks === 'function') {
+            await window.loadGameBlocks();
         }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
     }
 }
+
+// ==================== БЛОКИ ПРИЛОЖЕНИЙ (ИСПРАВЛЕННЫЕ) ====================
 
 async function loadAppBlocks() {
     try {
         const response = await fetch('/api/app-blocks?_=' + Date.now());
         if (!response.ok) throw new Error('Ошибка загрузки приложений');
         appBlocks = await response.json();
+        window.appBlocks = appBlocks;
         renderAppsBlocks();
         if (typeof renderHomeAppBlocks === 'function') {
             renderHomeAppBlocks();
@@ -832,84 +873,42 @@ async function loadAppBlocks() {
     } catch (error) {
         console.error('Ошибка загрузки блоков приложений:', error);
         appBlocks = [];
+        window.appBlocks = [];
     }
 }
 
 function renderAppsBlocks() {
-  const container = document.getElementById("appsBlocksList");
-  if (!container) return;
-  
-  if (appBlocks.length === 0) {
-    container.innerHTML = "<div style='color: var(--text-muted);'>Нет блоков приложений</div>";
-    return;
-  }
-  
-  container.innerHTML = appBlocks.map(block => `
-    <div class="game-block-item">
-      <div class="game-block-info">
-        <div class="game-block-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div>
-          <div class="game-block-name">${escapeHtml(block.name)}</div>
-          <div class="game-block-keyword">${block.keywordId ? '🔗 Привязан к ключевому слову' : '📌 Без привязки'}</div>
-          ${block.imageUrl ? `<div class="game-block-keyword">📷 Фото установлено</div>` : ''}
-        </div>
-      </div>
-      <div class="game-block-actions">
-        <button class="edit-game-btn" onclick="editAppBlock('${block.id}')"><i class="fas fa-edit"></i></button>
-        <button class="delete-game-btn" onclick="deleteAppBlock('${block.id}')"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderHomeAppBlocks() {
-    const wrapper = document.getElementById('appsScrollWrapper');
-    if (!wrapper) return;
+    const container = document.getElementById("appsBlocksList");
+    if (!container) return;
     
-    if (!appBlocks || appBlocks.length === 0) {
-        wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
+    const blocks = window.appBlocks || appBlocks || [];
+    
+    if (blocks.length === 0) {
+        container.innerHTML = "<div style='color: var(--text-muted);'>Нет блоков приложений</div>";
         return;
     }
     
-    const midIndex = Math.ceil(appBlocks.length / 2);
-    const firstRow = appBlocks.slice(0, midIndex);
-    const secondRow = appBlocks.slice(midIndex);
-    
-    wrapper.innerHTML = `
-        <div class="games-row">
-            ${firstRow.map(block => `
-                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                    <div class="game-icon">
-                        ${block.image_url ? 
-                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
-                            `<i class="${block.icon || 'fab fa-android'}"></i>`
-                        }
-                    </div>
-                    <div class="game-name">${escapeHtml(block.name)}</div>
+    container.innerHTML = blocks.map(block => `
+        <div class="game-block-item">
+            <div class="game-block-info">
+                <div class="game-block-icon">
+                    ${block.image_url ? 
+                        `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 12px;">` : 
+                        `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
+                    }
                 </div>
-            `).join('')}
-        </div>
-        <div class="games-row-second">
-            ${secondRow.map(block => `
-                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                    <div class="game-icon">
-                        ${block.image_url ? 
-                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
-                            `<i class="${block.icon || 'fab fa-android'}"></i>`
-                        }
-                    </div>
-                    <div class="game-name">${escapeHtml(block.name)}</div>
+                <div>
+                    <div class="game-block-name">${escapeHtml(block.name)}</div>
+                    <div class="game-block-keyword">${block.keyword_id ? '🔗 Привязан к ключевому слову' : '📌 Без привязки'}</div>
+                    ${block.image_url ? `<div class="game-block-keyword">📷 Фото установлено</div>` : ''}
                 </div>
-            `).join('')}
+            </div>
+            <div class="game-block-actions">
+                <button class="edit-game-btn" onclick="editAppBlock('${block.id}')"><i class="fas fa-edit"></i></button>
+                <button class="delete-game-btn" onclick="deleteAppBlock('${block.id}')"><i class="fas fa-trash"></i></button>
+            </div>
         </div>
-    `;
+    `).join('');
 }
 
 async function addAppBlock() {
@@ -929,8 +928,10 @@ async function addAppBlock() {
         keyword_id: keywordId || null,
         icon: icon || "fab fa-android",
         image_url: imageUrl || null,
-        sort_order: appBlocks.length
+        sort_order: (window.appBlocks || appBlocks || []).length
     };
+    
+    console.log('📤 Отправка блока приложения:', newBlock);
     
     try {
         const response = await fetch('/api/app-blocks', {
@@ -938,66 +939,98 @@ async function addAppBlock() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newBlock)
         });
-        if (!response.ok) throw new Error('Ошибка создания');
         
-        await loadAppBlocks(); // Перезагружаем с сервера
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка создания');
+        }
         
         document.getElementById("newAppName").value = "";
         document.getElementById("newAppKeyword").value = "";
         document.getElementById("newAppIcon").value = "fab fa-android";
         document.getElementById("newAppImageUrl").value = "";
         
+        await loadAppBlocks();
         showToast("✅ Блок приложения добавлен!", "success");
+        
+        if (typeof window.loadAppBlocks === 'function') {
+            await window.loadAppBlocks();
+        }
+        
     } catch (error) {
+        console.error('Ошибка:', error);
         showToast("❌ Ошибка: " + error.message, "error");
     }
 }
 
 async function deleteAppBlock(id) {
-    if (confirm("Удалить этот блок?")) {
-        try {
-            const response = await fetch(`/api/app-blocks/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Ошибка удаления');
-            
-            await loadAppBlocks(); // Перезагружаем с сервера
-            showToast("✅ Блок удален", "success");
-        } catch (error) {
-            showToast("❌ Ошибка: " + error.message, "error");
-        }
-    }
-}
-async function editAppBlock(id) {
-    const block = appBlocks.find(b => b.id === id);
-    if (!block) return;
+    if (!confirm("Удалить этот блок?")) return;
     
-    const newName = prompt("Введите новое название:", block.name);
-    if (newName && newName.trim()) {
-        const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
+    try {
+        const response = await fetch(`/api/app-blocks/${id}`, {
+            method: 'DELETE'
+        });
         
-        const updatedBlock = {
-            name: newName.trim(),
-            keyword_id: block.keyword_id,
-            icon: block.icon,
-            image_url: newImageUrl?.trim() || null,
-            sort_order: block.sort_order
-        };
-        
-        try {
-            const response = await fetch(`/api/app-blocks/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedBlock)
-            });
-            if (!response.ok) throw new Error('Ошибка обновления');
-            
-            await loadAppBlocks(); // Перезагружаем с сервера
-            showToast("✅ Блок обновлен!", "success");
-        } catch (error) {
-            showToast("❌ Ошибка: " + error.message, "error");
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка удаления');
         }
+        
+        await loadAppBlocks();
+        showToast("✅ Блок удален", "success");
+        
+        if (typeof window.loadAppBlocks === 'function') {
+            await window.loadAppBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
     }
 }
 
+async function editAppBlock(id) {
+    const blocks = window.appBlocks || appBlocks || [];
+    const block = blocks.find(b => b.id === id);
+    if (!block) return;
+    
+    const newName = prompt("Введите новое название:", block.name);
+    if (!newName || !newName.trim()) return;
+    
+    const newImageUrl = prompt("Введите URL фото (оставьте пустым для использования иконки):", block.image_url || "");
+    
+    const updatedBlock = {
+        name: newName.trim(),
+        keyword_id: block.keyword_id,
+        icon: block.icon,
+        image_url: newImageUrl?.trim() || null,
+        sort_order: block.sort_order
+    };
+    
+    try {
+        const response = await fetch(`/api/app-blocks/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedBlock)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка обновления');
+        }
+        
+        await loadAppBlocks();
+        showToast("✅ Блок обновлен!", "success");
+        
+        if (typeof window.loadAppBlocks === 'function') {
+            await window.loadAppBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
 // admin.js - ИСПРАВЛЕННАЯ ВЕРСИЯ (удалены дублирующиеся функции)
 
 // ==================== КЛЮЧЕВЫЕ СЛОВА (ТОЛЬКО СЕРВЕРНЫЕ ВЕРСИИ) ====================

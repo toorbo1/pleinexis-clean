@@ -64,7 +64,7 @@ function renderDetailPage(product) {
                      src="${escapeHtml(imageUrl)}" 
                      alt="${title}"
                      onerror="this.src='https://picsum.photos/id/42/500/375'">
-                ${discount ? `<div style="margin-top: 12px; background: rgba(239,68,68,0.2); color:#ef4444; padding: 6px 12px; border-radius: 20px; text-align: center; font-size:0.8rem;">- Скидка ${escapeHtml(discount)}</div>` : ''}
+                ${discount ? `<div style="margin-top: 12px; background: rgba(239,68,68,0.2); color:#ef4444; padding: 6px 12px; border-radius: 20px; text-align: center; font-size:0.8rem;">🔥 Скидка ${escapeHtml(discount)}</div>` : ''}
             </div>
             
             <!-- Информация справа -->
