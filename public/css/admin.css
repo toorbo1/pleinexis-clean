@@ -1,0 +1,770 @@
+/* Админ панель - черная */
+.admin-card {
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(59,130,246,0.05);
+}
+
+/* АДМИН ПАНЕЛЬ */
+.admin-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.admin-container h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-card {
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(59,130,246,0.2);
+}
+
+.admin-card h3 {
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-toggle-btn {
+  background: rgba(59,130,246,0.2);
+  border: none;
+  color: var(--text-main);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 30px;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.admin-toggle-btn:hover {
+  background: var(--accent-primary);
+}
+
+/* Ключевые слова */
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.keyword-item {
+  background: linear-gradient(135deg, #1a2332, #0f1722);
+  border-radius: 30px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(59,130,246,0.3);
+}
+
+.keyword-name {
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.keyword-type {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.1);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.delete-keyword-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0 4px;
+}
+
+.delete-keyword-btn:hover {
+  color: #ff6666;
+}
+
+.add-keyword-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.add-keyword-form .input-modern {
+  margin: 0;
+}
+
+/* Форма создания товара */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Список товаров в админке */
+.admin-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.admin-product-item {
+  background: var(--bg-elevated);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-product-info {
+  flex: 1;
+}
+
+.admin-product-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.admin-product-price {
+  color: var(--green-bright);
+  font-size: 0.9rem;
+}
+
+.admin-product-keyword {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(59,130,246,0.2);
+  padding: 2px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.admin-product-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-delete-btn {
+  background: rgba(239,68,68,0.2);
+  border: none;
+  color: #ef4444;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-delete-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.admin-edit-btn {
+  background: rgba(59,130,246,0.2);
+  border: none;
+  color: var(--accent-primary);
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-edit-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+/* Бейдж скидки */
+.discount-badge {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+/* Блоки игр в админке */
+.games-blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.game-block-item {
+  background: var(--bg-elevated);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-block-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.game-block-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #1a2332, #0f1722);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.game-block-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.game-block-icon i {
+  font-size: 1.2rem;
+  color: var(--accent-primary);
+}
+
+.game-block-name {
+  font-weight: 600;
+}
+
+.game-block-keyword {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: rgba(59,130,246,0.2);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.game-block-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-game-btn, .delete-game-btn {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-game-btn {
+  color: var(--accent-primary);
+}
+
+.edit-game-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.delete-game-btn {
+  color: #ef4444;
+}
+
+.delete-game-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.add-game-block-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Админ панель - новые стили */
+.admin-nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+}
+
+.admin-nav-btn {
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 40px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-nav-btn:hover {
+  background: rgba(59,130,246,0.2);
+  color: #3b82f6;
+}
+
+.admin-nav-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-stat-card {
+  background: linear-gradient(135deg, #1a1c2e, #0f111a);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid rgba(59,130,246,0.2);
+}
+
+.admin-stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #3b82f6;
+}
+
+.admin-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+.admin-quick-actions {
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.quick-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 40px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-btn:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.admin-user-item, .pending-product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin-user-avatar {
+  width: 45px;
+  height: 45px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.owner-badge, .admin-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 8px;
+}
+
+.owner-badge {
+  background: #f59e0b;
+  color: #1a1c2e;
+}
+
+.admin-badge {
+  background: #22c55e;
+  color: #1a1c2e;
+}
+
+.delete-admin-btn {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.hire-admin-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pending-product-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-product-btn {
+  background: rgba(34,197,94,0.2);
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #22c55e;
+  padding: 8px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.reject-product-btn {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+/* Админ чат */
+.admin-chat-container {
+  display: flex;
+  height: 500px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.admin-chat-sidebar {
+  width: 300px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-dialogs-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.admin-dialog-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 5px;
+}
+
+.admin-dialog-item:hover {
+  background: rgba(59,130,246,0.1);
+}
+
+.admin-dialog-item.active {
+  background: rgba(59,130,246,0.2);
+}
+
+.admin-dialog-avatar {
+  width: 45px;
+  height: 45px;
+  background: #3b82f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #1a1c2e;
+}
+
+.admin-chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-chat-header {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-to-list {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none;
+}
+
+.admin-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.admin-chat-input {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-chat-input input {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 30px;
+  color: white;
+}
+
+.admin-chat-input button {
+  width: 45px;
+  height: 45px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+}
+
+/* Редактор слайдеров */
+.slider-editor-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.slider-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slider-editor-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.slider-image-item {
+  width: 150px;
+  text-align: center;
+}
+
+.slider-image-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.image-url-input {
+  width: 100%;
+  padding: 6px;
+  font-size: 0.7rem;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: white;
+  margin-top: 8px;
+}
+
+.remove-image-btn {
+  background: rgba(239,68,68,0.2);
+  border: none;
+  color: #ef4444;
+  padding: 4px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.add-slide-image-btn {
+  background: #22c55e;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .admin-chat-sidebar {
+    width: 100%;
+  }
+  
+  .admin-chat-sidebar.hide {
+    display: none;
+  }
+  
+  .back-to-list {
+    display: block;
+  }
+  
+  .admin-nav-btn span {
+    display: none;
+  }
+  
+  .admin-nav-btn {
+    padding: 10px;
+  }
+}
+/* Ключевые слова */
+.keywords-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.keyword-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.keyword-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.keyword-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.keyword-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #3b82f6;
+}
+
+.keyword-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.keyword-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-keyword-btn, .delete-keyword-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.edit-keyword-btn:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.delete-keyword-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.add-keyword-form {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-keyword-form h4 {
+  margin-bottom: 15px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}

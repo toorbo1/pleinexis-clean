@@ -1,0 +1,906 @@
+/* ========== МОБИЛЬНАЯ АДАПТАЦИЯ ========== */
+
+/* ========== ФИКС ИЗОБРАЖЕНИЙ - ПОЛНОЕ ЗАПОЛНЕНИЕ ========== */
+
+/* Для всех устройств */
+.product-img-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 4 / 3 !important;
+  background: #0a0a0a !important;
+  overflow: hidden !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+.product-img-wrapper img {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+/* Убираем все старые стили которые мешают */
+.product-img-wrapper i,
+.product-img-wrapper .fa-tag {
+  display: none !important;
+}
+
+/* Бейдж скидки */
+.discount-badge-img {
+  position: absolute;
+  font-size: 0.6rem;
+  padding: 3px 8px;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+/* Детальная страница */
+.product-detail-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center;
+  background: #0a0a0a;
+  border-radius: 20px;
+}
+
+/* Слайдеры */
+.mini-slide-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+.mini-slider-wrapper {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+@media (max-width: 480px) {
+  .product-img-wrapper {
+    border-radius: 12px 12px 0 0 !important;
+  }
+  
+  .discount-badge-img {
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    top: 6px;
+    left: 6px;
+  }
+}
+/* ========== МОБИЛЬНЫЕ УСТРОЙСТВА (до 768px) ========== */
+@media (max-width: 768px) {
+  /* Карточки товаров */
+  .product-card {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+    .page#chat {
+    padding-bottom: 60px !important;  /* было 70px, стало 60px */
+  }
+  
+  .chat-window {
+    bottom: 60px !important;  /* было 70px, стало 60px */
+  }
+  
+  .chats-sidebar {
+    bottom: 60px !important;  /* было 70px, стало 60px */
+  }
+  
+  .chats-container {
+    height: calc(100vh - 120px) !important;  /* было 130px, стало 120px */
+  }
+ .product-img-wrapper {
+    border-radius: 14px 14px 0 0 !important;
+  }
+  
+  .product-img-wrapper img {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: cover !important;
+  }
+  
+  .discount-badge-img {
+    top: 8px;
+    left: 8px;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+  
+  .product-body {
+    padding: 8px;
+  }
+  
+  .product-price {
+    font-size: 0.8rem;
+  }
+  
+  .product-title {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .product-stars {
+    font-size: 0.55rem;
+  }
+  
+  .product-reviews-count {
+    font-size: 0.55rem;
+  }
+  
+  /* Сетка товаров - 2 колонки */
+  .grid-modern {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  /* Слайдеры */
+  .slider-card {
+    min-width: 240px;
+  }
+  
+  .mini-slider-wrapper {
+    aspect-ratio: 16 / 9;
+  }
+  
+  /* Топ ссылки */
+  .top-links {
+    flex-wrap: wrap;
+    gap: 8px;
+    border-radius: 30px;
+    padding: 10px 16px;
+  }
+  
+  .top-link {
+    font-size: 0.65rem;
+    padding: 6px 10px;
+    white-space: nowrap;
+  }
+  
+  /* Блок Steam */
+  .steam-fields-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .steam-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  /* Кнопки скролла слайдеров */
+  .slider-scroll-btn {
+    display: none;
+  }
+  
+  /* Страницы */
+  .page {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  
+  /* Заголовок */
+  .hero-logo-text {
+    font-size: 28px;
+  }
+  
+  /* Карточка Steam */
+  .card-modern {
+    padding: 16px;
+  }
+  
+  /* Игры и приложения */
+  .game-card {
+    width: 75px;
+    height: 95px;
+  }
+  
+  .game-icon {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .game-icon i {
+    font-size: 1.5rem;
+  }
+  
+  .game-name {
+    font-size: 0.65rem;
+  }
+  
+  .games-scroll-container {
+    max-height: 220px;
+  }
+}
+
+/* ========== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ (до 380px) ========== */
+@media (max-width: 380px) {
+  .grid-modern {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .product-card {
+    border-radius: 12px;
+  }
+  
+  .product-img-wrapper {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .product-price {
+    font-size: 0.7rem;
+  }
+  
+  .product-title {
+    font-size: 0.6rem;
+  }
+  
+  .discount-badge-img {
+    font-size: 0.45rem;
+    padding: 2px 5px;
+    top: 4px;
+    left: 4px;
+  }
+  
+  .product-body {
+    padding: 4px;
+  }
+  
+  .product-stars {
+    font-size: 0.45rem;
+  }
+  
+  .product-reviews-count {
+    font-size: 0.45rem;
+  }
+}
+
+/* ========== ТЕЛЕФОНЫ 381px-480px ========== */
+@media (min-width: 381px) and (max-width: 480px) {
+  .grid-modern {
+    gap: 10px;
+  }
+  
+  .product-price {
+    font-size: 0.75rem;
+  }
+  
+  .product-title {
+    font-size: 0.65rem;
+  }
+}
+
+/* ========== БОЛЬШИЕ ТЕЛЕФОНЫ 481px-600px ========== */
+@media (min-width: 481px) and (max-width: 600px) {
+  .grid-modern {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .product-price {
+    font-size: 0.75rem;
+  }
+  
+  .product-title {
+    font-size: 0.65rem;
+  }
+}
+
+/* ========== ПЛАНШЕТЫ 601px-768px ========== */
+@media (min-width: 601px) and (max-width: 768px) {
+  .grid-modern {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  
+  .product-price {
+    font-size: 0.8rem;
+  }
+  
+  .product-title {
+    font-size: 0.7rem;
+  }
+}
+
+/* ========== ДЕСКТОП (от 769px) ========== */
+@media (min-width: 769px) {
+  .product-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  
+  .product-img-wrapper img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .product-card:hover .product-img-wrapper img {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  
+  .slider-scroll-btn {
+    display: flex;
+  }
+  
+  .bottom-nav {
+    display: none !important;
+  }
+  
+  .nav-links {
+    display: flex !important;
+  }
+}
+
+/* ========== ПРОФИЛЬ ========== */
+@media (max-width: 768px) {
+  .profile-new-container {
+    padding: 16px;
+  }
+  
+  .profile-hero-section {
+    padding: 20px;
+  }
+  
+  .hero-name {
+    font-size: 1.5rem;
+  }
+  
+  .avatar-circle {
+    width: 90px;
+    height: 90px;
+    font-size: 42px;
+  }
+  
+  .balance-amount {
+    font-size: 1.5rem;
+  }
+  
+  .profile-stats-grid {
+    gap: 12px;
+  }
+  
+  .stat-item .stat-number {
+    font-size: 1.3rem;
+  }
+  
+  .profile-tab-btn {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .profile-product-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+  
+  .change-bg-btn-hero {
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  
+  .wallet-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+  
+  .payment-icons i {
+    font-size: 1.8rem;
+  }
+}
+
+/* Планшеты (769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .profile-new-container {
+    padding: 20px 24px;
+  }
+  
+  .hero-name {
+    font-size: 1.6rem;
+  }
+  
+  .avatar-circle {
+    width: 95px;
+    height: 95px;
+    font-size: 46px;
+  }
+}
+
+/* ========== ЧАТ ========== */
+@media (max-width: 768px) {
+  .chats-container {
+    height: calc(100vh - 140px);
+    border-radius: 0;
+  }
+  
+  .chats-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 200;
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border-radius: 0;
+  }
+  
+  .chats-sidebar.hidden-mobile {
+    transform: translateX(-100%);
+  }
+  
+  .chat-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 210;
+    display: none;
+    border-radius: 0;
+  }
+  
+  .chat-window.active-mobile {
+    display: flex;
+  }
+  
+  .back-to-chat-list {
+    display: flex;
+  }
+  
+  .message-group {
+    max-width: 90%;
+  }
+  
+  .dialog-item {
+    padding: 10px 12px;
+  }
+  
+  .dialog-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+  }
+  
+  .message-bubble {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+  
+  .chat-messages-area {
+    padding: 12px;
+  }
+}
+
+/* Десктопная версия чата */
+@media (min-width: 769px) {
+  .back-to-chat-list {
+    display: none;
+  }
+}
+
+/* ========== ХЕДЕР ========== */
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  
+  .header-left {
+    width: auto;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .header-search {
+    max-width: none;
+    flex: 1;
+  }
+  
+  .company-name {
+    font-size: 1.1rem;
+  }
+  
+  .nav-links {
+    display: none !important;
+  }
+  
+  .bottom-nav {
+    display: flex !important;
+  }
+}
+
+/* ========== ФУТЕР ========== */
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 30px 16px 16px;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    text-align: center;
+  }
+  
+  .footer-section {
+    text-align: center;
+  }
+  
+  .footer-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .payment-methods-footer {
+    justify-content: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .footer-links-list a:hover {
+    transform: translateX(0);
+  }
+}
+
+/* ========== АДМИН ПАНЕЛЬ ========== */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 0 12px;
+  }
+  
+  .admin-card {
+    padding: 16px;
+  }
+  
+  .game-block-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .game-block-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .admin-product-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .admin-product-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+}
+
+/* ========== ДЕТАЛЬНАЯ СТРАНИЦА ========== */
+@media (max-width: 550px) {
+  .detail-top-row {
+    flex-direction: column;
+  }
+  
+  .detail-image-col {
+    max-width: 100%;
+    text-align: center;
+  }
+  
+  .product-detail-image {
+    max-width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  
+  .product-detail-name {
+    font-size: 1.1rem;
+  }
+  
+  .product-detail-price {
+    font-size: 1.4rem;
+  }
+  
+  .detail-buttons-row {
+    flex-direction: column;
+  }
+  
+  .buy-button-inline,
+  .chat-button-inline {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .detail-buttons-row {
+    flex-direction: row;
+  }
+  
+  .buy-button-inline,
+  .chat-button-inline {
+    flex: 1;
+  }
+}
+
+/* ========== СТРАНИЦА УПРАВЛЕНИЯ ТОВАРАМИ ========== */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .product-item-card {
+    flex-wrap: wrap;
+  }
+  
+  .product-item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .radio-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .product-form-body {
+    padding: 20px;
+  }
+  
+  .product-form-header {
+    padding: 20px 20px 0;
+  }
+}
+
+/* ========== ОБЩИЕ ОТСТУПЫ СТРАНИЦ ========== */
+.page {
+  display: none;
+  padding: 85px 12px 90px;
+  animation: fadeIn 0.25s ease;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .page {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1599px) {
+  .page {
+    padding-left: 150px;
+    padding-right: 150px;
+  }
+}
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+  .page {
+    padding-left: 220px;
+    padding-right: 220px;
+  }
+}
+
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .page {
+    padding-left: 320px;
+    padding-right: 320px;
+  }
+
+}
+
+@media (min-width: 2560px) {
+  .page {
+    padding-left: 500px;
+    padding-right: 500px;
+  }
+}
+
+/* ========== АНИМАЦИИ ========== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== СЛАЙДЕРЫ ========== */
+.sliders-container,
+.hero-sliders-wrapper,
+.hero-sliders {
+  width: 100%;
+}
+
+.slider-card {
+  flex: 0 0 auto;
+  min-width: 120px;
+}
+
+.page.active {
+  display: block !important;
+}
+
+/* ========== ТОВАРЫ - СЕТКА ========== */
+@media (max-width: 480px) {
+  .products-header {
+    margin: 12px 0 12px;
+  }
+  
+  .products-header h4 {
+    font-size: 1rem;
+  }
+  
+  #productCountStat {
+    font-size: 0.7rem;
+  }
+}
+
+/* ========== КЛЮЧЕВЫЕ СЛОВА ========== */
+#keywordProductsGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1280px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* ========== ПОПОЛНЕНИЕ STEAM ========== */
+@media (max-width: 550px) {
+  .steam-fields-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .steam-fields-row .field-group {
+    min-width: auto;
+  }
+  
+  .steam-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .card-modern {
+    padding: 16px;
+  }
+}
+
+/* ========== ИГРЫ И ПРИЛОЖЕНИЯ ========== */
+@media (max-width: 480px) {
+  .games-header h4 {
+    font-size: 1rem;
+  }
+  
+  .scroll-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ========== ФИКС СТРАНИЦЫ ЧАТА - ОТСТУП ОТ ВЕРХНЕЙ ПАНЕЛИ ========== */
+.page#chat {
+  padding-top: 70px !important;
+}
+
+@media (max-width: 768px) {
+  .page#chat {
+    padding-top: 65px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .page#chat {
+    padding-top: 60px !important;
+  }
+}
+
+/* ========== ФИКС ЧАТА ДЛЯ ТЕЛЕФОНОВ ========== */
+@media (max-width: 768px) {
+  .page#chat {
+    padding-top: 60px !important;
+    padding-bottom: 70px !important;
+  }
+  
+  .chats-container {
+    height: calc(100vh - 130px) !important;
+  }
+  
+  .chat-window {
+    position: fixed !important;
+    top: 60px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 70px !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: 999 !important;
+  }
+  
+  .chat-window-header {
+    position: sticky !important;
+    top: 0 !important;
+    background: rgba(16, 20, 35, 0.98) !important;
+    z-index: 10 !important;
+  }
+  
+  .chats-sidebar {
+    position: fixed !important;
+    top: 60px !important;
+    left: 0 !important;
+    bottom: 70px !important;
+    width: 100% !important;
+    z-index: 998 !important;
+    background: #0a0f1c !important;
+  }
+  
+  .chats-sidebar.hide {
+    transform: translateX(-100%);
+  }
+}

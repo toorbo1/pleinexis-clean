@@ -1,0 +1,294 @@
+/* Хедер - черный */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(59,130,246,0.1);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  background: #0a0a0a;
+  border-radius: 30px;
+  padding: 8px 16px;
+  gap: 8px;
+  border: 1px solid #1a1a1a;
+  max-width: 280px;
+  width: 100%;
+}
+
+/* Новый стиль хедера */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  background: rgba(10, 15, 28, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-light);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.company-name {
+  font-weight: 700;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, #fff, var(--accent-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border-radius: 30px;
+  padding: 8px 16px;
+  gap: 8px;
+  border: 1px solid #2d3a4e;
+  max-width: 280px;
+  width: 100%;
+}
+
+.header-search i {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.global-search-input {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  width: 100%;
+}
+
+.global-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Убираем старый поиск на главной */
+.home-search {
+  display: none;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  
+  .header-left {
+    width: auto;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .header-search {
+    max-width: none;
+    flex: 1;
+  }
+  
+  .company-name {
+    font-size: 1.1rem;
+  }
+}
+
+/* ========== ДЕСКТОПНАЯ НАВИГАЦИЯ — ПРЕМИУМ ВЕРСИЯ ========== */
+.nav-links {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  background: rgba(10, 15, 28, 0.7);
+  backdrop-filter: blur(12px);
+  padding: 5px;
+  border-radius: 50px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 20px;
+  border-radius: 40px;
+  transition: all 0.3s ease;
+  position: relative;
+  letter-spacing: 0.3px;
+}
+
+/* Иконки */
+.nav-link i {
+  font-size: 1.1rem;
+  transition: all 0.25s ease;
+}
+
+/* Эффект свечения при наведении */
+.nav-link:hover {
+  color: white;
+  background: rgba(59, 130, 246, 0.2);
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.nav-link:hover i {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 0 4px var(--accent-primary));
+}
+
+/* Активная кнопка — градиент с эффектом */
+.nav-link.active {
+  color: white;
+  background: linear-gradient(105deg, var(--accent-primary), #4f46e5);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.nav-link.active i {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+}
+
+/* Анимация рипла при клике */
+.nav-link:active {
+  transform: scale(0.96);
+}
+
+/* Кнопка "Создать" — особый стиль с градиентом */
+.plus-link {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
+}
+
+.plus-link i, .plus-link span {
+  color: white;
+}
+
+.plus-link:hover {
+  background: linear-gradient(135deg, #2ecc71, #1a8a3e);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+}
+
+.plus-link:active {
+  transform: translateY(1px);
+}
+
+/* Разделитель между кнопками (опционально) */
+.nav-link:not(.plus-link)::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.1);
+}
+
+.nav-link:last-child::after,
+.plus-link::after {
+  display: none;
+}
+
+/* Показываем на ПК */
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+  }
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Скрываем на мобильных */
+@media (max-width: 767px) {
+  .nav-links {
+    display: none !important;
+  }
+  .bottom-nav {
+    display: flex !important;
+  }
+}
+
+/* Кнопка смены фона секции */
+.change-bg-btn-hero {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 60px;
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ddd;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  z-index: 10;
+}
+
+.change-bg-btn-hero:hover {
+  background: #2b6ef0;
+  color: white;
+  transform: scale(1.02);
+}
+
+.header-logo {
+  width: 150px;      /* Было меньше, увеличь это значение */
+  height: auto; 
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .header-logo {
+    height: 32px;
+  }
+}

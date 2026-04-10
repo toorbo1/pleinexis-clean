@@ -1,0 +1,299 @@
+/* ========== НИЖНЯЯ ПАНЕЛЬ С LIQUID BLOB ЭФФЕКТОМ ========== */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 14, 23, 0.95);
+  backdrop-filter: blur(25px);
+
+
+  z-index: 1000;
+  will-change: transform;
+}
+
+.nav-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 12px 12px 14px;  /* было 24px, стало 14px */
+  min-height: 70px;  /* было 80px, стало 70px */
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 4px;
+  cursor: pointer;
+  z-index: 10;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  transition: none; /* Убираем анимацию */
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+/* Убираем эффект нажатия */
+.nav-item:active {
+  transform: none;
+}
+
+/* Минималистичные черно-белые иконки (SVG) */
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  transition: none; /* Убираем анимацию */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #888888;
+  stroke-width: 1.5;
+  fill: none;
+  transition: none; /* Убираем анимацию */
+}
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: none; /* Убираем анимацию */
+  color: #888888;
+  text-transform: uppercase;
+}
+
+/* Активное состояние - белый цвет (без анимации) */
+.nav-item.active .nav-label {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-item.active .nav-icon svg {
+  stroke: #ffffff;
+  transform: none; /* Убираем translateY */
+}
+
+/* BLOB - КАПЛЯ ВОДЫ (зеленая, с водными эффектами) */
+.blob {
+  position: absolute;
+  background: radial-gradient(ellipse at 35% 35%, 
+                              rgba(80, 220, 60, 0.95), 
+                              rgba(30, 150, 20, 0.9));
+  border-radius: 40px;
+  height: 52px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+              inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+              inset -1px -1px 3px rgba(0, 0, 0, 0.1);
+  will-change: left, width;
+  filter: url('#gooeyFilter');
+  backface-visibility: hidden;
+  transition: left 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), 
+              width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  z-index: 5;
+}
+
+/* ГЛАВНЫЙ БЛИК (световое пятно как на капле) */
+.blob::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, 
+                              rgba(255, 255, 255, 0.9), 
+                              rgba(255, 255, 255, 0.3));
+  border-radius: 50%;
+  top: 12px;
+  left: 12px;
+  filter: blur(1px);
+}
+
+/* ВТОРОЙ БЛИК (маленький отраженный) */
+.blob::after {
+  content: '';
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  top: 28px;
+  left: 10px;
+  filter: blur(0.5px);
+}
+
+/* ДОПОЛНИТЕЛЬНЫЙ ЭФФЕКТ - отражение снизу (как на мокрой поверхности) */
+.blob-reflection {
+  position: absolute;
+  width: 100%;
+  height: 8px;
+  bottom: -6px;
+  left: 0;
+  background: radial-gradient(ellipse, 
+                              rgba(80, 220, 60, 0.3), 
+                              transparent);
+  border-radius: 50%;
+  filter: blur(3px);
+  z-index: 4;
+}
+
+/* Вариант с эффектом преломления света (как у настоящей капли) */
+.blob--refraction {
+  background: radial-gradient(ellipse at 30% 30%, 
+                              rgba(100, 240, 80, 0.95), 
+                              rgba(20, 120, 10, 0.85)),
+              repeating-linear-gradient(45deg, 
+                              rgba(255, 255, 255, 0.05) 0px,
+                              rgba(255, 255, 255, 0.05) 2px,
+                              transparent 2px,
+                              transparent 8px);
+}
+
+/* Эффект "мокрого" блеска при наведении */
+.blob:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12),
+              inset 3px 3px 6px rgba(255, 255, 255, 0.7),
+              inset -2px -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.blob:hover::before {
+  width: 16px;
+  height: 16px;
+  top: 11px;
+  left: 11px;
+  transition: all 0.2s ease;
+}
+
+/* Убираем все hover-эффекты */
+.nav-item:hover {
+  background: transparent;
+  transform: none;
+}
+
+.nav-icon:hover svg {
+  stroke: #888888; /* Не меняется при наведении */
+}
+/* Мобильные устройства */
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 10px 12px 12px;  /* было 20px, стало 12px */
+    min-height: 65px;  /* было 75px, стало 65px */
+  }
+  
+  .blob {
+    height: 44px !important;  /* было 48px, стало 44px */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    bottom: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 8px 12px 10px;  /* было 18px, стало 10px */
+    min-height: 60px;  /* было 70px, стало 60px */
+  }
+  
+  .blob {
+    height: 40px !important;  /* было 44px, стало 40px */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    bottom: auto !important;
+    border-radius: 35px !important;
+  }
+  
+  .nav-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .nav-label {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-container {
+    padding: 6px 12px 8px;  /* было 16px, стало 8px */
+    min-height: 55px;  /* было 65px, стало 55px */
+  }
+  
+  .blob {
+    height: 36px !important;  /* было 40px, стало 36px */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+}
+
+/* Safe area для iPhone */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .nav-container {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));  /* было 20px, стало 10px */
+  }
+  
+  .blob {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    bottom: auto !important;
+  }
+}
+
+/* Safe area для iPhone */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .nav-container {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+  
+  .blob {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    bottom: auto !important;
+  }
+}
+
+/* Частицы */
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 7;
+}
+
+/* Фильтр для gooey эффекта */
+.gooey-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Скрываем старую волну и plus-btn */
+.wave {
+  display: none !important;
+}
+
+.plus-btn {
+  display: none !important;
+}
+
+/* Убираем blob-content если он есть */
+.blob-content {
+  display: none !important;
+}

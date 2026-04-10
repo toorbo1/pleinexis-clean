@@ -1,0 +1,197 @@
+/* ========== ФУТЕР (ПОДВАЛ) ДЛЯ ВСЕХ СТРАНИЦ ========== */
+.site-footer {
+  background: linear-gradient(135deg, #050505, #000000);
+  border-top: 1px solid rgba(59, 130, 246, 0.15);
+  margin-top: 40px;
+  padding: 40px 20px 20px;
+  width: 100%;
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footer-section {
+  text-align: left;
+}
+
+.footer-title {
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+  position: relative;
+  display: inline-block;
+}
+
+.footer-title::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+
+/* Способы оплаты */
+.payment-methods-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.payment-icon {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.payment-icon:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+}
+
+.payment-icon.visa,
+.payment-icon.mastercard,
+.payment-icon.mir {
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+/* Список ссылок */
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links-list li {
+  margin-bottom: 10px;
+}
+
+.footer-links-list a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.footer-links-list a:hover {
+  color: var(--accent-primary);
+  transform: translateX(4px);
+}
+
+/* Социальные сети */
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.social-link {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.social-link:hover {
+  background: var(--accent-primary);
+  color: white;
+  transform: translateY(-3px);
+}
+
+.social-link.telegram {
+  font-weight: bold;
+  font-family: monospace;
+}
+
+/* Кнопка поддержки */
+.support-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 10px 20px;
+  border-radius: 40px;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.support-btn:hover {
+  background: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+}
+
+/* Копирайт */
+.footer-copyright {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-copyright p {
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  margin: 0;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 30px 16px 16px;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    text-align: center;
+  }
+  
+  .footer-section {
+    text-align: center;
+  }
+  
+  .footer-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .payment-methods-footer {
+    justify-content: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  .footer-links-list a:hover {
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Плейнексис — Цифровой маркетплейс</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Anonymous+Pro:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS файлы -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/products.css">
+  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="css/chat.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/modals.css">
+  <link rel="stylesheet" href="css/detail-page.css">
+  <link rel="stylesheet" href="css/bottom-nav.css">
+  <link rel="stylesheet" href="css/payment.css">
+  <link rel="stylesheet" href="css/products-manage.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/tasks-create.css">
+  <link rel="stylesheet" href="css/withdraw.css">
+</head>
+<body>
+
+<!-- ХЕДЕР -->
+<div class="header">
+  <div class="header-left">
+    <img src="Робот с контроллером и текстом-Photoroom.jpg" alt="Плейнексис" class="header-logo">
+  </div>
+  <div class="header-right">
+    <div class="header-search">
+      <i class="fas fa-search"></i>
+      <input id="globalSearchInput" placeholder="Поиск товаров..." class="global-search-input">
+      <i class="fas fa-times" id="clearSearchBtn" style="display: none; cursor: pointer;"></i>
+    </div>
+    <button class="admin-toggle-btn" onclick="toggleAdminPanel()" id="adminToggleBtn">
+      <i class="fas fa-user-shield"></i>
+    </button>
+  </div>
+  <div class="nav-links" id="desktopNav">
+    <button class="nav-link active" data-nav="home"><i class="fas fa-home"></i><span>Главная</span></button>
+    <button class="nav-link" data-nav="chat"><i class="fab fa-telegram"></i><span>Чаты</span></button>
+    <button class="nav-link" data-nav="products-manage"><i class="fas fa-tag"></i><span>Товары</span></button>
+    <button class="nav-link" data-nav="profile"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
+  </div>
+</div>
+
+<!-- ==================== ГЛАВНАЯ ==================== -->
+<div class="page active" id="home">
+  <div class="top-links">
+    <a href="#" class="top-link" onclick="showInfo('about')">📖 О нас</a>
+    <a href="#" class="top-link" onclick="showInfo('privacy')">🔒 Политика</a>
+    <a href="#" class="top-link" onclick="showInfo('info')">ℹ️ О проекте</a>
+    <a href="#" class="top-link" onclick="showInfo('discounts')">🏷️ Скидки</a>
+    <a href="#" class="top-link" onclick="showInfo('interesting')">✨ Интересное</a>
+  </div>
+
+  <div class="logo-block1" id="greetingLogo">
+    <div class="hero-logo-text" id="typewriterText">Привет! :)</div>
+    <div class="hero-logo-subtitle">Цифровой маркетплейс</div>
+  </div>
+
+  <!-- СЛАЙДЕР (КАРУСЕЛЬ) -->
+  <div class="sliders-container">
+    <button class="slider-scroll-btn" id="scrollLeftBtn">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    
+    <div class="hero-sliders-wrapper" id="heroSlidersWrapper">
+      <div class="hero-sliders" id="heroSliders">
+        
+        <!-- Слайд 1 -->
+        <div class="slider-card">
+          <div class="mini-slider" data-slider="0">
+            <div class="mini-slider-wrapper">
+              <div class="mini-slider-images" id="slider0Images">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide 1">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide 2">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide 3">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide 4">
+              </div>
+            </div>
+            <div class="mini-slider-dots" id="slider0Dots"></div>
+          </div>
+        </div>
+        
+        <!-- Слайд 2 -->
+        <div class="slider-card">
+          <div class="mini-slider" data-slider="1">
+            <div class="mini-slider-wrapper">
+              <div class="mini-slider-images" id="slider1Images">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/40/78/e5/4078e5daa067fa17b71eb40261e106da.jpg" alt="slide 1">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/69/68/96/696896bfa0a5613f0ebe4b4d5481f5a8.jpg" alt="slide 2">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/fe/a8/8e/fea88e7cfac8a4ba70a87e022836dc05.jpg" alt="slide 3">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/31/0e/31/310e31770e6f9d02b3a5e2de008b58dc.jpg" alt="slide 4">
+              </div>
+            </div>
+            <div class="mini-slider-dots" id="slider1Dots"></div>
+          </div>
+        </div>
+        
+        <!-- Слайд 3 -->
+        <div class="slider-card">
+          <div class="mini-slider" data-slider="2">
+            <div class="mini-slider-wrapper">
+              <div class="mini-slider-images" id="slider2Images">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/de/f7/2b/def72b229b868259fd68d2122fdd162f.jpg" alt="slide 1">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/fb/e5/22/fbe5225d0d30b4a4250cbd16306311ee.jpg" alt="slide 2">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/33/f7/5a/33f75aee717c9220980be296efa46289.jpg" alt="slide 3">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/0e/0e/50/0e0e50e31b6abbeb0b835141fce5853f.jpg" alt="slide 4">
+              </div>
+            </div>
+            <div class="mini-slider-dots" id="slider2Dots"></div>
+          </div>
+        </div>
+        
+        <!-- Слайд 4 -->
+        <div class="slider-card">
+          <div class="mini-slider" data-slider="3">
+            <div class="mini-slider-wrapper">
+              <div class="mini-slider-images" id="slider3Images">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/8e/5b/0f/8e5b0f9fd6009019f19b0c7930979baa.jpg" alt="slide 1">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/47/f0/23/47f023d2b2e5944fbabf18cb079d9c6d.jpg" alt="slide 2">
+                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/1d/68/ae/1d68ae89b43e171904a6a565f0b758af.jpg" alt="slide 3">
+                <img class="mini-slide-img" src="https://i.pinimg.com/736x/96/85/ed/9685edf6785e3f3bba563d3e4d2eb366.jpg" alt="slide 4">
+              </div>
+            </div>
+            <div class="mini-slider-dots" id="slider3Dots"></div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <button class="slider-scroll-btn" id="scrollRightBtn">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+  
+  <!-- ПОПОЛНЕНИЕ БАЛАНСА STEAM -->
+  <div class="card-modern">
+    <h3>Пополнить баланс <strong>Steam</strong></h3>
+    <div class="steam-fields-row">
+      <div class="field-group">
+        <input class="input-modern" id="steamLogin" placeholder="Логин Steam">
+      </div>
+      <div class="field-group">
+        <input class="input-modern" id="amountInput" type="number" value="1000" placeholder="Сумма">
+      </div>
+    </div>
+    <div class="steam-info-row">
+      <span class="commission-badge"><i class="fas fa-percent"></i> Комиссия 5%</span>
+      <button class="promo-btn" onclick="alert('Введите промокод для получения скидки')"><i class="fas fa-ticket-alt"></i> Ввести промокод</button>
+    </div>
+    <div class="payment-section">
+      <button class="pay-btn-blue" id="payBtnDynamic"><i class="fas fa-credit-card"></i><span> Оплатить 1050 ₽</span></button>
+    </div>
+  </div>
+
+  <!-- ИГРЫ -->
+  <div class="games-header">
+    <h4><span class="game-text">ИГРЫ</span></h4>
+    <button class="scroll-btn" onclick="scrollGames('left')"><i class="fas fa-chevron-left"></i></button>
+    <button class="scroll-btn" onclick="scrollGames('right')"><i class="fas fa-chevron-right"></i></button>
+  </div>
+  <div class="games-scroll-container" id="gamesScrollContainer">
+    <div class="games-scroll-wrapper" id="gamesScrollWrapper"></div>
+  </div>
+
+  <!-- ПРИЛОЖЕНИЯ -->
+  <div class="games-header">
+    <h4><span class="game-text">ПРИЛОЖЕНИЯ</span></h4>
+    <button class="scroll-btn" onclick="scrollApps('left')"><i class="fas fa-chevron-left"></i></button>
+    <button class="scroll-btn" onclick="scrollApps('right')"><i class="fas fa-chevron-right"></i></button>
+  </div>
+  <div class="games-scroll-container" id="appsScrollContainer">
+    <div class="games-scroll-wrapper" id="appsScrollWrapper"></div>
+  </div>
+  
+  <!-- ТОВАРЫ НА ГЛАВНОЙ -->
+  <div class="products-header">
+    <h4><i class="fas fa-fire"></i> Товары <span id="productCountStat" style="font-size: 0.7rem; color: var(--text-muted);">(0)</span></h4>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</div>
+<!-- ==================== ЧАТ ==================== -->
+<div class="page" id="chat">
+  <div class="chats-container">
+    
+    <!-- САЙДБАР СО СПИСКОМ ЧАТОВ -->
+    <div class="chats-sidebar" id="chatsSidebar">
+      <div class="chats-sidebar-header">
+        <h3><i class="fas fa-comments"></i> Сообщения</h3>
+        <div class="chat-search">
+          <i class="fas fa-search"></i>
+          <input type="text" id="chatSearchInput" placeholder="Поиск диалогов...">
+        </div>
+      </div>
+      <div class="dialogs-list" id="dialogsList">
+        <div class="empty-dialogs">
+          <i class="fas fa-comment-dots"></i>
+          <p>Загрузка...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ОКНО ЧАТА -->
+    <div class="chat-window" id="chatWindow">
+      <!-- ХЕДЕР ЧАТА -->
+      <div class="chat-window-header">
+        <button class="back-to-chat-list" id="backToChatListBtn">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="chat-partner-avatar" id="chatPartnerAvatar">
+          🎧
+        </div>
+        <div class="chat-partner-info">
+          <div class="chat-partner-name" id="chatPartnerName">Поддержка</div>
+          <div class="chat-partner-status" id="chatPartnerStatus">
+            <span class="status-online"></span> онлайн 24/7
+          </div>
+        </div>
+      </div>
+      
+      <!-- ОБЛАСТЬ СООБЩЕНИЙ -->
+      <div class="chat-messages-area" id="chatMessagesArea">
+        <div class="empty-messages">
+          <i class="fas fa-headset"></i>
+          <p>Чат с поддержкой</p>
+          <span>Напишите ваш вопрос, и мы поможем!</span>
+        </div>
+      </div>
+      
+      <!-- ПОЛЕ ВВОДА -->
+      <div class="chat-input-wrapper">
+        <div class="chat-input-field">
+          <input type="text" id="chatMessageInput" placeholder="Введите сообщение...">
+        </div>
+        <button class="chat-send-btn" id="sendChatMsgBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<!-- ==================== ТОВАРЫ (УПРАВЛЕНИЕ) ==================== -->
+<div class="page" id="products-manage">
+  <div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+      <h2 style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #fff, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent;">
+        <i class="fas fa-tag"></i> Мои товары и подписки
+      </h2>
+      <button class="btn-glow" onclick="showCreateProductForm()" style="max-width: 220px; background: linear-gradient(105deg, #22c55e, #16a34a);">
+        <i class="fas fa-plus-circle"></i> Добавить товар
+      </button>
+    </div>
+    
+    <!-- ФОРМА ДОБАВЛЕНИЯ ТОВАРА -->
+    <div id="createProductForm" style="display: none;" class="product-form-card">
+      <div class="product-form-header">
+        <h2 style="font-size: 1.3rem; font-weight: 600; display: flex; align-items: center; gap: 10px; color: white;">
+          <i class="fas fa-plus-circle" style="color: #22c55e;"></i> Добавить новый товар / подписку
+        </h2>
+      </div>
+      <div class="product-form-body">
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-tags" style="color: #3b82f6;"></i> Категория товара <span style="color: #ef4444;">*</span></label>
+          <select id="productCategory" class="input-modern">
+            <option value="">Выберите категорию</option>
+            <option value="subscription">🎟️ Подписки и сервисы</option>
+            <option value="game">🎮 Игры и внутриигровые товары</option>
+            <option value="software">💻 Программы и лицензии</option>
+            <option value="service">🔧 Услуги и консультации</option>
+            <option value="other">📦 Другие цифровые товары</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-key" style="color: #3b82f6;"></i> Сервис / Ключевое слово <span style="color: #ef4444;">*</span></label>
+          <select id="productKeywordSelect" class="input-modern">
+            <option value="">Выберите сервис или ключевое слово</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-heading" style="color: #3b82f6;"></i> Название товара <span style="color: #ef4444;">*</span></label>
+          <input type="text" id="productTitle" class="input-modern" placeholder="Например: Discord Nitro 1 месяц, Steam Gift Card 1000₽">
+          <div class="char-counter" id="productTitleCounter">0/100</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-ruble-sign" style="color: #3b82f6;"></i> Цена <span style="color: #ef4444;">*</span></label>
+            <input type="text" id="productPrice" class="input-modern" placeholder="Например: 450 ₽ или 1000₽">
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-percent" style="color: #f59e0b;"></i> Скидка (опционально)</label>
+            <input type="text" id="productDiscount" class="input-modern" placeholder="Например: 20% или 100₽">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-clock" style="color: #3b82f6;"></i> Тип товара</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="productType" value="monthly" checked> Ежемесячная подписка</label>
+            <label class="radio-label"><input type="radio" name="productType" value="yearly"> Годовая подписка</label>
+            <label class="radio-label"><input type="radio" name="productType" value="one-time"> Одноразовая покупка</label>
+            <label class="radio-label"><input type="radio" name="productType" value="lifetime"> Бессрочная / Lifetime</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-align-left" style="color: #3b82f6;"></i> Описание товара <span style="color: #ef4444;">*</span></label>
+          <textarea id="productDescription" class="input-modern" rows="4" placeholder="Подробно опишите, что получает покупатель, особенности подписки, сроки доставки..."></textarea>
+          <div class="char-counter" id="productDescCounter">0/1000</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-info-circle" style="color: #3b82f6;"></i> Инструкция по активации (опционально)</label>
+          <textarea id="productInstructions" class="input-modern" rows="3" placeholder="Как активировать товар/подписку? Ссылки, коды, инструкции..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-image" style="color: #3b82f6;"></i> Изображение товара</label>
+          <div id="imageUploadArea" class="image-upload-area">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #3b82f6; margin-bottom: 8px; display: block;"></i>
+            <p style="color: #8f8f9e; font-size: 0.8rem;">Нажмите или перетащите изображение</p>
+            <p style="font-size: 0.7rem; color: #5f5f6b; margin-top: 8px;">Рекомендуемый размер: 400x300px (до 5МБ)</p>
+            <input type="file" id="productImageInput" style="display: none;" accept="image/jpeg,image/png,image/gif,image/webp">
+          </div>
+          <div id="imagePreviewGrid" class="image-preview-grid"></div>
+          <input type="hidden" id="productImageUrl" value="">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-at" style="color: #3b82f6;"></i> Контакты для связи (опционально)</label>
+          <input type="text" id="productContact" class="input-modern" placeholder="Telegram, Discord или другой мессенджер">
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-secondary" onclick="cancelCreateProduct()"><i class="fas fa-times"></i> Отмена</button>
+          <button class="btn-primary" onclick="createNewProduct()"><i class="fas fa-check-circle"></i> Опубликовать товар</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- СПИСОК ТОВАРОВ -->
+    <div class="products-list-container">
+      <div class="products-list-header">
+        <h3><i class="fas fa-box"></i> Мои товары и подписки</h3>
+        <span style="font-size: 0.8rem; color: #8f8f9e;" id="userProductsTotalCount">Всего: 0</span>
+      </div>
+      <div id="userProductsList">
+        <div class="empty-products-state">
+          <i class="fas fa-box-open"></i>
+          <p>У вас пока нет товаров</p>
+          <p style="font-size: 0.8rem; margin-top: 8px;">Нажмите "Добавить товар", чтобы выставить подписку или цифровой товар на продажу</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ПРОФИЛЬ ==================== -->
+<div class="page" id="profile">
+  <div class="profile-new-container">
+    <div class="profile-hero-section" id="profileHeroSection">
+      <button class="change-bg-btn-hero" id="changeHeroBgBtn" title="Сменить фон вокруг аватара"><i class="fas fa-palette"></i> Сменить фон</button>
+      <div class="hero-content">
+        <div class="avatar-centered">
+          <div class="avatar-wrapper">
+            <div class="avatar-circle" id="profileAvatarCircle"><span id="avatarInitial">Г</span></div>
+          </div>
+        </div>
+        <div class="hero-info">
+          <div class="hero-name" id="profileUsername">Гость</div>
+          <div class="hero-rating">
+            <span class="hero-stars">★★★★★</span>
+            <span class="hero-rating-value">5.0</span>
+          </div>
+          <div><span class="hero-reviews" id="profileReviewsLink">0 отзывов</span></div>
+          <div class="hero-since" id="profileJoined">на Плейнексис с января 2026</div>
+        </div>
+      </div>
+    </div>
+    
+<!-- Блок баланса -->
+<div class="profile-balance-card">
+  <div class="balance-left">
+    <div class="wallet-icon">💼</div>
+    <span class="balance-amount" id="profileBalance">0 ₽</span>
+  </div>
+  <div class="balance-chevron">›</div>
+</div>
+
+<!-- Новая кнопка витрины -->
+<button class="shop-window-btn" onclick="alert('🏪 Витрина магазина\n\nЗдесь будут отображаться ваши товары для покупателей.\nСкоро появится возможность настроить витрину!')">
+  🏪 Вы магазин? Подключить витрину
+</button>
+    
+    <div class="profile-stats-grid">
+      <div class="stat-item">
+        <div class="stat-number" id="profileProductsCount">0</div>
+        <div class="stat-label">Мои товары</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="profilePurchasesCount">0</div>
+        <div class="stat-label">Покупки</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="profileSalesCount">0</div>
+        <div class="stat-label">Продажи</div>
+      </div>
+    </div>
+    
+    <div class="profile-tabs">
+      <button class="profile-tab-btn active" data-tab="active"><i class="fas fa-fire"></i> Активные <span id="activeCount">0</span></button>
+      <button class="profile-tab-btn" data-tab="completed"><i class="fas fa-check-circle"></i> Завершённые <span id="completedCount">0</span></button>
+    </div>
+    
+    <div class="profile-products-list" id="profileProductsList">
+      <div class="empty-products">
+        <i class="fas fa-box-open"></i>
+        <p>Нет товаров</p>
+        <p class="empty-subtitle">Пора выставить свой товар на продажу</p>
+        <button class="btn-glow sell-btn" onclick="window.openModal()">Выставить товар</button>
+      </div>
+    </div>
+    
+    <div class="profile-payment-methods">
+      <h4><i class="fas fa-credit-card"></i> Способы оплаты</h4>
+      <div class="payment-icons">
+        <i class="fab fa-cc-visa"></i>
+        <i class="fab fa-cc-mastercard"></i>
+        <i class="fab fa-cc-mir"></i>
+        <i class="fab fa-apple-pay"></i>
+        <i class="fab fa-google-pay"></i>
+        <i class="fas fa-mobile-alt"></i>
+        <i class="fab fa-bitcoin"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== СТРАНИЦА КЛЮЧЕВОГО СЛОВА ==================== -->
+<div class="page" id="keywordPage">
+  <div class="keyword-page-header">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+    <h2 id="keywordPageTitle"></h2>
+  </div>
+  <div class="products-grid" id="keywordProductsGrid"></div>
+</div>
+
+<!-- АДМИН ПАНЕЛЬ (ПОЛНАЯ ВЕРСИЯ) -->
+<div class="page" id="admin">
+  <div class="admin-container">
+    <h2><i class="fas fa-user-shield"></i> Админ-панель</h2>
+    
+    <!-- КНОПКИ НАВИГАЦИИ ПО АДМИНКЕ -->
+    <div class="admin-nav-buttons" id="adminNavButtons"></div>
+    
+    <!-- ===== ОСНОВНАЯ СЕКЦИЯ ===== -->
+    <div id="adminMainSection" class="admin-section">
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-number" id="adminProductsCount">0</div>
+          <div class="admin-stat-label">Всего товаров</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-number" id="adminPendingCount">0</div>
+          <div class="admin-stat-label">На модерации</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-number" id="adminAdminsCount">0</div>
+          <div class="admin-stat-label">Администраторов</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-number" id="adminDialogsCount">0</div>
+          <div class="admin-stat-label">Чатов поддержки</div>
+        </div>
+      </div>
+      
+      <div class="admin-quick-actions">
+        <h3>Быстрые действия</h3>
+        <div class="quick-buttons">
+          <button class="quick-btn" onclick="showAdminSection('adminModerationSection')">
+            <i class="fas fa-clipboard-list"></i> Модерация
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminChatSection')">
+            <i class="fas fa-headset"></i> Чаты
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminSlidersSection')">
+            <i class="fas fa-images"></i> Слайдеры
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminAdminsSection')">
+            <i class="fas fa-users"></i> Админы
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminGamesSection')">
+            <i class="fas fa-gamepad"></i> Игры
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminAppsSection')">
+            <i class="fas fa-mobile-alt"></i> Приложения
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminProductsSection')">
+            <i class="fas fa-box"></i> Товары
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== 1. УПРАВЛЕНИЕ АДМИНИСТРАТОРАМИ ===== -->
+    <div id="adminAdminsSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-user-plus"></i> Назначить администратора</h3>
+        <div class="hire-admin-form">
+          <input type="text" id="newAdminUsername" class="input-modern" placeholder="Никнейм пользователя">
+          <button class="btn-glow" onclick="hireAdmin()">
+            <i class="fas fa-user-shield"></i> Назначить админом
+          </button>
+        </div>
+        <p class="help-text">* Пользователь должен быть зарегистрирован в системе</p>
+      </div>
+      
+      <div class="admin-card">
+        <h3><i class="fas fa-users"></i> Список администраторов</h3>
+        <div id="adminsList" class="admins-list"></div>
+      </div>
+    </div>
+    
+    <!-- ===== 2. МОДЕРАЦИЯ ТОВАРОВ ===== -->
+    <div id="adminModerationSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-clipboard-list"></i> Товары на модерации</h3>
+        <div id="pendingProductsList" class="pending-products-list"></div>
+      </div>
+    </div>
+    
+    <!-- ===== 3. РЕДАКТОР СЛАЙДЕРОВ ===== -->
+    <div id="adminSlidersSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-images"></i> Редактор слайдеров (карусель)</h3>
+        <p class="help-text">Редактируйте изображения в карусели на главной странице</p>
+        <button class="btn-glow" onclick="openSliderEditor()">
+          <i class="fas fa-edit"></i> Редактировать слайдеры
+        </button>
+      </div>
+    </div>
+    
+    <!-- ===== 4. ЧАТ ПОДДЕРЖКИ (АДМИН) ===== -->
+    <div id="adminChatSection" class="admin-section" style="display: none;">
+      <div class="admin-chat-container">
+        <!-- Сайдбар со списком чатов -->
+        <div class="admin-chat-sidebar" id="adminChatSidebar">
+          <div class="chat-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="adminChatSearchInput" placeholder="Поиск диалогов...">
+          </div>
+          <div class="admin-dialogs-list" id="adminDialogsList"></div>
+        </div>
+        
+        <!-- Окно чата -->
+        <div class="admin-chat-window" id="adminChatWindow" style="display: none;">
+          <div class="admin-chat-header">
+            <button class="back-to-list" id="backToAdminChatListBtn">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="admin-chat-partner">
+              <i class="fas fa-user-circle"></i>
+              <span id="adminChatPartnerName">Пользователь</span>
+            </div>
+          </div>
+          <div class="admin-chat-messages" id="adminChatMessagesArea">
+            <div class="empty-messages">
+              <i class="fas fa-comment-dots"></i>
+              <p>Выберите чат для начала общения</p>
+            </div>
+          </div>
+          <div class="admin-chat-input">
+            <input type="text" id="adminChatMessageInput" placeholder="Введите сообщение...">
+            <button id="sendAdminChatMsgBtn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== 5. УПРАВЛЕНИЕ ТОВАРАМИ (АДМИН) ===== -->
+    <div id="adminProductsSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-plus-circle"></i> Создать товар (админ)</h3>
+        <div class="form-group">
+          <select id="postKeyword" class="input-modern">
+            <option value="">Выберите ключевое слово/категорию</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="text" id="postType" placeholder="Тип подписки" class="input-modern">
+        </div>
+        <div class="form-group">
+          <input type="text" id="postTitle" placeholder="Название товара" class="input-modern">
+        </div>
+        <div class="form-group">
+          <input type="text" id="postPrice" placeholder="Цена" class="input-modern">
+        </div>
+        <div class="form-group">
+          <input type="text" id="postDiscount" placeholder="Скидка (например: 20% или 100₽)" class="input-modern">
+        </div>
+        <div class="form-group">
+          <textarea id="postDescription" placeholder="Описание товара" rows="4" class="input-modern"></textarea>
+        </div>
+        <div class="form-group">
+          <input type="text" id="postImageUrl" placeholder="URL фото" class="input-modern">
+        </div>
+        <div class="form-group">
+          <input type="text" id="postSeller" placeholder="Продавец" class="input-modern">
+        </div>
+        <button class="btn-glow" onclick="createAdminProduct()">
+          <i class="fas fa-check-circle"></i> Опубликовать товар
+        </button>
+      </div>
+      
+      <div class="admin-card">
+        <h3><i class="fas fa-list"></i> Управление товарами</h3>
+        <div class="admin-products-list" id="adminProductsList"></div>
+      </div>
+    </div>
+    
+    <!-- ===== 6. УПРАВЛЕНИЕ БЛОКАМИ ИГР ===== -->
+    <div id="adminGamesSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-gamepad"></i> Управление блоками игр</h3>
+        <div class="games-blocks-list" id="gamesBlocksList"></div>
+        <div class="add-game-block-form">
+          <h4>➕ Добавить новый блок</h4>
+          <input type="text" id="newGameName" placeholder="Название игры/блока" class="input-modern">
+          <select id="newGameKeyword" class="input-modern">
+            <option value="">Без привязки к ключевому слову</option>
+          </select>
+          <select id="newGameIcon" class="input-modern">
+            <option value="fas fa-gamepad">🎮 Gamepad</option>
+            <option value="fab fa-steam">🎮 Steam</option>
+            <option value="fab fa-discord">💬 Discord</option>
+            <option value="fas fa-crown">👑 Premium</option>
+            <option value="fas fa-crosshairs">🎯 Valorant</option>
+            <option value="fas fa-cube">🧱 Minecraft</option>
+            <option value="fas fa-skull">💀 CS</option>
+            <option value="fas fa-tree">🌲 Rust</option>
+            <option value="fas fa-plane">✈️ PUBG</option>
+            <option value="fas fa-dragon">🐉 Crimson Desert</option>
+            <option value="fas fa-tank">🚀 Танки</option>
+          </select>
+          <input type="text" id="newGameImageUrl" class="input-modern" placeholder="URL фото (необязательно)">
+          <button class="btn-glow" onclick="addGameBlock()">
+            <i class="fas fa-plus"></i> Добавить блок
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== 7. УПРАВЛЕНИЕ БЛОКАМИ ПРИЛОЖЕНИЙ ===== -->
+    <div id="adminAppsSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-mobile-alt"></i> Управление блоками приложений</h3>
+        <div class="games-blocks-list" id="appsBlocksList"></div>
+        <div class="add-game-block-form">
+          <h4>➕ Добавить новое приложение</h4>
+          <input type="text" id="newAppName" placeholder="Название приложения" class="input-modern">
+          <select id="newAppKeyword" class="input-modern">
+            <option value="">Без привязки к ключевому слову</option>
+          </select>
+          <select id="newAppIcon" class="input-modern">
+            <option value="fab fa-telegram">📱 Telegram</option>
+            <option value="fab fa-whatsapp">📱 WhatsApp</option>
+            <option value="fab fa-instagram">📸 Instagram</option>
+            <option value="fab fa-tiktok">🎵 TikTok</option>
+            <option value="fab fa-youtube">📺 YouTube</option>
+            <option value="fab fa-spotify">🎵 Spotify</option>
+            <option value="fas fa-tv">📺 Netflix</option>
+            <option value="fab fa-discord">💬 Discord</option>
+          </select>
+          <input type="text" id="newAppImageUrl" class="input-modern" placeholder="URL фото (необязательно)">
+          <button class="btn-glow" onclick="addAppBlock()">
+            <i class="fas fa-plus"></i> Добавить блок
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ ===== -->
+<div id="adminKeywordsSection" class="admin-section" style="display: none;">
+  <div class="admin-card">
+    <h3><i class="fas fa-tags"></i> Управление ключевыми словами (категориями)</h3>
+    <div class="keywords-list" id="keywordsList"></div>
+    <div class="add-keyword-form">
+      <h4>➕ Добавить ключевое слово</h4>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <input type="text" id="newKeywordName" class="input-modern" placeholder="Название (например: Steam, Discord)" style="flex: 1;">
+        <input type="text" id="newKeywordType" class="input-modern" placeholder="Тип (например: Premium, Nitro)" style="flex: 1;">
+        <button class="btn-glow" onclick="addKeyword()">
+          <i class="fas fa-plus"></i> Добавить
+        </button>
+      </div>
+      <p class="help-text">Ключевые слова используются для категоризации товаров и привязки блоков игр/приложений</p>
+    </div>
+  </div>
+</div>
+<!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТОРА СЛАЙДЕРОВ -->
+<div id="sliderEditorModal" class="modal-glass">
+  <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+    <h3><i class="fas fa-images"></i> Редактор слайдеров</h3>
+    <p class="help-text">Редактируйте изображения в карусели на главной странице</p>
+    <div id="sliderEditorContent"></div>
+    <div class="modal-actions" style="margin-top: 20px;">
+      <button class="btn-glow" onclick="closeSliderEditor()">Закрыть</button>
+    </div>
+  </div>
+</div>
+<!-- ==================== ДЕТАЛЬНАЯ КАРТОЧКА ТОВАРА ==================== -->
+<div id="detailPage" class="detail-page">
+  <div class="detail-header">
+    <h2><i class="fas fa-info-circle"></i> Детали товара</h2>
+    <button class="close-detail" onclick="window.closeDetail()"><i class="fas fa-times"></i></button>
+  </div>
+  <div id="detailContent"></div>
+</div>
+
+<!-- ==================== МОДАЛКА СОЗДАНИЯ ТОВАРА (старая) ==================== -->
+<div class="modal-glass" id="modalOverlay">
+  <div class="modal-content">
+    <h3>✨ Создать товар</h3>
+    <select id="productKeyword" class="input-modern">
+      <option value="">Выберите ключевое слово/категорию</option>
+    </select>
+    <input type="text" id="productType" class="input-modern" placeholder="Тип подписки">
+    <input class="input-modern" id="productTitleOld" placeholder="Название товара">
+    <input class="input-modern" id="productPriceOld" placeholder="Цена">
+    <textarea id="productDescriptionOld" class="input-modern" rows="3" placeholder="Описание товара"></textarea>
+    <input class="input-modern" id="productImageUrlOld" placeholder="URL фото">
+    <button class="btn-glow" onclick="window.createNewProductOld()">📦 Создать</button>
+    <button class="btn-glow" style="background:#334155;" onclick="window.closeModal()">Отмена</button>
+  </div>
+</div>
+
+<!-- ==================== НИЖНЯЯ НАВИГАЦИЯ ==================== -->
+<div class="bottom-nav">
+  <div class="nav-container" id="navContainer">
+    <button class="nav-item active" data-nav="home">
+      <div class="nav-icon"></div>
+      <div class="nav-label">Главная</div>
+    </button>
+    <button class="nav-item" data-nav="chat">
+      <div class="nav-icon"></div>
+      <div class="nav-label">Чаты</div>
+    </button>
+    <button class="nav-item" data-nav="products-manage">
+      <div class="nav-icon"></div>
+      <div class="nav-label">Товары</div>
+    </button>
+    <button class="nav-item" data-nav="profile">
+      <div class="nav-icon"></div>
+      <div class="nav-label">Профиль</div>
+    </button>
+    
+    <div id="mainBlob" class="blob"></div>
+    <div id="particlesContainer" class="particles-container"></div>
+  </div>
+</div>
+
+<!-- SVG фильтр для gooey эффекта -->
+<svg class="gooey-filter" style="position: absolute; width: 0; height: 0; pointer-events: none;">
+  <defs>
+    <filter id="gooeyFilter">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+      <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="gooey" />
+      <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
+    </filter>
+  </defs>
+</svg>
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
+<div class="page" id="withdrawPage">
+  <div class="withdraw-header">
+    <button class="back-btn" onclick="showPage('profile')">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+  </div>
+  
+  <div class="withdraw-container">
+    <!-- Баланс -->
+    <div class="balance-card">
+      <div class="balance-label">Доступно для вывода</div>
+      <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+      <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+    </div>
+
+    <!-- Способ вывода -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-wallet"></i> Способ вывода
+      </div>
+      <div class="methods-grid" id="methodsList"></div>
+    </div>
+
+    <!-- Реквизиты -->
+    <div class="section-card" id="detailsSection">
+      <div class="section-title">
+        <i class="fas fa-address-card"></i> Реквизиты
+      </div>
+      <div class="input-group">
+        <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+      </div>
+    </div>
+
+    <!-- Сумма -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-coins"></i> Сумма вывода
+      </div>
+      <div class="amount-row">
+        <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+        <div class="amount-presets">
+          <button class="preset-btn" data-amount="500">500₽</button>
+          <button class="preset-btn" data-amount="1000">1000₽</button>
+          <button class="preset-btn" data-amount="5000">5000₽</button>
+        </div>
+      </div>
+      
+      <div class="commission-info" id="commissionInfo">
+        <span>Комиссия системы:</span>
+        <span id="commissionValue">0 ₽</span>
+      </div>
+      <div class="commission-info">
+        <span>Итого к списанию:</span>
+        <span id="totalWithdraw">0 ₽</span>
+      </div>
+    </div>
+
+    <button class="withdraw-btn" id="submitWithdrawBtn">
+      <i class="fas fa-paper-plane"></i> Запросить вывод
+    </button>
+    <div class="warning-text">
+      <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов. Средства поступят на указанные реквизиты.
+    </div>
+  </div>
+</div>
+<!-- ==================== ФУТЕР ==================== -->
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-section">
+      <h4 class="footer-title">Способы оплаты</h4>
+      <div class="payment-methods-footer">
+        <div class="payment-icon">🛒</div>
+        <div class="payment-icon">💳</div>
+        <div class="payment-icon">📱</div>
+        <div class="payment-icon">💵</div>
+        <div class="payment-icon visa">Visa</div>
+        <div class="payment-icon mastercard">Mastercard</div>
+        <div class="payment-icon mir">МИР</div>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4 class="footer-title">Информация</h4>
+      <ul class="footer-links-list">
+        <li><a href="#" onclick="showInfo('privacy')">Политика конфиденциальности</a></li>
+        <li><a href="#" onclick="showInfo('info')">Условия продажи</a></li>
+        <li><a href="#" onclick="showInfo('about')">Пользовательское соглашение</a></li>
+        <li><a href="#" onclick="showInfo('contacts')">Контакты</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h4 class="footer-title">Социальные сети</h4>
+      <div class="social-links">
+        <a href="#" class="social-link">🔗</a>
+        <a href="#" class="social-link">👥</a>
+        <a href="#" class="social-link">🤝</a>
+        <a href="#" class="social-link">🌐</a>
+        <a href="#" class="social-link telegram">R</a>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4 class="footer-title">Поддержка</h4>
+      <button class="support-btn" onclick="navigate('chat')">📩 Написать в поддержку</button>
+    </div>
+  </div>
+  <div class="footer-copyright">
+    <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
+  </div>
+</footer>
+
+<!-- ==================== СКРИПТЫ ==================== -->
+<!-- 1. API -->
+<script src="js/api.js"></script>
+
+<!-- 2. GLOBAL FIX - синхронизация -->
+<script src="js/global-fix.js"></script>
+
+<!-- 3. Остальные скрипты -->
+<script src="js/auth-fix.js"></script>
+<script src="js/slider.js"></script>
+<script src="js/chats.js"></script>
+<script src="js/typewriter.js"></script>
+<script src="js/bottom-nav-blob.js"></script>
+<script src="js/profile-avatar-upload.js"></script>
+<script src="js/withdraw.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/products.js"></script>
+<script src="js/app.js"></script>
+<script src="js/profile-new.js"></script>
+<script src="js/products-manage.js"></script>
+
+<!-- 5. Финальная инициализация -->
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Финальная инициализация');
+    
+    // Убеждаемся, что товары загружены
+    if (typeof window.loadProducts === 'function') {
+        await window.loadProducts();
+    }
+    
+    // Показываем главную страницу
+    if (typeof window.showPage === 'function') {
+        window.showPage('home');
+    } else if (typeof window.navigate === 'function') {
+        window.navigate('home');
+    }
+});
+</script>
+
+</body>
+</html>
