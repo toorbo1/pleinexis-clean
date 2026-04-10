@@ -1,4 +1,4 @@
-// admin.js - ПОЛНАЯ АДМИН-ПАНЕЛЬ С СИНХРОНИЗАЦИЕЙ ЧЕРЕЗ API
+// admin.js - ПОЛНАЯ АДМИН-ПАНЕЛЬ (РАБОЧАЯ ВЕРСИЯ)
 
 let keywords = [];
 let gameBlocks = [];
@@ -44,7 +44,7 @@ async function updateAdminStats() {
     if (dialogsCount) dialogsCount.innerText = adminDialogs.length;
 }
 
-// ========== АДМИНИСТРАТОРЫ (API) ==========
+// ========== АДМИНИСТРАТОРЫ ==========
 async function loadAdmins() {
     try {
         admins = await API.getAdmins();
@@ -53,6 +53,27 @@ async function loadAdmins() {
         console.error(e);
         admins = [];
     }
+}
+
+function renderAdminsList() {
+    const container = document.getElementById("adminsList");
+    if (!container) return;
+    if (admins.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нет администраторов</div>';
+        return;
+    }
+    container.innerHTML = admins.map(admin => `
+        <div class="admin-user-item">
+            <div class="admin-user-info">
+                <div class="admin-user-avatar"><i class="fas fa-user-shield"></i></div>
+                <div>
+                    <div class="admin-user-name">${escapeHtml(admin.username)}${admin.is_owner ? '<span class="owner-badge">👑 Владелец</span>' : '<span class="admin-badge">Админ</span>'}</div>
+                    <div class="admin-user-date">Назначен: ${new Date(admin.hired_at).toLocaleDateString()}</div>
+                </div>
+            </div>
+            ${!admin.is_owner ? `<div class="admin-user-actions"><button class="delete-admin-btn" onclick="fireAdmin('${admin.id}')"><i class="fas fa-user-minus"></i> Уволить</button></div>` : ''}
+        </div>
+    `).join('');
 }
 
 async function hireAdmin() {
@@ -145,12 +166,12 @@ async function rejectProduct(productId) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== БЛОКИ ИГР (ЧЕРЕЗ API) ==========
+// ========== БЛОКИ ИГР ==========
 async function loadGameBlocks() {
     try {
         gameBlocks = await API.getGameBlocks();
         renderGamesBlocks();
-        renderHomeGameBlocks(); // обновить главную
+        if (typeof renderHomeGameBlocks === 'function') renderHomeGameBlocks();
         updateGameKeywordSelect();
     } catch(e) { console.error(e); gameBlocks = []; }
 }
@@ -221,12 +242,12 @@ async function editGameBlock(id) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== БЛОКИ ПРИЛОЖЕНИЙ (ЧЕРЕЗ API) ==========
+// ========== БЛОКИ ПРИЛОЖЕНИЙ ==========
 async function loadAppBlocks() {
     try {
         appBlocks = await API.getAppBlocks();
         renderAppsBlocks();
-        renderHomeAppBlocks();
+        if (typeof renderHomeAppBlocks === 'function') renderHomeAppBlocks();
         updateAppKeywordSelect();
     } catch(e) { console.error(e); appBlocks = []; }
 }
@@ -297,7 +318,7 @@ async function editAppBlock(id) {
     } catch(e) { showToast("❌ Ошибка: " + e.message, "error"); }
 }
 
-// ========== КЛЮЧЕВЫЕ СЛОВА (ЧЕРЕЗ API) ==========
+// ========== КЛЮЧЕВЫЕ СЛОВА ==========
 async function loadKeywords() {
     try {
         keywords = await API.getKeywords();
@@ -390,57 +411,6 @@ function updateAppKeywordSelect() {
     keywords.forEach(k => { select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type)}</option>`; });
 }
 
-// ========== ОТОБРАЖЕНИЕ НА ГЛАВНОЙ ==========
-function renderHomeGameBlocks() {
-    const container = document.getElementById("gamesScrollWrapper");
-    if (!container) return;
-    if (gameBlocks.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); padding: 20px;">Нет блоков</div>';
-        return;
-    }
-    const mid = Math.ceil(gameBlocks.length / 2);
-    const firstRow = gameBlocks.slice(0, mid);
-    const secondRow = gameBlocks.slice(mid);
-    container.innerHTML = `
-        <div class="games-row">${firstRow.map(block => gameCardHtml(block)).join('')}</div>
-        <div class="games-row-second">${secondRow.map(block => gameCardHtml(block)).join('')}</div>
-    `;
-}
-
-function renderHomeAppBlocks() {
-    const container = document.getElementById("appsScrollWrapper");
-    if (!container) return;
-    if (appBlocks.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); padding: 20px;">Нет блоков</div>';
-        return;
-    }
-    const mid = Math.ceil(appBlocks.length / 2);
-    const firstRow = appBlocks.slice(0, mid);
-    const secondRow = appBlocks.slice(mid);
-    container.innerHTML = `
-        <div class="games-row">${firstRow.map(block => gameCardHtml(block)).join('')}</div>
-        <div class="games-row-second">${secondRow.map(block => gameCardHtml(block)).join('')}</div>
-    `;
-}
-
-function gameCardHtml(block) {
-    let keywordName = block.name;
-    let hasKeyword = false;
-    if (block.keyword_id) {
-        const kw = keywords.find(k => k.id === block.keyword_id);
-        if (kw) { keywordName = kw.name; hasKeyword = true; }
-    }
-    return `
-        <div class="game-card" onclick="openKeywordPage('${escapeHtml(keywordName)}')">
-            <div class="game-icon">
-                ${block.image_url ? `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}">` : `<i class="${block.icon}"></i>`}
-            </div>
-            <div class="game-name">${escapeHtml(block.name)}</div>
-            ${hasKeyword ? `<div class="game-keyword-badge">🔗 ${escapeHtml(keywordName)}</div>` : ''}
-        </div>
-    `;
-}
-
 // ========== УПРАВЛЕНИЕ ТОВАРАМИ (АДМИН) ==========
 async function loadAdminProducts() {
     const container = document.getElementById("adminProductsList");
@@ -527,11 +497,116 @@ async function editProduct(productId) {
     showToast("Редактирование: заполните форму и нажмите 'Опубликовать товар'", "info");
 }
 
+// ========== СЛАЙДЕРЫ ==========
+function openSliderEditor() {
+    const modal = document.getElementById("sliderEditorModal");
+    if (modal) {
+        renderSliderEditorContent();
+        modal.classList.add("active");
+    }
+}
+
+function closeSliderEditor() {
+    const modal = document.getElementById("sliderEditorModal");
+    if (modal) modal.classList.remove("active");
+}
+
+function renderSliderEditorContent() {
+    const container = document.getElementById("sliderEditorContent");
+    if (!container) return;
+    const sliders = document.querySelectorAll('.mini-slider');
+    const slidesData = [];
+    sliders.forEach((slider, index) => {
+        const images = slider.querySelectorAll('.mini-slide-img');
+        const imageUrls = Array.from(images).map(img => img.src);
+        slidesData.push({ index, images: imageUrls });
+    });
+    if (slidesData.length === 0) {
+        container.innerHTML = '<div class="empty-state">Слайды не найдены</div>';
+        return;
+    }
+    container.innerHTML = slidesData.map(slide => `
+        <div class="slider-editor-card">
+            <div class="slider-editor-header"><h4>Слайд ${slide.index + 1}</h4><button class="add-slide-image-btn" onclick="addSlideImage(${slide.index})"><i class="fas fa-plus"></i> Добавить изображение</button></div>
+            <div class="slider-editor-images" id="sliderEditorImages_${slide.index}">
+                ${slide.images.map((img, imgIndex) => `
+                    <div class="slider-image-item">
+                        <img src="${escapeHtml(img)}" alt="slide ${imgIndex + 1}">
+                        <div class="slider-image-actions">
+                            <input type="text" class="image-url-input" value="${escapeHtml(img)}" onchange="updateSlideImage(${slide.index}, ${imgIndex}, this.value)">
+                            <button class="remove-image-btn" onclick="removeSlideImage(${slide.index}, ${imgIndex})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function addSlideImage(sliderIndex) {
+    const newUrl = prompt("Введите URL изображения:");
+    if (!newUrl) return;
+    const slider = document.querySelector(`.mini-slider[data-slider="${sliderIndex}"]`);
+    if (slider) {
+        const imagesContainer = slider.querySelector('.mini-slider-images');
+        const newImg = document.createElement('img');
+        newImg.className = 'mini-slide-img';
+        newImg.src = newUrl;
+        imagesContainer.appendChild(newImg);
+        const dotsContainer = slider.querySelector('.mini-slider-dots');
+        if (dotsContainer) {
+            const newDot = document.createElement('div');
+            newDot.className = 'mini-dot';
+            dotsContainer.appendChild(newDot);
+        }
+        if (typeof initMiniSliders === 'function') initMiniSliders();
+    }
+    renderSliderEditorContent();
+    showToast("Изображение добавлено!", "success");
+}
+
+function updateSlideImage(sliderIndex, imageIndex, newUrl) {
+    if (!newUrl) return;
+    const slider = document.querySelector(`.mini-slider[data-slider="${sliderIndex}"]`);
+    if (slider) {
+        const images = slider.querySelectorAll('.mini-slide-img');
+        if (images[imageIndex]) images[imageIndex].src = newUrl;
+    }
+    showToast("Изображение обновлено!", "success");
+}
+
+function removeSlideImage(sliderIndex, imageIndex) {
+    if (confirm("Удалить это изображение?")) {
+        const slider = document.querySelector(`.mini-slider[data-slider="${sliderIndex}"]`);
+        if (slider) {
+            const images = slider.querySelectorAll('.mini-slide-img');
+            const dots = slider.querySelectorAll('.mini-dot');
+            if (images[imageIndex]) images[imageIndex].remove();
+            if (dots[imageIndex]) dots[imageIndex].remove();
+            if (typeof initMiniSliders === 'function') initMiniSliders();
+        }
+        renderSliderEditorContent();
+        showToast("Изображение удалено!", "success");
+    }
+}
+
 // ========== ЧАТ ПОДДЕРЖКИ (АДМИН) ==========
 function loadAdminDialogs() {
     const stored = localStorage.getItem("apex_admin_dialogs");
-    adminDialogs = stored ? JSON.parse(stored) : [];
+    if (stored) {
+        adminDialogs = JSON.parse(stored);
+    } else {
+        adminDialogs = [{
+            id: "admin_dialog_1",
+            userName: "Гость",
+            userId: "guest",
+            messages: [{ sender: "guest", text: "Здравствуйте! У меня проблема с оплатой", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: new Date(Date.now() - 3600000).toISOString() }],
+            lastMessageTime: new Date(Date.now() - 3600000).toISOString()
+        }];
+        saveAdminDialogs();
+    }
     renderAdminDialogsList();
+    updateAdminStats();
 }
 
 function saveAdminDialogs() { localStorage.setItem("apex_admin_dialogs", JSON.stringify(adminDialogs)); }
@@ -539,21 +614,110 @@ function saveAdminDialogs() { localStorage.setItem("apex_admin_dialogs", JSON.st
 function renderAdminDialogsList(searchTerm = '') {
     const container = document.getElementById("adminDialogsList");
     if (!container) return;
-    let filtered = adminDialogs.filter(d => d.userName.toLowerCase().includes(searchTerm.toLowerCase()));
-    if (filtered.length === 0) { container.innerHTML = '<div class="empty-dialogs"><i class="fas fa-comments"></i><p>Нет диалогов</p></div>'; return; }
-    container.innerHTML = filtered.map(dialog => `
-        <div class="admin-dialog-item ${adminCurrentDialogId === dialog.id ? 'active' : ''}" onclick="openAdminDialog('${dialog.id}')">
-            <div class="admin-dialog-avatar"><i class="fas fa-user-circle"></i></div>
-            <div class="admin-dialog-info"><div class="admin-dialog-name">${escapeHtml(dialog.userName)}</div><div class="admin-dialog-preview">${escapeHtml(dialog.messages[dialog.messages.length-1]?.text.substring(0,40) || '')}</div></div>
-            <div class="admin-dialog-time">${dialog.messages[dialog.messages.length-1]?.time || ''}</div>
-        </div>
-    `).join('');
+    let filtered = adminDialogs;
+    if (searchTerm) filtered = adminDialogs.filter(d => d.userName.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-dialogs"><i class="fas fa-comments"></i><p>Нет диалогов</p></div>';
+        return;
+    }
+    container.innerHTML = filtered.map(dialog => {
+        const lastMsg = dialog.messages[dialog.messages.length - 1];
+        const preview = lastMsg ? (lastMsg.sender === "support" ? "Поддержка: " + lastMsg.text : lastMsg.text) : "Нет сообщений";
+        const shortPreview = preview.length > 40 ? preview.substring(0, 40) + '...' : preview;
+        return `
+            <div class="admin-dialog-item ${adminCurrentDialogId === dialog.id ? 'active' : ''}" onclick="openAdminDialog('${dialog.id}')">
+                <div class="admin-dialog-avatar"><i class="fas fa-user-circle"></i></div>
+                <div class="admin-dialog-info"><div class="admin-dialog-name">${escapeHtml(dialog.userName)}</div><div class="admin-dialog-preview">${escapeHtml(shortPreview)}</div></div>
+                <div class="admin-dialog-time">${lastMsg ? lastMsg.time : ''}</div>
+            </div>
+        `;
+    }).join('');
 }
 
-function openAdminDialog(dialogId) { /* ... существующая логика ... */ }
-function closeAdminChat() { /* ... */ }
-function sendAdminMessage() { /* ... */ }
-function setupAdminChatListeners() { /* ... */ }
+function openAdminDialog(dialogId) {
+    const dialog = adminDialogs.find(d => d.id === dialogId);
+    if (!dialog) return;
+    adminCurrentDialogId = dialogId;
+    dialog.messages.forEach(m => { if (m.sender !== "support") m.read = true; });
+    saveAdminDialogs();
+    const sidebar = document.getElementById("adminChatSidebar");
+    const chatWindow = document.getElementById("adminChatWindow");
+    if (sidebar) sidebar.classList.add("hide");
+    if (chatWindow) {
+        chatWindow.style.display = "flex";
+        chatWindow.classList.add("active");
+    }
+    const partnerName = document.getElementById("adminChatPartnerName");
+    if (partnerName) partnerName.textContent = dialog.userName;
+    renderAdminMessages(dialogId);
+    renderAdminDialogsList();
+}
+
+function closeAdminChat() {
+    const sidebar = document.getElementById("adminChatSidebar");
+    const chatWindow = document.getElementById("adminChatWindow");
+    if (sidebar) sidebar.classList.remove("hide");
+    if (chatWindow) {
+        chatWindow.style.display = "none";
+        chatWindow.classList.remove("active");
+    }
+    adminCurrentDialogId = null;
+}
+
+function renderAdminMessages(dialogId) {
+    const dialog = adminDialogs.find(d => d.id === dialogId);
+    const area = document.getElementById("adminChatMessagesArea");
+    if (!area || !dialog) return;
+    if (dialog.messages.length === 0) {
+        area.innerHTML = '<div class="empty-messages"><i class="fas fa-comment-dots"></i><p>Нет сообщений</p></div>';
+        return;
+    }
+    let html = '';
+    let lastDate = null;
+    dialog.messages.forEach((msg) => {
+        const isOut = msg.sender === "support";
+        const msgDate = new Date(msg.timestamp);
+        const today = new Date();
+        const isToday = msgDate.toDateString() === today.toDateString();
+        if (lastDate !== msgDate.toDateString()) {
+            lastDate = msgDate.toDateString();
+            const dateStr = isToday ? 'Сегодня' : msgDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+            html += `<div class="date-divider"><span>${dateStr}</span></div>`;
+        }
+        let messageText = escapeHtml(msg.text);
+        messageText = messageText.replace(/\n/g, '<br>');
+        html += `<div class="message-group ${isOut ? 'outgoing' : 'incoming'}"><div class="message-content"><div class="message-bubble ${isOut ? 'out' : 'in'}">${messageText}</div><div class="message-time">${msg.time}</div></div></div>`;
+    });
+    area.innerHTML = html;
+    area.scrollTop = area.scrollHeight;
+}
+
+function sendAdminMessage() {
+    const input = document.getElementById("adminChatMessageInput");
+    const text = input.value.trim();
+    if (!text || !adminCurrentDialogId) return;
+    const dialogIndex = adminDialogs.findIndex(d => d.id === adminCurrentDialogId);
+    if (dialogIndex === -1) return;
+    const now = new Date();
+    const newMsg = { sender: "support", text: text, time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), timestamp: now.toISOString() };
+    adminDialogs[dialogIndex].messages.push(newMsg);
+    adminDialogs[dialogIndex].lastMessageTime = now.toISOString();
+    saveAdminDialogs();
+    renderAdminMessages(adminCurrentDialogId);
+    renderAdminDialogsList();
+    input.value = "";
+}
+
+function setupAdminChatListeners() {
+    const sendBtn = document.getElementById("sendAdminChatMsgBtn");
+    const msgInput = document.getElementById("adminChatMessageInput");
+    const searchInput = document.getElementById("adminChatSearchInput");
+    const backBtn = document.getElementById("backToAdminChatListBtn");
+    if (sendBtn) { const newBtn = sendBtn.cloneNode(true); sendBtn.parentNode.replaceChild(newBtn, sendBtn); newBtn.onclick = sendAdminMessage; }
+    if (msgInput) { msgInput.onkeypress = (e) => { if (e.key === "Enter") { e.preventDefault(); sendAdminMessage(); } }; }
+    if (searchInput) { searchInput.oninput = (e) => renderAdminDialogsList(e.target.value); }
+    if (backBtn) { const newBackBtn = backBtn.cloneNode(true); backBtn.parentNode.replaceChild(newBackBtn, backBtn); newBackBtn.onclick = closeAdminChat; }
+}
 
 // ========== НАВИГАЦИЯ ПО АДМИНКЕ ==========
 function renderAdminNavButtons() {
@@ -574,17 +738,63 @@ function renderAdminNavButtons() {
 }
 
 function showAdminSection(sectionId) {
-    document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
+    const sections = ["adminMainSection", "adminAdminsSection", "adminKeywordsSection", "adminModerationSection", "adminSlidersSection", "adminChatSection", "adminProductsSection", "adminGamesSection", "adminAppsSection"];
+    sections.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "none"; });
     const target = document.getElementById(sectionId);
-    if (target) target.style.display = 'block';
+    if (target) target.style.display = "block";
     document.querySelectorAll('.admin-nav-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = Array.from(document.querySelectorAll('.admin-nav-btn')).find(btn => btn.getAttribute('onclick')?.includes(sectionId));
     if (activeBtn) activeBtn.classList.add('active');
 }
 
+// ========== ВХОД В АДМИНКУ ==========
+function toggleAdminPanel() {
+    const currentUser = localStorage.getItem("apex_user") || "Гость";
+    if (!admins.some(a => a.username === currentUser)) {
+        const password = prompt("Введите пароль администратора:");
+        if (password === ADMIN_PASSWORD) {
+            showAdminUI();
+        } else { alert("Неверный пароль!"); }
+    } else {
+        if (typeof navigate === 'function') navigate("admin");
+        else if (typeof showPage === 'function') showPage("admin");
+    }
+}
+
+function showAdminUI() {
+    const adminBtn = document.getElementById("adminToggleBtn");
+    if (adminBtn) { adminBtn.style.background = "var(--accent-primary)"; adminBtn.innerHTML = '<i class="fas fa-user-shield"></i>'; }
+    const bottomNav = document.getElementById("bottomNav");
+    if (bottomNav && !document.getElementById("adminNavBtn")) {
+        const adminNavBtn = document.createElement("button");
+        adminNavBtn.className = "nav-item";
+        adminNavBtn.id = "adminNavBtn";
+        adminNavBtn.setAttribute("data-nav", "admin");
+        adminNavBtn.innerHTML = '<div class="nav-icon"></div><div class="nav-label">Админ</div>';
+        const navContainer = document.getElementById("navContainer");
+        if (navContainer) navContainer.appendChild(adminNavBtn);
+        if (window.initBlobNavigation) window.initBlobNavigation();
+        alert("Добро пожаловать в админ-панель!");
+        initAdmin();
+    }
+}
+
 // ========== ВСПОМОГАТЕЛЬНЫЕ ==========
 function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-function showToast(message, type = 'success') { /* ... тост ... */ }
+
+function showToast(message, type = 'success') {
+    let toast = document.getElementById('adminToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'adminToast';
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle');
+    toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    toast.className = `toast-notification ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
 
 // ========== ЭКСПОРТ ==========
 window.initAdmin = initAdmin;
@@ -611,9 +821,11 @@ window.createAdminProduct = createAdminProduct;
 window.deleteProduct = deleteProduct;
 window.editProduct = editProduct;
 window.toggleAdminPanel = toggleAdminPanel;
-window.openKeywordPage = openKeywordPage;
 window.addKeyword = addKeyword;
 window.editKeyword = editKeyword;
 window.deleteKeyword = deleteKeyword;
 
-document.addEventListener('DOMContentLoaded', () => initAdmin());
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM loaded, initializing admin...");
+    initAdmin();
+});
