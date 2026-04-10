@@ -1586,3 +1586,15 @@ html::-webkit-scrollbar-thumb:hover {
     overflow: visible !important;
     width: 100%;
 }
+
+/* Базовые стили для блоков */
+.games-scroll-container {
+    overflow-x: auto;
+    overflow-y: visible;
+    margin-bottom: 24px;
+}
+
+#gamesScrollWrapper, #appsScrollWrapper {
+    width: 100%;
+    min-height: 200px;
+}
