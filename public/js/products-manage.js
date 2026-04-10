@@ -148,6 +148,8 @@ function cancelCreateProduct() {
     removeProductImage();
 }
 
+// ========== СОЗДАНИЕ ТОВАРА С ОТПРАВКОЙ НА МОДЕРАЦИЮ ==========
+
 async function createNewProduct() {
     console.log('🔵 Создание товара...');
     
@@ -158,8 +160,6 @@ async function createNewProduct() {
     const discount = document.getElementById('productDiscount')?.value.trim();
     const description = document.getElementById('productDescription')?.value.trim();
     const instructions = document.getElementById('productInstructions')?.value.trim();
-    const contact = document.getElementById('productContact')?.value.trim();
-    const productType = document.querySelector('input[name="productType"]:checked')?.value || 'monthly';
     const imageUrl = document.getElementById('productImageUrl')?.value;
     
     // Валидация
@@ -204,7 +204,7 @@ async function createNewProduct() {
     const currentUser = localStorage.getItem('apex_user') || 'Гость';
     
     const productData = {
-        title,
+        title: title,
         price: finalPrice,
         seller: currentUser,
         keyword: keywordName,
@@ -212,20 +212,27 @@ async function createNewProduct() {
         description: fullDescription,
         discount: discountText,
         original_price: originalPrice,
-        contact: contact || '',
-        type: productType
+        contact: document.getElementById('productContact')?.value.trim() || '',
+        type: document.querySelector('input[name="productType"]:checked')?.value || 'monthly'
     };
     
     try {
+        console.log('📤 Отправка товара на модерацию:', productData);
         const result = await API.createPendingProduct(productData);
+        console.log('✅ Товар отправлен на модерацию:', result);
         showToast('✅ Товар отправлен на модерацию!', 'success');
         cancelCreateProduct();
         await renderUserProductsList();
+        
+        // Обновляем главную страницу
+        if (typeof window.loadProducts === 'function') {
+            await window.loadProducts();
+        }
     } catch(error) {
+        console.error('❌ Ошибка:', error);
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }
-
 async function renderUserProductsList() {
     const container = document.getElementById('userProductsList');
     if (!container) return;

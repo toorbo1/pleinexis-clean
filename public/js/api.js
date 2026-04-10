@@ -24,7 +24,9 @@ const API = {
     
     // Товары
     async getProducts() {
-        return await this.request('/api/products');
+        const products = await this.request('/api/products');
+        console.log('📦 API getProducts:', products.length, 'товаров');
+        return products;
     },
     
     async getProduct(id) {
@@ -57,6 +59,7 @@ const API = {
     },
     
     async createPendingProduct(product) {
+        console.log('📤 Отправка товара на модерацию:', product);
         return await this.request('/api/pending-products', {
             method: 'POST',
             body: JSON.stringify(product)
