@@ -9,12 +9,33 @@ app.use(express.static('public'));
 // ========== ПОДКЛЮЧЕНИЕ К POSTGRESQL ==========
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// ========== ФУНКЦИЯ ПРОВЕРКИ ПОДКЛЮЧЕНИЯ ==========
+async function testConnection() {
+    try {
+        const client = await pool.connect();
+        console.log('✅ PostgreSQL подключена успешно');
+        client.release();
+        return true;
+    } catch (error) {
+        console.error('❌ Ошибка подключения к PostgreSQL:', error.message);
+        return false;
+    }
+}
 
 // ========== СОЗДАНИЕ ВСЕХ ТАБЛИЦ ==========
 async function initTables() {
+    console.log('🔄 Создание таблиц в PostgreSQL...');
+    
     try {
+        // Проверяем подключение
+        const isConnected = await testConnection();
+        if (!isConnected) {
+            throw new Error('Нет подключения к базе данных');
+        }
+
         // 1. Таблица товаров
         await pool.query(`
             CREATE TABLE IF NOT EXISTS products (
@@ -33,7 +54,7 @@ async function initTables() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица products создана');
+        console.log('✅ Таблица products создана/проверена');
 
         // 2. Таблица товаров на модерации
         await pool.query(`
@@ -52,7 +73,7 @@ async function initTables() {
                 created_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица pending_products создана');
+        console.log('✅ Таблица pending_products создана/проверена');
 
         // 3. Таблица ключевых слов
         await pool.query(`
@@ -62,7 +83,7 @@ async function initTables() {
                 type TEXT
             )
         `);
-        console.log('✅ Таблица keywords создана');
+        console.log('✅ Таблица keywords создана/проверена');
 
         // 4. Таблица игр (game_blocks)
         await pool.query(`
@@ -75,7 +96,7 @@ async function initTables() {
                 sort_order INTEGER DEFAULT 0
             )
         `);
-        console.log('✅ Таблица game_blocks создана');
+        console.log('✅ Таблица game_blocks создана/проверена');
 
         // 5. Таблица приложений (app_blocks)
         await pool.query(`
@@ -88,7 +109,7 @@ async function initTables() {
                 sort_order INTEGER DEFAULT 0
             )
         `);
-        console.log('✅ Таблица app_blocks создана');
+        console.log('✅ Таблица app_blocks создана/проверена');
 
         // 6. Таблица администраторов
         await pool.query(`
@@ -100,7 +121,7 @@ async function initTables() {
                 hired_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица admins создана');
+        console.log('✅ Таблица admins создана/проверена');
 
         // 7. Таблица диалогов поддержки
         await pool.query(`
@@ -111,7 +132,7 @@ async function initTables() {
                 last_message_time TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица support_dialogs создана');
+        console.log('✅ Таблица support_dialogs создана/проверена');
 
         // 8. Таблица сообщений
         await pool.query(`
@@ -124,7 +145,7 @@ async function initTables() {
                 timestamp TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица messages создана');
+        console.log('✅ Таблица messages создана/проверена');
 
         // 9. Таблица заявок на вывод средств
         await pool.query(`
@@ -141,7 +162,7 @@ async function initTables() {
                 date TIMESTAMP DEFAULT NOW()
             )
         `);
-        console.log('✅ Таблица withdraw_requests создана');
+        console.log('✅ Таблица withdraw_requests создана/проверена');
 
         // ========== ДОБАВЛЕНИЕ НАЧАЛЬНЫХ ДАННЫХ ==========
 
@@ -210,16 +231,17 @@ async function initTables() {
             console.log('✅ Начальный администратор добавлен');
         }
 
-        console.log('✅ Все таблицы созданы и заполнены начальными данными!');
+        console.log('🎉 Все таблицы успешно созданы и заполнены начальными данными!');
+        return true;
+        
     } catch (error) {
-        console.error('❌ Ошибка создания таблиц:', error.message);
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА при создании таблиц:', error.message);
+        console.error('Детали:', error.stack);
+        return false;
     }
 }
 
-// Запускаем создание таблиц
-initTables();
-
-// ==================== ТОВАРЫ ====================
+// ==================== API ЭНДПОИНТЫ ====================
 
 // Получить все товары
 app.get('/api/products', async (req, res) => {
@@ -499,9 +521,29 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ==================== ЗАПУСК ====================
+// ==================== ЗАПУСК СЕРВЕРА С ИНИЦИАЛИЗАЦИЕЙ БД ====================
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Сервер запущен на порту ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
-});
+
+// Функция запуска сервера ПОСЛЕ создания таблиц
+async function startServer() {
+    console.log('🚀 Запуск сервера Плейнексис...');
+    console.log('📦 Версия: 1.0.0');
+    
+    // Сначала создаем таблицы
+    const tablesCreated = await initTables();
+    
+    if (!tablesCreated) {
+        console.error('❌ Не удалось создать таблицы. Сервер не будет запущен.');
+        process.exit(1);
+    }
+    
+    // Запускаем HTTP сервер
+    app.listen(PORT, () => {
+        console.log(`✅ HTTP сервер запущен на порту ${PORT}`);
+        console.log(`📍 http://localhost:${PORT}`);
+        console.log(`🔄 База данных: ${process.env.DATABASE_URL ? 'Railway PostgreSQL' : 'Локальная'}`);
+    });
+}
+
+// Запускаем сервер
+startServer();
