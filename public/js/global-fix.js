@@ -75,6 +75,38 @@ window.renderHomeGameBlocks = async function() {
     }
 };
 
+window.renderHomeAppBlocks = async function() {
+    const wrapper = document.getElementById('appsScrollWrapper');
+    if (!wrapper) {
+        console.warn('appsScrollWrapper не найден');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/app-blocks');
+        const blocks = await res.json();
+        
+        wrapper.innerHTML = blocks.length ? `
+            <div class="horizontal-scroll-container">
+                ${blocks.map(b => `
+                    <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(b.name)}')">
+                        <div class="vertical-card-inner">
+                            <img class="vertical-card-img" src="${escapeHtml(b.image_url)}" 
+                                 alt="${escapeHtml(b.name)}"
+                                 onerror="this.src='https://picsum.photos/id/42/400/500'">
+                            <div class="vertical-card-title">
+                                <span>${escapeHtml(b.name)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : '<div class="empty-state">Нет блоков приложений</div>';
+    } catch (e) {
+        console.error('Ошибка загрузки приложений:', e);
+        wrapper.innerHTML = '<div class="empty-state">Ошибка загрузки</div>';
+    }
+};
 
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
