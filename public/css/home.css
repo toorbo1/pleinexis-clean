@@ -957,3 +957,61 @@ html::-webkit-scrollbar-thumb:hover {
   font-size: 1.3rem;
   font-weight: 600;
 }
+
+
+/* Горизонтальные блоки игр и приложений */
+.games-scroll-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin: 0 -16px;
+    padding: 0 16px;
+}
+.games-scroll-wrapper {
+    display: inline-flex;
+    gap: 16px;
+    padding: 8px 0;
+}
+.game-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 12px 8px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+.game-card:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+.game-icon {
+    font-size: 32px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    margin-bottom: 8px;
+}
+.game-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.game-name {
+    font-size: 12px;
+    text-align: center;
+    font-weight: 500;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 90px;
+}
