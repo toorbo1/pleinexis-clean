@@ -1,8 +1,6 @@
-// ========== УПРАВЛЕНИЕ ТОВАРАМИ (ПОДПИСКАМИ) ==========
-// Полностью через API, с разделением на модерацию
+// ========== УПРАВЛЕНИЕ ТОВАРАМИ ==========
 
 let productImageFile = null;
-let currentEditingProductId = null;
 
 function escapeHtml(str) {
     if (!str) return '';
@@ -61,11 +59,10 @@ async function loadKeywordsForProductSelect() {
     if (!select) return;
     
     try {
-        const response = await fetch('/api/keywords');
-        const keywords = await response.json();
+        const keywords = await API.getKeywords();
         select.innerHTML = '<option value="">Выберите сервис или ключевое слово</option>';
         keywords.forEach(kw => {
-            select.innerHTML += `<option value="${escapeHtml(kw.id)}">${escapeHtml(kw.name)} - ${escapeHtml(kw.type)}</option>`;
+            select.innerHTML += `<option value="${escapeHtml(kw.id)}">${escapeHtml(kw.name)} - ${escapeHtml(kw.type || 'Стандарт')}</option>`;
         });
     } catch(e) {
         console.error('Ошибка загрузки ключевых слов:', e);
@@ -149,19 +146,10 @@ function cancelCreateProduct() {
     document.getElementById('productDescCounter').innerText = '0/1000';
     document.querySelector('input[name="productType"][value="monthly"]').checked = true;
     removeProductImage();
-    currentEditingProductId = null;
 }
 
-// Проверка, является ли пользователь админом (из localStorage)
-function isUserAdmin() {
-    const currentUser = localStorage.getItem('apex_user') || 'Гость';
-    const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
-    return admins.some(a => a.username === currentUser);
-}
-
-// Создание товара (с учётом роли)
 async function createNewProduct() {
-    console.log('🔵 createNewProduct вызвана');
+    console.log('🔵 Создание товара...');
     
     const category = document.getElementById('productCategory')?.value;
     const keywordId = document.getElementById('productKeywordSelect')?.value;
@@ -181,13 +169,11 @@ async function createNewProduct() {
     if (title.length < 3) { showToast('Название должно быть не менее 3 символов', 'error'); return; }
     if (!price) { showToast('Введите цену товара', 'error'); return; }
     if (!description) { showToast('Введите описание товара', 'error'); return; }
-    if (description.length < 20) { showToast('Описание должно быть не менее 20 символов', 'error'); return; }
     
     // Получаем имя ключевого слова
     let keywordName = '';
     try {
-        const resp = await fetch('/api/keywords');
-        const keywords = await resp.json();
+        const keywords = await API.getKeywords();
         const selected = keywords.find(k => k.id === keywordId);
         if (selected) keywordName = selected.name;
     } catch(e) { console.error(e); }
@@ -216,6 +202,7 @@ async function createNewProduct() {
     }
     
     const currentUser = localStorage.getItem('apex_user') || 'Гость';
+    
     const productData = {
         title,
         price: finalPrice,
@@ -224,37 +211,19 @@ async function createNewProduct() {
         image_url: imageUrl || 'https://picsum.photos/id/42/400/200',
         description: fullDescription,
         discount: discountText,
-        originalPrice: originalPrice,
+        original_price: originalPrice,
         contact: contact || '',
         type: productType
     };
     
-    // Определяем, куда отправлять – сразу в товары или на модерацию
-    const isAdmin = isUserAdmin();
-    const endpoint = isAdmin ? '/api/products' : '/api/pending-products';
-    
     try {
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-        });
-        if (!response.ok) throw new Error('Ошибка при сохранении');
+        const result = await API.createProduct(productData);
+        console.log('Товар создан:', result);
+        showToast('✅ Товар опубликован!', 'success');
         
-        const saved = await response.json();
-        console.log('Товар сохранён:', saved);
-        
-        if (isAdmin) {
-            showToast('✅ Товар опубликован!', 'success');
-        } else {
-            showToast('✅ Товар отправлен на модерацию!', 'success');
-        }
-        
-        // Очищаем форму и обновляем списки
         cancelCreateProduct();
         await renderUserProductsList();
         if (typeof window.loadProducts === 'function') await window.loadProducts();
-        if (typeof updateUserProductsCount === 'function') updateUserProductsCount();
         
     } catch(error) {
         console.error(error);
@@ -262,15 +231,13 @@ async function createNewProduct() {
     }
 }
 
-// Отображение товаров пользователя (только одобренные)
 async function renderUserProductsList() {
     const container = document.getElementById('userProductsList');
     if (!container) return;
     
     const currentUser = localStorage.getItem('apex_user') || 'Гость';
     try {
-        const response = await fetch('/api/products');
-        const allProducts = await response.json();
+        const allProducts = await API.getProducts();
         const userProducts = allProducts.filter(p => p.seller === currentUser);
         
         const totalSpan = document.getElementById('userProductsTotalCount');
@@ -296,7 +263,6 @@ async function renderUserProductsList() {
                     <div class="product-item-keyword">${escapeHtml(product.keyword || 'Без категории')}</div>
                 </div>
                 <div class="product-item-actions">
-                    <button class="edit-product-btn" onclick="editUserProduct('${product.id}')"><i class="fas fa-edit"></i></button>
                     <button class="delete-product-btn" onclick="deleteUserProduct('${product.id}')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
@@ -308,46 +274,36 @@ async function renderUserProductsList() {
     }
 }
 
-// Удаление товара (через API)
 async function deleteUserProduct(productId) {
     if (!confirm('Удалить этот товар?')) return;
     try {
-        const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Ошибка удаления');
+        await API.deleteProduct(productId);
         showToast('✅ Товар удалён', 'success');
         await renderUserProductsList();
         if (typeof window.loadProducts === 'function') await window.loadProducts();
-        if (typeof updateUserProductsCount === 'function') updateUserProductsCount();
     } catch(e) {
         showToast('❌ Ошибка: ' + e.message, 'error');
     }
 }
 
-// Редактирование (пока через удаление + создание, для простоты)
-function editUserProduct(productId) {
-    alert('Функция редактирования в разработке.\nПока можно удалить и создать заново.');
-}
-
-// Экспорт глобальных функций
+// Экспорт
 window.showCreateProductForm = showCreateProductForm;
 window.cancelCreateProduct = cancelCreateProduct;
 window.createNewProduct = createNewProduct;
-window.editUserProduct = editUserProduct;
 window.deleteUserProduct = deleteUserProduct;
 window.renderUserProductsList = renderUserProductsList;
 window.removeProductImage = removeProductImage;
 
-// Инициализация при загрузке страницы
+// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     console.log('products-manage.js загружен');
     renderUserProductsList();
     loadKeywordsForProductSelect();
     setupImageUpload();
     
-    // Счётчики для полей ввода
+    // Счётчики
     const titleInput = document.getElementById('productTitle');
     const descInput = document.getElementById('productDescription');
-    const instructionsInput = document.getElementById('productInstructions');
     
     if (titleInput) {
         titleInput.addEventListener('input', function() {
@@ -364,15 +320,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const counter = document.getElementById('productDescCounter');
             if (counter) counter.innerText = `${len}/1000`;
             if (len > 1000) this.value = this.value.slice(0, 1000);
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 300) + 'px';
-        });
-    }
-    
-    if (instructionsInput) {
-        instructionsInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
         });
     }
 });

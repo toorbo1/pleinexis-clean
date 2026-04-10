@@ -1,10 +1,7 @@
 // ========== API КЛИЕНТ ==========
-
 const API = {
     async request(url, options = {}) {
         try {
-            console.log(`🌐 API request: ${options.method || 'GET'} ${url}`);
-            
             const response = await fetch(url, {
                 ...options,
                 headers: {
@@ -19,77 +16,69 @@ const API = {
             
             return await response.json();
         } catch (error) {
-            console.error(`API error:`, error);
+            console.error(`API error ${url}:`, error);
             throw error;
         }
     },
     
-    // Получить все одобренные товары
+    // Товары
     async getProducts() {
-        try {
-            const products = await this.request('/api/products');
-            return Array.isArray(products) ? products : [];
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            return [];
-        }
+        return await this.request('/api/products');
     },
     
-    // Создать товар (админ - сразу, пользователь - на модерацию)
-    async createProduct(product, isAdmin = false) {
-        if (isAdmin) {
-            return await this.request('/api/products', {
-                method: 'POST',
-                body: JSON.stringify(product)
-            });
-        } else {
-            return await this.request('/api/pending-products', {
-                method: 'POST',
-                body: JSON.stringify(product)
-            });
-        }
+    async getProduct(id) {
+        return await this.request(`/api/products/${id}`);
     },
     
-    // Удалить товар
+    async createProduct(product) {
+        return await this.request('/api/products', {
+            method: 'POST',
+            body: JSON.stringify(product)
+        });
+    },
+    
+    async updateProduct(id, product) {
+        return await this.request(`/api/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(product)
+        });
+    },
+    
     async deleteProduct(id) {
         return await this.request(`/api/products/${id}`, {
             method: 'DELETE'
         });
     },
     
-    // Получить товары на модерации (только админ)
+    // Товары на модерации
     async getPendingProducts() {
-        try {
-            return await this.request('/api/pending-products');
-        } catch (error) {
-            return [];
-        }
+        return await this.request('/api/pending-products');
     },
     
-    // Одобрить товар (только админ)
+    async createPendingProduct(product) {
+        return await this.request('/api/pending-products', {
+            method: 'POST',
+            body: JSON.stringify(product)
+        });
+    },
+    
     async approveProduct(id) {
         return await this.request(`/api/approve-product/${id}`, {
             method: 'POST'
         });
     },
     
-    // Отклонить товар (только админ)
     async rejectProduct(id) {
         return await this.request(`/api/pending-products/${id}`, {
             method: 'DELETE'
         });
     },
     
-    // Получить ключевые слова
+    // Ключевые слова
     async getKeywords() {
-        try {
-            return await this.request('/api/keywords');
-        } catch (error) {
-            return [];
-        }
+        return await this.request('/api/keywords');
     },
     
-    // Создать ключевое слово
     async createKeyword(keyword) {
         return await this.request('/api/keywords', {
             method: 'POST',
@@ -97,20 +86,70 @@ const API = {
         });
     },
     
-    // Удалить ключевое слово
     async deleteKeyword(id) {
         return await this.request(`/api/keywords/${id}`, {
             method: 'DELETE'
         });
     },
     
-    // Проверка соединения
-    async testConnection() {
-        try {
-            return await this.request('/api/test-db');
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
+    // Блоки игр
+    async getGameBlocks() {
+        return await this.request('/api/game-blocks');
+    },
+    
+    async createGameBlock(block) {
+        return await this.request('/api/game-blocks', {
+            method: 'POST',
+            body: JSON.stringify(block)
+        });
+    },
+    
+    async updateGameBlock(id, block) {
+        return await this.request(`/api/game-blocks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(block)
+        });
+    },
+    
+    async deleteGameBlock(id) {
+        return await this.request(`/api/game-blocks/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    // Блоки приложений
+    async getAppBlocks() {
+        return await this.request('/api/app-blocks');
+    },
+    
+    async createAppBlock(block) {
+        return await this.request('/api/app-blocks', {
+            method: 'POST',
+            body: JSON.stringify(block)
+        });
+    },
+    
+    async updateAppBlock(id, block) {
+        return await this.request(`/api/app-blocks/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(block)
+        });
+    },
+    
+    async deleteAppBlock(id) {
+        return await this.request(`/api/app-blocks/${id}`, {
+            method: 'DELETE'
+        });
+    },
+    
+    // Администраторы
+    async getAdmins() {
+        return await this.request('/api/admins');
+    },
+    
+    // Тест
+    async test() {
+        return await this.request('/api/test');
     }
 };
 

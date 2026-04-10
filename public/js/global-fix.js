@@ -1,14 +1,12 @@
 // ============================================
-// GLOBAL FIX - ПОЛНОСТЬЮ С СЕРВЕРОМ
+// GLOBAL FIX - ЗАГРУЗКА ДАННЫХ С СЕРВЕРА
 // ============================================
 
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
 
-    // Глобальный массив товаров
     window.productsArray = [];
 
-    // Вспомогательная функция для экранирования HTML
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, function(m) {
@@ -23,14 +21,12 @@
     window.loadProducts = async function() {
         console.log('🔄 Загрузка товаров с сервера...');
         try {
-            const response = await fetch('/api/products');
-            if (!response.ok) throw new Error('Ошибка загрузки товаров');
-            const products = await response.json();
+            const products = await API.getProducts();
             window.productsArray = products;
             
             console.log('✅ Получено товаров:', products.length);
             
-            // Отображаем товары на главной странице
+            // Отображаем товары на главной
             const grid = document.getElementById('productsGrid');
             if (grid) {
                 if (products.length === 0) {
@@ -63,42 +59,60 @@
         }
     };
 
-    // Загрузка ключевых слов с сервера
-    window.loadKeywordsGlobal = async function() {
+    // Загрузка блоков игр с сервера
+    window.loadGameBlocks = async function() {
         try {
-            const response = await fetch('/api/keywords');
-            if (!response.ok) throw new Error('Ошибка загрузки ключевых слов');
-            const keywords = await response.json();
-            window.keywords = keywords;
-            
-            console.log('✅ Получено ключевых слов:', keywords.length);
-            
-            // Обновляем все выпадающие списки
-            const selects = ['postKeyword', 'productKeywordSelect', 'newGameKeyword', 'newAppKeyword'];
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                if (select) {
-                    select.innerHTML = '<option value="">Выберите категорию</option>';
-                    keywords.forEach(k => {
-                        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type || 'Стандарт')}</option>`;
-                    });
-                }
-            });
-            
-            return keywords;
+            const blocks = await API.getGameBlocks();
+            const wrapper = document.getElementById('gamesScrollWrapper');
+            if (wrapper && blocks.length > 0) {
+                wrapper.innerHTML = blocks.map(block => `
+                    <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                        <div class="game-icon">
+                            ${block.image_url ? 
+                                `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}">` : 
+                                `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                            }
+                        </div>
+                        <div class="game-name">${escapeHtml(block.name)}</div>
+                    </div>
+                `).join('');
+            }
+            return blocks;
         } catch(e) {
-            console.error('loadKeywordsGlobal error:', e);
+            console.error('loadGameBlocks error:', e);
             return [];
         }
     };
 
-    // Открытие деталей товара (через API, чтобы всегда свежие данные)
+    // Загрузка блоков приложений с сервера
+    window.loadAppBlocks = async function() {
+        try {
+            const blocks = await API.getAppBlocks();
+            const wrapper = document.getElementById('appsScrollWrapper');
+            if (wrapper && blocks.length > 0) {
+                wrapper.innerHTML = blocks.map(block => `
+                    <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                        <div class="game-icon">
+                            ${block.image_url ? 
+                                `<img src="${escapeHtml(block.image_url)}" alt="${escapeHtml(block.name)}">` : 
+                                `<i class="${block.icon || 'fab fa-android'}"></i>`
+                            }
+                        </div>
+                        <div class="game-name">${escapeHtml(block.name)}</div>
+                    </div>
+                `).join('');
+            }
+            return blocks;
+        } catch(e) {
+            console.error('loadAppBlocks error:', e);
+            return [];
+        }
+    };
+
+    // Открытие деталей товара
     window.openProductDetailById = async function(productId) {
         try {
-            const response = await fetch(`/api/products/${productId}`);
-            if (!response.ok) throw new Error('Товар не найден');
-            const product = await response.json();
-            
+            const product = await API.getProduct(productId);
             alert(`📦 ${product.title}\n💰 ${product.price}\n👤 ${product.seller}\n\n${product.description || ''}`);
         } catch(e) {
             console.error(e);
@@ -106,10 +120,49 @@
         }
     };
 
-    // Инициализация приложения
+    // Функция для поиска по ключевому слову
+    window.openKeywordPage = async function(keyword) {
+        const products = await API.getProducts();
+        const filteredProducts = products.filter(p => 
+            p.keyword && p.keyword.toLowerCase().includes(keyword.toLowerCase())
+        );
+        
+        const container = document.getElementById("keywordProductsGrid");
+        const title = document.getElementById("keywordPageTitle");
+        
+        if (title) title.innerText = keyword;
+        
+        if (container) {
+            if (filteredProducts.length === 0) {
+                container.innerHTML = "<div class='empty-state'><i class='fas fa-box-open'></i><p>Нет товаров по этой категории</p></div>";
+            } else {
+                container.innerHTML = filteredProducts.map(prod => `
+                    <div class="product-card" onclick="window.openProductDetailById('${prod.id}')">
+                        <div class="card-image">
+                            <img src="${escapeHtml(prod.image_url || 'https://picsum.photos/id/42/400/300')}" 
+                                 onerror="this.src='https://picsum.photos/id/42/400/300'">
+                        </div>
+                        <div class="card-body">
+                            <div class="current-price">${escapeHtml(prod.price)}</div>
+                            <h3 class="product-title">${escapeHtml(prod.title.substring(0, 50))}</h3>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        if (typeof showPage === 'function') {
+            showPage("keywordPage");
+        }
+    };
+
+    // Инициализация
     async function init() {
-        await window.loadKeywordsGlobal();
-        await window.loadProducts();
+        await Promise.all([
+            window.loadProducts(),
+            window.loadGameBlocks(),
+            window.loadAppBlocks()
+        ]);
         console.log('✅ Глобальная инициализация завершена');
     }
     
