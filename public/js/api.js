@@ -11,7 +11,8 @@ const API = {
             });
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `HTTP ${response.status}`);
             }
             
             return await response.json();
@@ -55,12 +56,12 @@ const API = {
         return await this.request('/api/pending-products');
     },
     
-async createPendingProduct(product) {
-    return await this.request('/api/pending-products', {
-        method: 'POST',
-        body: JSON.stringify(product)
-    });
-},
+    async createPendingProduct(product) {
+        return await this.request('/api/pending-products', {
+            method: 'POST',
+            body: JSON.stringify(product)
+        });
+    },
     
     async approveProduct(id) {
         return await this.request(`/api/approve-product/${id}`, {
@@ -147,7 +148,6 @@ async createPendingProduct(product) {
         return await this.request('/api/admins');
     },
     
-    // Тест
     async test() {
         return await this.request('/api/test');
     }
