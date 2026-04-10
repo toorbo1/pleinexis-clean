@@ -99,15 +99,28 @@ window.goBack = function() {
 window.scrollGames = function(direction) {
     const container = document.getElementById('gamesScrollContainer');
     if (!container) return;
-    const scrollAmount = 250;
-    container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    const scrollWrapper = container.querySelector('#gamesScrollWrapper .horizontal-scroll-container');
+    if (scrollWrapper) {
+        const scrollAmount = 280;
+        scrollWrapper.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    } else {
+        // Fallback
+        const scrollAmount = 280;
+        container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
 };
 
 window.scrollApps = function(direction) {
     const container = document.getElementById('appsScrollContainer');
     if (!container) return;
-    const scrollAmount = 250;
-    container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    const scrollWrapper = container.querySelector('#appsScrollWrapper .horizontal-scroll-container');
+    if (scrollWrapper) {
+        const scrollAmount = 280;
+        scrollWrapper.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    } else {
+        const scrollAmount = 280;
+        container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
 };
 
 window.showInfo = function(type) {

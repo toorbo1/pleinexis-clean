@@ -1,4 +1,5 @@
-// global-fix.js - ИСПРАВЛЕННАЯ ВЕРСИЯ (игры в 2 строки, приложения восстановлены)
+// global-fix.js - ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ВЕРСИЯ
+// Блоки игр и приложений: вертикальные карточки 4:5, текст на фото, горизонтальный скролл
 
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
@@ -46,7 +47,7 @@
         }
     };
 
-    // ========== ИГРЫ - В 2 СТРОКИ ==========
+    // ========== ИГРЫ - ВЕРТИКАЛЬНЫЕ КАРТОЧКИ 4:5 ==========
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
@@ -60,49 +61,29 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
                 } else {
-                    // Разделяем на две строки
-                    const midIndex = Math.ceil(blocks.length / 2);
-                    const firstRow = blocks.slice(0, midIndex);
-                    const secondRow = blocks.slice(midIndex);
-                    
+                    // Горизонтальный скролл с карточками 4:5
                     wrapper.innerHTML = `
-                        <div class="games-row">
-                            ${firstRow.map(block => `
-                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="game-icon">
-                                        ${block.image_url ? 
-                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
-                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
-                                            `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
-                                        }
+                        <div class="horizontal-scroll-container">
+                            ${blocks.map(block => `
+                                <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="vertical-card-inner">
+                                        <img class="vertical-card-img" 
+                                             src="${escapeHtml(block.image_url || 'https://picsum.photos/id/42/400/500')}" 
+                                             alt="${escapeHtml(block.name)}"
+                                             onerror="this.src='https://picsum.photos/id/42/400/500'">
+                                        <div class="vertical-card-title">
+                                            <span>${escapeHtml(block.name)}</span>
+                                        </div>
                                     </div>
-                                    <div class="game-name">${escapeHtml(block.name)}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="games-row-second">
-                            ${secondRow.map(block => `
-                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="game-icon">
-                                        ${block.image_url ? 
-                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;" 
-                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none; font-size: 32px;"></i>` : 
-                                            `<i class="${block.icon || 'fas fa-gamepad'}" style="font-size: 32px;"></i>`
-                                        }
-                                    </div>
-                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
                             `).join('')}
                         </div>
                     `;
-                    console.log('✅ Блоки игр отображены в 2 строки');
+                    
+                    // Добавляем обработчики скролла для кнопок
+                    setupScrollButtons('games');
                 }
-            } else {
-                console.error('❌ gamesScrollWrapper НЕ НАЙДЕН в DOM!');
             }
-            
             window.gameBlocks = blocks;
             return blocks;
         } catch(e) { 
@@ -111,7 +92,7 @@
         }
     };
 
-    // ========== ПРИЛОЖЕНИЯ - В 2 СТРОКИ ==========
+    // ========== ПРИЛОЖЕНИЯ - ВЕРТИКАЛЬНЫЕ КАРТОЧКИ 4:5 ==========
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
         try {
@@ -125,49 +106,27 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
                 } else {
-                    // Разделяем на две строки
-                    const midIndex = Math.ceil(blocks.length / 2);
-                    const firstRow = blocks.slice(0, midIndex);
-                    const secondRow = blocks.slice(midIndex);
-                    
                     wrapper.innerHTML = `
-                        <div class="games-row">
-                            ${firstRow.map(block => `
-                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="game-icon">
-                                        ${block.image_url ? 
-                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;"
-                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                             <i class="${block.icon || 'fab fa-android'}" style="display: none; font-size: 32px;"></i>` : 
-                                            `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
-                                        }
+                        <div class="horizontal-scroll-container">
+                            ${blocks.map(block => `
+                                <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="vertical-card-inner">
+                                        <img class="vertical-card-img" 
+                                             src="${escapeHtml(block.image_url || 'https://picsum.photos/id/42/400/500')}" 
+                                             alt="${escapeHtml(block.name)}"
+                                             onerror="this.src='https://picsum.photos/id/42/400/500'">
+                                        <div class="vertical-card-title">
+                                            <span>${escapeHtml(block.name)}</span>
+                                        </div>
                                     </div>
-                                    <div class="game-name">${escapeHtml(block.name)}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="games-row-second">
-                            ${secondRow.map(block => `
-                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="game-icon">
-                                        ${block.image_url ? 
-                                            `<img src="${escapeHtml(block.image_url)}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 16px;"
-                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                             <i class="${block.icon || 'fab fa-android'}" style="display: none; font-size: 32px;"></i>` : 
-                                            `<i class="${block.icon || 'fab fa-android'}" style="font-size: 32px;"></i>`
-                                        }
-                                    </div>
-                                    <div class="game-name">${escapeHtml(block.name)}</div>
                                 </div>
                             `).join('')}
                         </div>
                     `;
-                    console.log('✅ Блоки приложений отображены в 2 строки');
+                    
+                    setupScrollButtons('apps');
                 }
-            } else {
-                console.error('❌ appsScrollWrapper НЕ НАЙДЕН в DOM!');
             }
-            
             window.appBlocks = blocks;
             return blocks;
         } catch(e) { 
@@ -175,6 +134,38 @@
             return []; 
         }
     };
+    
+    // Настройка кнопок скролла
+    function setupScrollButtons(type) {
+        setTimeout(() => {
+            const container = document.getElementById(`${type}ScrollContainer`);
+            const leftBtn = document.querySelector(`#${type}ScrollContainer + .scroll-buttons .scroll-left, .games-header:has(+ #${type}ScrollContainer) .scroll-btn:first-child`);
+            const rightBtn = document.querySelector(`#${type}ScrollContainer + .scroll-buttons .scroll-right, .games-header:has(+ #${type}ScrollContainer) .scroll-btn:last-child`);
+            
+            // Ищем кнопки в games-header
+            const header = document.querySelector(`.games-header:has(+ #${type}ScrollContainer)`);
+            if (header) {
+                const btns = header.querySelectorAll('.scroll-btn');
+                if (btns[0] && !btns[0].hasAttribute('data-scroll-attached')) {
+                    btns[0].setAttribute('data-scroll-attached', 'true');
+                    btns[0].onclick = () => scrollHorizontal(container, 'left');
+                    if (btns[1]) {
+                        btns[1].setAttribute('data-scroll-attached', 'true');
+                        btns[1].onclick = () => scrollHorizontal(container, 'right');
+                    }
+                }
+            }
+        }, 50);
+    }
+    
+    function scrollHorizontal(container, direction) {
+        if (!container) return;
+        const scrollAmount = 280;
+        container.scrollBy({
+            left: direction === 'left' ? -scrollAmount : scrollAmount,
+            behavior: 'smooth'
+        });
+    }
 
     window.openKeywordPage = async function(keyword) {
         console.log('🔍 Открываем категорию:', keyword);
@@ -207,6 +198,7 @@
             }
             
             if (typeof showPage === 'function') showPage("keywordPage");
+            else if (typeof window.showPage === 'function') window.showPage("keywordPage");
         } catch(e) {
             console.error('openKeywordPage error:', e);
         }
@@ -220,17 +212,14 @@
     async function init() {
         console.log('🚀 GLOBAL FIX инициализация...');
         
-        // Проверяем API
         try {
             const testResponse = await fetch('/api/test');
             const testData = await testResponse.json();
             console.log('✅ API test:', testData);
         } catch(e) {
             console.error('❌ API недоступен:', e);
-            return;
         }
         
-        // Загружаем данные
         await window.loadProducts();
         await window.loadGameBlocks();
         await window.loadAppBlocks();
@@ -238,7 +227,6 @@
         console.log('✅ Глобальная инициализация завершена');
     }
     
-    // Запускаем после полной загрузки DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

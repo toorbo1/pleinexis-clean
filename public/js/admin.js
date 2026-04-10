@@ -731,10 +731,11 @@ function renderGamesBlocks() {
     `).join('');
 }
 
+// В admin.js, найдите функцию addGameBlock и замените её:
+
 async function addGameBlock() {
     const name = document.getElementById("newGameName")?.value.trim();
     const keywordId = document.getElementById("newGameKeyword")?.value;
-    const icon = document.getElementById("newGameIcon")?.value;
     const imageUrl = document.getElementById("newGameImageUrl")?.value.trim();
     
     if (!name) {
@@ -742,12 +743,17 @@ async function addGameBlock() {
         return;
     }
     
+    if (!imageUrl) {
+        showToast("Введите URL фото для блока (обязательно для вертикальных карточек)", "error");
+        return;
+    }
+    
     const newBlock = {
         id: Date.now().toString(),
         name: name,
         keyword_id: keywordId || null,
-        icon: icon || "fas fa-gamepad",
-        image_url: imageUrl || null,
+        icon: "fas fa-gamepad",
+        image_url: imageUrl,
         sort_order: (window.gameBlocks || gameBlocks || []).length
     };
     
@@ -765,20 +771,164 @@ async function addGameBlock() {
             throw new Error(error.error || 'Ошибка создания');
         }
         
-        // Очищаем форму
         document.getElementById("newGameName").value = "";
         document.getElementById("newGameKeyword").value = "";
-        document.getElementById("newGameIcon").value = "fas fa-gamepad";
         document.getElementById("newGameImageUrl").value = "";
         
-        // Перезагружаем списки
         await loadGameBlocks();
-        
         showToast("✅ Блок игры добавлен!", "success");
         
-        // Обновляем главную страницу
         if (typeof window.loadGameBlocks === 'function') {
             await window.loadGameBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
+
+// Функция редактирования блока игры
+async function editGameBlock(id) {
+    const blocks = window.gameBlocks || gameBlocks || [];
+    const block = blocks.find(b => b.id === id);
+    if (!block) return;
+    
+    const newName = prompt("Введите новое название:", block.name);
+    if (!newName || !newName.trim()) return;
+    
+    const newImageUrl = prompt("Введите URL фото (обязательно):", block.image_url || "");
+    if (!newImageUrl || !newImageUrl.trim()) {
+        showToast("Фото обязательно для вертикальных карточек", "error");
+        return;
+    }
+    
+    const updatedBlock = {
+        name: newName.trim(),
+        keyword_id: block.keyword_id,
+        icon: block.icon,
+        image_url: newImageUrl.trim(),
+        sort_order: block.sort_order
+    };
+    
+    try {
+        const response = await fetch(`/api/game-blocks/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedBlock)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка обновления');
+        }
+        
+        await loadGameBlocks();
+        showToast("✅ Блок обновлен!", "success");
+        
+        if (typeof window.loadGameBlocks === 'function') {
+            await window.loadGameBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
+
+// То же самое для приложений
+async function addAppBlock() {
+    const name = document.getElementById("newAppName")?.value.trim();
+    const keywordId = document.getElementById("newAppKeyword")?.value;
+    const imageUrl = document.getElementById("newAppImageUrl")?.value.trim();
+    
+    if (!name) {
+        showToast("Введите название приложения", "error");
+        return;
+    }
+    
+    if (!imageUrl) {
+        showToast("Введите URL фото для блока (обязательно)", "error");
+        return;
+    }
+    
+    const newBlock = {
+        id: Date.now().toString(),
+        name: name,
+        keyword_id: keywordId || null,
+        icon: "fab fa-android",
+        image_url: imageUrl,
+        sort_order: (window.appBlocks || appBlocks || []).length
+    };
+    
+    try {
+        const response = await fetch('/api/app-blocks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newBlock)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка создания');
+        }
+        
+        document.getElementById("newAppName").value = "";
+        document.getElementById("newAppKeyword").value = "";
+        document.getElementById("newAppImageUrl").value = "";
+        
+        await loadAppBlocks();
+        showToast("✅ Блок приложения добавлен!", "success");
+        
+        if (typeof window.loadAppBlocks === 'function') {
+            await window.loadAppBlocks();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
+
+async function editAppBlock(id) {
+    const blocks = window.appBlocks || appBlocks || [];
+    const block = blocks.find(b => b.id === id);
+    if (!block) return;
+    
+    const newName = prompt("Введите новое название:", block.name);
+    if (!newName || !newName.trim()) return;
+    
+    const newImageUrl = prompt("Введите URL фото (обязательно):", block.image_url || "");
+    if (!newImageUrl || !newImageUrl.trim()) {
+        showToast("Фото обязательно для вертикальных карточек", "error");
+        return;
+    }
+    
+    const updatedBlock = {
+        name: newName.trim(),
+        keyword_id: block.keyword_id,
+        icon: block.icon,
+        image_url: newImageUrl.trim(),
+        sort_order: block.sort_order
+    };
+    
+    try {
+        const response = await fetch(`/api/app-blocks/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedBlock)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка обновления');
+        }
+        
+        await loadAppBlocks();
+        showToast("✅ Блок обновлен!", "success");
+        
+        if (typeof window.loadAppBlocks === 'function') {
+            await window.loadAppBlocks();
         }
         
     } catch (error) {
