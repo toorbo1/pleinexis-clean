@@ -998,13 +998,16 @@ async function editAppBlock(id) {
     }
 }
 
-// ==================== КЛЮЧЕВЫЕ СЛОВА (СИНХРОНИЗАЦИЯ С СЕРВЕРОМ) ====================
+// admin.js - ИСПРАВЛЕННАЯ ВЕРСИЯ (удалены дублирующиеся функции)
+
+// ==================== КЛЮЧЕВЫЕ СЛОВА (ТОЛЬКО СЕРВЕРНЫЕ ВЕРСИИ) ====================
 
 async function loadKeywords() {
     try {
-        const response = await fetch('/api/keywords');
+        const response = await fetch('/api/keywords?_=' + Date.now());
         if (!response.ok) throw new Error('Ошибка загрузки ключевых слов');
         keywords = await response.json();
+        window.keywords = keywords;
         renderKeywords();
         updateKeywordSelect();
         updateGameKeywordSelect();
@@ -1013,6 +1016,7 @@ async function loadKeywords() {
     } catch(e) {
         console.error('Ошибка загрузки ключевых слов:', e);
         keywords = [];
+        window.keywords = [];
     }
 }
 
@@ -1026,19 +1030,20 @@ async function addKeyword() {
     }
     
     try {
-        const newKeyword = await API.createKeyword({
-            name: name,
-            type: type || "Стандарт"
+        const response = await fetch('/api/keywords', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, type: type || "Стандарт" })
         });
         
-        // Обновляем локальный массив
-        window.keywords = await API.getKeywords();
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка создания');
+        }
         
-        renderKeywords();
-        updateKeywordSelect();
-        updateGameKeywordSelect();
-        updateAppKeywordSelect();
+        await loadKeywords(); // Перезагружаем список с сервера
         
+        // Очищаем поля
         document.getElementById("newKeywordName").value = "";
         document.getElementById("newKeywordType").value = "";
         
@@ -1051,19 +1056,24 @@ async function addKeyword() {
 }
 
 async function deleteKeyword(keywordId) {
-    if (confirm("Удалить это ключевое слово? Все товары с ним останутся, но категория пропадёт.")) {
-        try {
-            await API.deleteKeyword(keywordId);
-            window.keywords = await API.getKeywords();
-            renderKeywords();
-            updateKeywordSelect();
-            updateGameKeywordSelect();
-            updateAppKeywordSelect();
-            showToast("✅ Ключевое слово удалено", "success");
-        } catch (error) {
-            console.error('Error deleting keyword:', error);
-            showToast("❌ Ошибка при удалении: " + error.message, "error");
+    if (!confirm("Удалить это ключевое слово? Все товары с ним останутся, но категория пропадёт.")) return;
+    
+    try {
+        const response = await fetch(`/api/keywords/${keywordId}`, { 
+            method: 'DELETE' 
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка удаления');
         }
+        
+        await loadKeywords(); // Перезагружаем список с сервера
+        showToast("✅ Ключевое слово удалено", "success");
+        
+    } catch (error) {
+        console.error('Error deleting keyword:', error);
+        showToast("❌ Ошибка при удалении: " + error.message, "error");
     }
 }
 
@@ -1071,18 +1081,19 @@ function renderKeywords() {
     const container = document.getElementById("keywordsList");
     if (!container) return;
     
-    const keywords = window.keywords || [];
+    // Используем глобальную переменную или локальную
+    const kw = window.keywords || keywords || [];
     
-    if (keywords.length === 0) {
+    if (kw.length === 0) {
         container.innerHTML = '<div class="empty-state">Нет ключевых слов</div>';
         return;
     }
     
-    container.innerHTML = keywords.map(k => `
+    container.innerHTML = kw.map(k => `
         <div class="keyword-item">
             <div class="keyword-info">
                 <span class="keyword-name">${escapeHtml(k.name)}</span>
-                <span class="keyword-type">${escapeHtml(k.type)}</span>
+                <span class="keyword-type">${escapeHtml(k.type || 'Стандарт')}</span>
             </div>
             <div class="keyword-actions">
                 <button class="delete-keyword-btn" onclick="deleteKeyword('${k.id}')">
@@ -1097,11 +1108,11 @@ function updateKeywordSelect() {
     const select = document.getElementById("postKeyword");
     if (!select) return;
     
-    const keywords = window.keywords || [];
+    const kw = window.keywords || keywords || [];
     
     select.innerHTML = '<option value="">Выберите ключевое слово/категорию</option>';
-    keywords.forEach(k => {
-        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type)}</option>`;
+    kw.forEach(k => {
+        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type || 'Стандарт')}</option>`;
     });
 }
 
@@ -1109,11 +1120,11 @@ function updateGameKeywordSelect() {
     const select = document.getElementById("newGameKeyword");
     if (!select) return;
     
-    const keywords = window.keywords || [];
+    const kw = window.keywords || keywords || [];
     
     select.innerHTML = '<option value="">Без привязки к ключевому слову</option>';
-    keywords.forEach(k => {
-        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type)}</option>`;
+    kw.forEach(k => {
+        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type || 'Стандарт')}</option>`;
     });
 }
 
@@ -1121,13 +1132,17 @@ function updateAppKeywordSelect() {
     const select = document.getElementById("newAppKeyword");
     if (!select) return;
     
-    const keywords = window.keywords || [];
+    const kw = window.keywords || keywords || [];
     
     select.innerHTML = '<option value="">Без привязки к ключевому слову</option>';
-    keywords.forEach(k => {
-        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type)}</option>`;
+    kw.forEach(k => {
+        select.innerHTML += `<option value="${escapeHtml(k.id)}">${escapeHtml(k.name)} - ${escapeHtml(k.type || 'Стандарт')}</option>`;
     });
 }
+
+// Убедитесь, что в конце файла есть правильный экспорт функций
+window.addKeyword = addKeyword;
+window.deleteKeyword = deleteKeyword;
 
 async function updateAdminStats() {
     try {
