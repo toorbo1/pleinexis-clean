@@ -25,6 +25,21 @@
   <link rel="stylesheet" href="css/tasks-create.css">
   <link rel="stylesheet" href="css/withdraw.css">
 </head>
+<style>
+    /* Скрываем кнопки скролла для приложений */
+    .games-header:has(+ #appsScrollContainer) .scroll-btn {
+        display: none;
+    }
+    
+    /* Убираем горизонтальный скролл у контейнера приложений */
+    #appsScrollContainer {
+        overflow-x: visible !important;
+    }
+    
+    #appsScrollWrapper {
+        overflow: visible !important;
+    }
+</style>
 <body>
 
 <!-- ХЕДЕР -->

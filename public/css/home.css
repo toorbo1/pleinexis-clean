@@ -1108,3 +1108,29 @@ html::-webkit-scrollbar-thumb:hover {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+
+/* Стили для приложений - без горизонтального скролла */
+#appsScrollContainer {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+}
+
+.apps-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px;
+}
+
+/* Убираем кнопки скролла для приложений, если они есть */
+.apps-scroll-buttons {
+    display: none;
+}
+
+/* Гарантируем, что wrapper не вызывает скролл */
+#appsScrollWrapper {
+    overflow: visible !important;
+    width: 100%;
+}
