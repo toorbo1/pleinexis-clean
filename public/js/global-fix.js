@@ -5,11 +5,11 @@
     // Глобальная переменная для товаров
     window.productsArray = [];
 
-    // ЗАГРУЗКА ТОВАРОВ С СЕРВЕРА
+    // ЗАГРУЗКА ТОВАРОВ С СЕРВЕРА (без кеша)
     window.loadProducts = async function() {
         console.log('🔄 loadProducts: запрос к API...');
         try {
-            const response = await fetch('/api/products');
+            const response = await fetch('/api/products?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки товаров');
             const products = await response.json();
             window.productsArray = products;
@@ -51,7 +51,6 @@
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
-            // Добавляем параметр для отключения кеша
             const response = await fetch('/api/game-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки игр');
             const blocks = await response.json();
@@ -62,7 +61,6 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
                 } else {
-                    // Разделяем на два ряда
                     const midIndex = Math.ceil(blocks.length / 2);
                     const firstRow = blocks.slice(0, midIndex);
                     const secondRow = blocks.slice(midIndex);
@@ -99,6 +97,9 @@
                     `;
                 }
             }
+            
+            // Сохраняем в глобальную переменную для других функций
+            window.gameBlocks = blocks;
             return blocks;
         } catch(e) { 
             console.error('loadGameBlocks error:', e); 
@@ -156,6 +157,9 @@
                     `;
                 }
             }
+            
+            // Сохраняем в глобальную переменную для других функций
+            window.appBlocks = blocks;
             return blocks;
         } catch(e) { 
             console.error('loadAppBlocks error:', e); 
@@ -179,7 +183,7 @@
     // ОТКРЫТИЕ СТРАНИЦЫ ПО КЛЮЧЕВОМУ СЛОВУ
     window.openKeywordPage = async function(keyword) {
         console.log('🔍 Открываем категорию:', keyword);
-        const response = await fetch('/api/products');
+        const response = await fetch('/api/products?_=' + Date.now());
         const products = await response.json();
         const filtered = products.filter(p => p.keyword && p.keyword.toLowerCase().includes(keyword.toLowerCase()));
         
@@ -209,10 +213,31 @@
         if (typeof showPage === 'function') showPage("keywordPage");
     };
 
+    // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+    window.refreshAllUsersData = function() {
+        localStorage.setItem('force_refresh_blocks', Date.now().toString());
+        setTimeout(() => {
+            localStorage.removeItem('force_refresh_blocks');
+        }, 100);
+        showToast("✅ Данные обновлены для всех пользователей", "success");
+    };
+
     // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
+    }
+
+    function showToast(message, type = 'success') {
+        let toast = document.querySelector('.toast-notification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
+        toast.className = `toast-notification ${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     // ПРОВЕРКА API
@@ -246,6 +271,17 @@
         
         console.log('✅ Глобальная инициализация завершена');
     }
+    
+    // СЛУШАЕМ ОБНОВЛЕНИЯ ОТ ДРУГИХ ВКЛАДОК
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'force_refresh_blocks') {
+            console.log('🔄 Принудительное обновление блоков...');
+            window.loadGameBlocks();
+            window.loadAppBlocks();
+            window.loadProducts();
+            showToast('🔄 Данные обновлены администратором', 'info');
+        }
+    });
     
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

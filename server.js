@@ -334,7 +334,6 @@ app.post('/api/keywords', async (req, res) => {
     }
 });
 
-// НОВЫЙ PUT ДЛЯ КЛЮЧЕВЫХ СЛОВ
 app.put('/api/keywords/:id', async (req, res) => {
     try {
         const { id } = req.params;

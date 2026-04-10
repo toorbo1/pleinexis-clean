@@ -32,7 +32,6 @@ window.navigate = window.showPage;
 
 // ========== ОБНОВЛЕНИЕ АКТИВНОЙ КНОПКИ ==========
 function updateActiveNavButton(pageId) {
-    // Обновляем нижнюю навигацию
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         const navPage = item.getAttribute('data-nav');
@@ -43,7 +42,6 @@ function updateActiveNavButton(pageId) {
         }
     });
     
-    // Обновляем десктопную навигацию
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         const navPage = link.getAttribute('data-nav');
@@ -59,10 +57,8 @@ function updateActiveNavButton(pageId) {
 function initNavigation() {
     console.log('🔵 initNavigation started');
     
-    // Нижняя навигация
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(btn => {
-        // Удаляем старые обработчики
         const newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
         
@@ -77,7 +73,6 @@ function initNavigation() {
         });
     });
     
-    // Десктопная навигация
     const desktopNav = document.querySelectorAll('.nav-link');
     desktopNav.forEach(link => {
         const newLink = link.cloneNode(true);
@@ -172,15 +167,12 @@ function escapeHtml(str) {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 APP.JS - загрузка приложения');
     
-    // Инициализация навигации
     initNavigation();
     
-    // Инициализация авторизации
     if (typeof initAuth === 'function') {
         await initAuth();
     }
     
-    // Загрузка данных с сервера
     if (typeof window.loadProducts === 'function') {
         await window.loadProducts();
     }
@@ -191,7 +183,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         await window.loadAppBlocks();
     }
     
-    // Настройка поиска
     const globalSearchInput = document.getElementById('globalSearchInput');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
     
@@ -222,12 +213,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
     
-    // Показываем главную страницу
     window.showPage('home');
-    
     console.log('✅ APP.JS - инициализация завершена');
 });
-// В конец app.js добавьте:
+
+// СЛУШАЕМ ОБНОВЛЕНИЯ ОТ ДРУГИХ ВКЛАДОК
 window.addEventListener('storage', (e) => {
     if (e.key === 'force_refresh_blocks') {
         console.log('🔄 Принудительное обновление блоков...');
@@ -243,3 +233,15 @@ window.addEventListener('storage', (e) => {
         showToast('🔄 Данные обновлены администратором', 'info');
     }
 });
+
+function showToast(message, type = 'success') {
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
+    toast.className = `toast-notification ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
