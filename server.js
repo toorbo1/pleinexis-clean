@@ -223,7 +223,7 @@ app.delete('/api/app-blocks/:id', async (req, res) => {
     }
 });
 // ==================== 2. БЛОКИ ИГР (СЕРВЕР) ====================
-
+    
 async function loadGameBlocks() {
     try {
         const response = await fetch('/api/game-blocks');
