@@ -62,7 +62,8 @@ function initMiniSliders() {
     { id: 0, imagesId: 'slider0Images', dotsId: 'slider0Dots', totalSlides: 4 },
     { id: 1, imagesId: 'slider1Images', dotsId: 'slider1Dots', totalSlides: 4 },
     { id: 2, imagesId: 'slider2Images', dotsId: 'slider2Dots', totalSlides: 4 },
-    { id: 3, imagesId: 'slider3Images', dotsId: 'slider3Dots', totalSlides: 4 }
+    { id: 3, imagesId: 'slider3Images', dotsId: 'slider3Dots', totalSlides: 4 },
+    { id: 4, imagesId: 'slider4Images', dotsId: 'slider4Dots', totalSlides: 4 }
   ];
   
   slidersConfig.forEach(config => {

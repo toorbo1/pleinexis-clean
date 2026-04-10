@@ -790,7 +790,7 @@ html::-webkit-scrollbar-thumb:hover {
 }
 .pay-btn-blue:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(30, 60, 114, 0.6);
+  box-shadow: 0 0 30px rgb(255, 255, 255);
 }
 .pay-btn-blue:active {
   transform: scale(0.98);
