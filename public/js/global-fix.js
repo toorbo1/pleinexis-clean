@@ -1,5 +1,4 @@
-// global-fix.js - ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ВЕРСИЯ
-// Блоки игр и приложений: вертикальные карточки 4:5, текст на фото, горизонтальный скролл
+// global-fix.js - ИСПРАВЛЕННАЯ ВЕРСИЯ С ОТЛАДКОЙ
 
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
@@ -47,7 +46,7 @@
         }
     };
 
-    // ========== ИГРЫ - ВЕРТИКАЛЬНЫЕ КАРТОЧКИ 4:5 ==========
+    // ========== ИГРЫ ==========
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
@@ -55,35 +54,51 @@
             if (!response.ok) throw new Error('Ошибка загрузки игр');
             let blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков игр`);
+            console.log('📋 Данные блоков игр:', blocks);
             
             const wrapper = document.getElementById('gamesScrollWrapper');
+            console.log('🔍 gamesScrollWrapper найден:', !!wrapper);
+            
             if (wrapper) {
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
+                    console.log('⚠️ Нет блоков игр');
                 } else {
-                    // Горизонтальный скролл с карточками 4:5
-                    wrapper.innerHTML = `
-                        <div class="horizontal-scroll-container">
-                            ${blocks.map(block => `
-                                <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="vertical-card-inner">
-                                        <img class="vertical-card-img" 
-                                             src="${escapeHtml(block.image_url || 'https://picsum.photos/id/42/400/500')}" 
-                                             alt="${escapeHtml(block.name)}"
-                                             onerror="this.src='https://picsum.photos/id/42/400/500'">
-                                        <div class="vertical-card-title">
-                                            <span>${escapeHtml(block.name)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
+                    // Проверяем, есть ли у блоков image_url
+                    const blocksWithImage = blocks.filter(b => b.image_url);
+                    console.log(`📸 Блоков с фото: ${blocksWithImage.length} из ${blocks.length}`);
                     
-                    // Добавляем обработчики скролла для кнопок
-                    setupScrollButtons('games');
+                    if (blocksWithImage.length === 0) {
+                        wrapper.innerHTML = '<div class="empty-state">⚠️ У блоков игр нет фото! Добавьте URL фото в админ-панели.</div>';
+                    } else {
+                        wrapper.innerHTML = `
+                            <div class="horizontal-scroll-container">
+                                ${blocks.map(block => {
+                                    // Используем заглушку если нет фото
+                                    const imgUrl = block.image_url || 'https://picsum.photos/id/42/400/500';
+                                    return `
+                                        <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                            <div class="vertical-card-inner">
+                                                <img class="vertical-card-img" 
+                                                     src="${escapeHtml(imgUrl)}" 
+                                                     alt="${escapeHtml(block.name)}"
+                                                     onerror="this.src='https://picsum.photos/id/42/400/500'">
+                                                <div class="vertical-card-title">
+                                                    <span>${escapeHtml(block.name)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                        console.log('✅ Блоки игр отображены');
+                    }
                 }
+            } else {
+                console.error('❌ gamesScrollWrapper НЕ НАЙДЕН в DOM!');
             }
+            
             window.gameBlocks = blocks;
             return blocks;
         } catch(e) { 
@@ -92,7 +107,7 @@
         }
     };
 
-    // ========== ПРИЛОЖЕНИЯ - ВЕРТИКАЛЬНЫЕ КАРТОЧКИ 4:5 ==========
+    // ========== ПРИЛОЖЕНИЯ ==========
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
         try {
@@ -100,33 +115,49 @@
             if (!response.ok) throw new Error('Ошибка загрузки приложений');
             let blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков приложений`);
+            console.log('📋 Данные блоков приложений:', blocks);
             
             const wrapper = document.getElementById('appsScrollWrapper');
+            console.log('🔍 appsScrollWrapper найден:', !!wrapper);
+            
             if (wrapper) {
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
+                    console.log('⚠️ Нет блоков приложений');
                 } else {
-                    wrapper.innerHTML = `
-                        <div class="horizontal-scroll-container">
-                            ${blocks.map(block => `
-                                <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                                    <div class="vertical-card-inner">
-                                        <img class="vertical-card-img" 
-                                             src="${escapeHtml(block.image_url || 'https://picsum.photos/id/42/400/500')}" 
-                                             alt="${escapeHtml(block.name)}"
-                                             onerror="this.src='https://picsum.photos/id/42/400/500'">
-                                        <div class="vertical-card-title">
-                                            <span>${escapeHtml(block.name)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
+                    const blocksWithImage = blocks.filter(b => b.image_url);
+                    console.log(`📸 Блоков с фото: ${blocksWithImage.length} из ${blocks.length}`);
                     
-                    setupScrollButtons('apps');
+                    if (blocksWithImage.length === 0) {
+                        wrapper.innerHTML = '<div class="empty-state">⚠️ У блоков приложений нет фото! Добавьте URL фото в админ-панели.</div>';
+                    } else {
+                        wrapper.innerHTML = `
+                            <div class="horizontal-scroll-container">
+                                ${blocks.map(block => {
+                                    const imgUrl = block.image_url || 'https://picsum.photos/id/42/400/500';
+                                    return `
+                                        <div class="vertical-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                            <div class="vertical-card-inner">
+                                                <img class="vertical-card-img" 
+                                                     src="${escapeHtml(imgUrl)}" 
+                                                     alt="${escapeHtml(block.name)}"
+                                                     onerror="this.src='https://picsum.photos/id/42/400/500'">
+                                                <div class="vertical-card-title">
+                                                    <span>${escapeHtml(block.name)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                        console.log('✅ Блоки приложений отображены');
+                    }
                 }
+            } else {
+                console.error('❌ appsScrollWrapper НЕ НАЙДЕН в DOM!');
             }
+            
             window.appBlocks = blocks;
             return blocks;
         } catch(e) { 
@@ -134,38 +165,6 @@
             return []; 
         }
     };
-    
-    // Настройка кнопок скролла
-    function setupScrollButtons(type) {
-        setTimeout(() => {
-            const container = document.getElementById(`${type}ScrollContainer`);
-            const leftBtn = document.querySelector(`#${type}ScrollContainer + .scroll-buttons .scroll-left, .games-header:has(+ #${type}ScrollContainer) .scroll-btn:first-child`);
-            const rightBtn = document.querySelector(`#${type}ScrollContainer + .scroll-buttons .scroll-right, .games-header:has(+ #${type}ScrollContainer) .scroll-btn:last-child`);
-            
-            // Ищем кнопки в games-header
-            const header = document.querySelector(`.games-header:has(+ #${type}ScrollContainer)`);
-            if (header) {
-                const btns = header.querySelectorAll('.scroll-btn');
-                if (btns[0] && !btns[0].hasAttribute('data-scroll-attached')) {
-                    btns[0].setAttribute('data-scroll-attached', 'true');
-                    btns[0].onclick = () => scrollHorizontal(container, 'left');
-                    if (btns[1]) {
-                        btns[1].setAttribute('data-scroll-attached', 'true');
-                        btns[1].onclick = () => scrollHorizontal(container, 'right');
-                    }
-                }
-            }
-        }, 50);
-    }
-    
-    function scrollHorizontal(container, direction) {
-        if (!container) return;
-        const scrollAmount = 280;
-        container.scrollBy({
-            left: direction === 'left' ? -scrollAmount : scrollAmount,
-            behavior: 'smooth'
-        });
-    }
 
     window.openKeywordPage = async function(keyword) {
         console.log('🔍 Открываем категорию:', keyword);
