@@ -708,24 +708,31 @@
     </div>
   </div>
 </div>
-<!-- ===== УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ ===== -->
-<!-- ===== УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ ===== -->
-<div id="adminKeywordsSection" class="admin-section" style="display: none;">
-    <div class="admin-card">
+    <!-- ===== 7. УПРАВЛЕНИЕ БЛОКАМИ ПРИЛОЖЕНИЙ ===== -->
+    <div id="adminAppsSection" class="admin-section" style="display: none;">
+      ...
+    </div>
+    
+    <!-- ===== 8. УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ ===== -->
+    <div id="adminKeywordsSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
         <h3><i class="fas fa-tags"></i> Управление ключевыми словами (категориями)</h3>
         <div class="keywords-list" id="keywordsList"></div>
         <div class="add-keyword-form">
-            <h4>➕ Добавить ключевое слово</h4>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <input type="text" id="newKeywordName" class="input-modern" placeholder="Название (например: Steam, Discord)" style="flex: 1;">
-                <input type="text" id="newKeywordType" class="input-modern" placeholder="Тип (например: Premium, Nitro)" style="flex: 1;">
-                <button class="btn-glow" onclick="addKeyword()">
-                    <i class="fas fa-plus"></i> Добавить
-                </button>
-            </div>
+          <h4>➕ Добавить ключевое слово</h4>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="newKeywordName" class="input-modern" placeholder="Название (например: Steam, Discord)" style="flex: 1;">
+            <input type="text" id="newKeywordType" class="input-modern" placeholder="Тип (например: Premium, Nitro)" style="flex: 1;">
+            <button class="btn-glow" onclick="addKeyword()">
+              <i class="fas fa-plus"></i> Добавить
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+    
+  </div> <!-- Это закрывающий тег admin-container -->
+</div> <!-- Это закрывающий тег admin page -->
 <!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТОРА СЛАЙДЕРОВ -->
 <div id="sliderEditorModal" class="modal-glass">
   <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
