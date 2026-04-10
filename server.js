@@ -11,7 +11,6 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
-
 // Создание таблиц при запуске
 async function initTables() {
     try {
@@ -61,31 +60,14 @@ async function initTables() {
             )
         `);
 
-        // Добавляем начальные ключевые слова, если таблица пуста
-        const { rows } = await pool.query('SELECT COUNT(*) FROM keywords');
-        if (parseInt(rows[0].count) === 0) {
-            await pool.query(`
-                INSERT INTO keywords (id, name, type) VALUES
-                ('1', 'Steam', 'Premium'),
-                ('2', 'Discord', 'Nitro'),
-                ('3', 'Netflix', '4K'),
-                ('4', 'Spotify', 'Premium'),
-                ('5', 'YouTube', 'Premium'),
-                ('6', 'Telegram', 'Premium'),
-                ('7', 'TikTok', 'Premium'),
-                ('8', 'Instagram', 'Business')
-            `);
-            console.log('✅ Начальные ключевые слова добавлены');
-        }
-
-        console.log('✅ Все таблицы созданы');
+        console.log('✅ Все таблицы созданы или уже существуют');
     } catch (error) {
         console.error('Ошибка создания таблиц:', error.message);
     }
 }
 
+// Вызови функцию после подключения к БД
 initTables();
-
 // ==================== ТОВАРЫ ====================
 
 // Получить все товары
