@@ -15,7 +15,6 @@
             window.productsArray = products;
             console.log(`✅ Загружено ${products.length} товаров с сервера`);
             
-            // Отображаем товары
             const grid = document.getElementById('productsGrid');
             if (grid) {
                 if (!products.length) {
@@ -38,7 +37,6 @@
                 }
             }
             
-            // Обновляем счетчик
             const countSpan = document.getElementById('productCountStat');
             if (countSpan) countSpan.innerText = products.length;
             
@@ -49,11 +47,12 @@
         }
     };
 
-    // ЗАГРУЗКА ИГР С СЕРВЕРА
+    // ЗАГРУЗКА ИГР С СЕРВЕРА (БЕЗ КЕША)
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
-            const response = await fetch('/api/game-blocks');
+            // Добавляем параметр для отключения кеша
+            const response = await fetch('/api/game-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки игр');
             const blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков игр`);
@@ -63,18 +62,41 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
                 } else {
-                    wrapper.innerHTML = blocks.map(block => `
-                        <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                            <div class="game-icon">
-                                ${block.image_url ? 
-                                    `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                     <i class="${block.icon || 'fas fa-gamepad'}" style="display: none;"></i>` : 
-                                    `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
-                                }
-                            </div>
-                            <div class="game-name">${escapeHtml(block.name)}</div>
+                    // Разделяем на два ряда
+                    const midIndex = Math.ceil(blocks.length / 2);
+                    const firstRow = blocks.slice(0, midIndex);
+                    const secondRow = blocks.slice(midIndex);
+                    
+                    wrapper.innerHTML = `
+                        <div class="games-row">
+                            ${firstRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
                         </div>
-                    `).join('');
+                        <div class="games-row-second">
+                            ${secondRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fas fa-gamepad'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fas fa-gamepad'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
                 }
             }
             return blocks;
@@ -84,11 +106,11 @@
         }
     };
 
-    // ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА
+    // ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА (БЕЗ КЕША)
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
         try {
-            const response = await fetch('/api/app-blocks');
+            const response = await fetch('/api/app-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки приложений');
             const blocks = await response.json();
             console.log(`✅ Загружено ${blocks.length} блоков приложений`);
@@ -98,18 +120,40 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
                 } else {
-                    wrapper.innerHTML = blocks.map(block => `
-                        <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
-                            <div class="game-icon">
-                                ${block.image_url ? 
-                                    `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                     <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
-                                    `<i class="${block.icon || 'fab fa-android'}"></i>`
-                                }
-                            </div>
-                            <div class="game-name">${escapeHtml(block.name)}</div>
+                    const midIndex = Math.ceil(blocks.length / 2);
+                    const firstRow = blocks.slice(0, midIndex);
+                    const secondRow = blocks.slice(midIndex);
+                    
+                    wrapper.innerHTML = `
+                        <div class="games-row">
+                            ${firstRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fab fa-android'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
                         </div>
-                    `).join('');
+                        <div class="games-row-second">
+                            ${secondRow.map(block => `
+                                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                                    <div class="game-icon">
+                                        ${block.image_url ? 
+                                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
+                                            `<i class="${block.icon || 'fab fa-android'}"></i>`
+                                        }
+                                    </div>
+                                    <div class="game-name">${escapeHtml(block.name)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
                 }
             }
             return blocks;
@@ -188,14 +232,12 @@
     async function init() {
         console.log('🚀 GLOBAL FIX инициализация...');
         
-        // Проверяем API
         const apiStatus = await testAPI();
         if (!apiStatus || apiStatus.status !== 'ok') {
             console.error('❌ API не работает! Проверьте сервер.');
             return;
         }
         
-        // Загружаем все данные
         await Promise.all([
             window.loadProducts(), 
             window.loadGameBlocks(), 
@@ -205,7 +247,6 @@
         console.log('✅ Глобальная инициализация завершена');
     }
     
-    // Запускаем после загрузки DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

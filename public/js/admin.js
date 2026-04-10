@@ -1519,7 +1519,48 @@ function showAdminUI() {
     initAdmin();
   }
 }
+// ========== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ ==========
+async function refreshAllUsersData() {
+    // Отправляем событие в localStorage, которое перехватят другие вкладки
+    localStorage.setItem('force_refresh_blocks', Date.now().toString());
+    setTimeout(() => {
+        localStorage.removeItem('force_refresh_blocks');
+    }, 100);
+    
+    showToast("✅ Данные обновлены для всех пользователей", "success");
+}
 
+// Добавляем кнопку обновления в админку (в раздел Игры и Приложения)
+function addRefreshButtonToAdmin() {
+    const gamesSection = document.getElementById("adminGamesSection");
+    const appsSection = document.getElementById("adminAppsSection");
+    
+    if (gamesSection && !document.getElementById('refreshBlocksBtn')) {
+        const refreshBtn = document.createElement('button');
+        refreshBtn.id = 'refreshBlocksBtn';
+        refreshBtn.className = 'btn-glow';
+        refreshBtn.style.marginBottom = '20px';
+        refreshBtn.style.background = '#3b82f6';
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Обновить кеш у всех пользователей';
+        refreshBtn.onclick = refreshAllUsersData;
+        
+        const firstCard = gamesSection.querySelector('.admin-card');
+        if (firstCard) {
+            firstCard.insertBefore(refreshBtn, firstCard.firstChild);
+        }
+    }
+}
+
+// Вызываем при инициализации
+window.refreshAllUsersData = refreshAllUsersData;
+window.addRefreshButtonToAdmin = addRefreshButtonToAdmin;
+
+// Добавляем в initAdmin
+const originalInitAdmin = window.initAdmin;
+window.initAdmin = async function() {
+    await originalInitAdmin();
+    addRefreshButtonToAdmin();
+};
 // ==================== 11. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
 
 function escapeHtml(str) {

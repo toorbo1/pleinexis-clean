@@ -227,3 +227,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     console.log('✅ APP.JS - инициализация завершена');
 });
+// В конец app.js добавьте:
+window.addEventListener('storage', (e) => {
+    if (e.key === 'force_refresh_blocks') {
+        console.log('🔄 Принудительное обновление блоков...');
+        if (typeof window.loadGameBlocks === 'function') {
+            window.loadGameBlocks();
+        }
+        if (typeof window.loadAppBlocks === 'function') {
+            window.loadAppBlocks();
+        }
+        if (typeof window.loadProducts === 'function') {
+            window.loadProducts();
+        }
+        showToast('🔄 Данные обновлены администратором', 'info');
+    }
+});
