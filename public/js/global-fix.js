@@ -2,26 +2,29 @@
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
 
-    // Загрузка товаров - ПРЯМО ИЗ API
+    // Глобальная переменная для товаров
+    window.productsArray = [];
+
+    // ЗАГРУЗКА ТОВАРОВ С СЕРВЕРА
     window.loadProducts = async function() {
+        console.log('🔄 loadProducts: запрос к API...');
         try {
-            console.log('🔄 loadProducts: запрос к API...');
-            const products = await API.getProducts();
+            const response = await fetch('/api/products');
+            if (!response.ok) throw new Error('Ошибка загрузки товаров');
+            const products = await response.json();
             window.productsArray = products;
+            console.log(`✅ Загружено ${products.length} товаров с сервера`);
             
-            // Сохраняем в localStorage как резервную копию
-            localStorage.setItem('apex_products_backup', JSON.stringify(products));
-            
+            // Отображаем товары
             const grid = document.getElementById('productsGrid');
             if (grid) {
                 if (!products.length) {
                     grid.innerHTML = '<div class="empty-state">Нет товаров</div>';
-                    console.log('⚠️ Товаров не найдено');
                 } else {
                     grid.innerHTML = products.map(p => `
                         <div class="product-card" onclick="window.openProductDetailById('${p.id}')">
                             <div class="card-image">
-                                <img src="${escapeHtml(p.image_url || 'https://picsum.photos/id/42/400/300')}" 
+                                <img src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
                                      onerror="this.src='https://picsum.photos/id/42/400/300'"
                                      loading="lazy">
                                 ${p.discount ? `<span class="discount-badge">🔥 ${escapeHtml(p.discount)}</span>` : ''}
@@ -32,45 +35,29 @@
                             </div>
                         </div>
                     `).join('');
-                    console.log(`✅ Отображено ${products.length} товаров`);
                 }
             }
             
+            // Обновляем счетчик
             const countSpan = document.getElementById('productCountStat');
             if (countSpan) countSpan.innerText = products.length;
             
             return products;
         } catch(e) { 
             console.error('❌ loadProducts error:', e);
-            // Fallback на резервную копию
-            const backup = localStorage.getItem('apex_products_backup');
-            if (backup) {
-                const products = JSON.parse(backup);
-                window.productsArray = products;
-                const grid = document.getElementById('productsGrid');
-                if (grid && products.length) {
-                    grid.innerHTML = products.map(p => `
-                        <div class="product-card" onclick="window.openProductDetailById('${p.id}')">
-                            <div class="card-image">
-                                <img src="${escapeHtml(p.image_url || 'https://picsum.photos/id/42/400/300')}" 
-                                     onerror="this.src='https://picsum.photos/id/42/400/300'">
-                            </div>
-                            <div class="card-body">
-                                <div class="current-price">${escapeHtml(p.price)}</div>
-                                <h3 class="product-title">${escapeHtml(p.title.substring(0, 50))}</h3>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            }
             return []; 
         }
     };
 
-    // Загрузка игр
+    // ЗАГРУЗКА ИГР С СЕРВЕРА
     window.loadGameBlocks = async function() {
+        console.log('🔄 loadGameBlocks: запрос к API...');
         try {
-            const blocks = await API.getGameBlocks();
+            const response = await fetch('/api/game-blocks');
+            if (!response.ok) throw new Error('Ошибка загрузки игр');
+            const blocks = await response.json();
+            console.log(`✅ Загружено ${blocks.length} блоков игр`);
+            
             const wrapper = document.getElementById('gamesScrollWrapper');
             if (wrapper) {
                 if (!blocks.length) {
@@ -97,10 +84,15 @@
         }
     };
 
-    // Загрузка приложений
+    // ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА
     window.loadAppBlocks = async function() {
+        console.log('🔄 loadAppBlocks: запрос к API...');
         try {
-            const blocks = await API.getAppBlocks();
+            const response = await fetch('/api/app-blocks');
+            if (!response.ok) throw new Error('Ошибка загрузки приложений');
+            const blocks = await response.json();
+            console.log(`✅ Загружено ${blocks.length} блоков приложений`);
+            
             const wrapper = document.getElementById('appsScrollWrapper');
             if (wrapper) {
                 if (!blocks.length) {
@@ -127,27 +119,30 @@
         }
     };
 
-    // Открытие деталей товара
+    // ОТКРЫТИЕ ДЕТАЛЕЙ ТОВАРА
     window.openProductDetailById = async function(id) {
+        console.log('🔍 Открываем товар:', id);
         try {
-            const p = await API.getProduct(id);
-            if (!p) {
-                alert('Товар не найден');
-                return;
-            }
-            alert(`📦 ${p.title}\n💰 ${p.price}\n👤 ${p.seller}\n\n${p.description || 'Нет описания'}`);
+            const response = await fetch(`/api/products/${id}`);
+            if (!response.ok) throw new Error('Товар не найден');
+            const p = await response.json();
+            alert(`📦 ${p.title}\n💰 ${p.price}\n👤 ${p.seller}\n\n📝 ${p.description || 'Нет описания'}`);
         } catch(e) { 
             alert('Товар не найден'); 
         }
     };
 
-    // Открытие страницы по ключевому слову
+    // ОТКРЫТИЕ СТРАНИЦЫ ПО КЛЮЧЕВОМУ СЛОВУ
     window.openKeywordPage = async function(keyword) {
-        const products = await API.getProducts();
+        console.log('🔍 Открываем категорию:', keyword);
+        const response = await fetch('/api/products');
+        const products = await response.json();
         const filtered = products.filter(p => p.keyword && p.keyword.toLowerCase().includes(keyword.toLowerCase()));
+        
         const container = document.getElementById("keywordProductsGrid");
         const title = document.getElementById("keywordPageTitle");
         if (title) title.innerText = keyword;
+        
         if (container) {
             if (!filtered.length) {
                 container.innerHTML = '<div class="empty-state">Нет товаров</div>';
@@ -166,23 +161,38 @@
                 `).join('');
             }
         }
+        
         if (typeof showPage === 'function') showPage("keywordPage");
     };
 
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
     function escapeHtml(str) {
         if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m] || m));
+        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
     }
 
+    // ПРОВЕРКА API
+    async function testAPI() {
+        try {
+            const response = await fetch('/api/test');
+            const data = await response.json();
+            console.log('✅ API test:', data);
+            return data;
+        } catch(e) {
+            console.error('❌ API недоступен:', e);
+            return null;
+        }
+    }
+
+    // ГЛАВНАЯ ИНИЦИАЛИЗАЦИЯ
     async function init() {
         console.log('🚀 GLOBAL FIX инициализация...');
         
-        // Проверяем соединение с API
-        try {
-            const test = await API.test();
-            console.log('✅ API соединение:', test);
-        } catch(e) {
-            console.error('❌ API недоступен:', e);
+        // Проверяем API
+        const apiStatus = await testAPI();
+        if (!apiStatus || apiStatus.status !== 'ok') {
+            console.error('❌ API не работает! Проверьте сервер.');
+            return;
         }
         
         // Загружаем все данные
@@ -195,6 +205,7 @@
         console.log('✅ Глобальная инициализация завершена');
     }
     
+    // Запускаем после загрузки DOM
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
