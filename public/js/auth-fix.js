@@ -32,7 +32,7 @@ window.openAvatarBgModal = function() {
 
 window.openHeroBgModal = function() {
     console.log('openHeroBgModal - заглушка');
-    alert('Выбор градиента для фона будет доступен позже');
+    alert('Выбор градиента для фона будет доступен позже'); 
 };
 
 // Экспорт
