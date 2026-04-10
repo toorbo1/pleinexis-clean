@@ -219,7 +219,7 @@ app.delete('/api/app-blocks/:id', async (req, res) => {
         await pool.query('DELETE FROM app_blocks WHERE id = $1', [req.params.id]);
         res.json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message }); 
     }
 });
 // ==================== 2. БЛОКИ ИГР (СЕРВЕР) ====================
