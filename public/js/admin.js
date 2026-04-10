@@ -684,7 +684,7 @@ async function loadGameBlocks() {
     try {
         gameBlocks = await API.getGameBlocks();
         renderGamesBlocks();
-        // Удаляем вызов renderHomeGameBlocks - он не нужен
+        renderHomeGameBlocks();
         updateGameKeywordSelect();
         console.log('✅ Загружено блоков игр:', gameBlocks.length);
     } catch (error) {
@@ -817,20 +817,7 @@ async function editGameBlock(id) {
         }
     }
 }
-async function loadAppBlocks() {
-    try {
-        const response = await fetch('/api/app-blocks?_=' + Date.now());
-        if (!response.ok) throw new Error('Ошибка загрузки приложений');
-        appBlocks = await response.json();
-        renderAppsBlocks();
-        // Удаляем вызов renderHomeAppBlocks
-        updateAppKeywordSelect();
-        console.log('✅ Загружено блоков приложений:', appBlocks.length);
-    } catch (error) {
-        console.error('Ошибка загрузки блоков приложений:', error);
-        appBlocks = [];
-    }
-}
+
 async function loadAppBlocks() {
     try {
         const response = await fetch('/api/app-blocks?_=' + Date.now());
@@ -1573,16 +1560,7 @@ function showToast(message, type = 'success') {
     toast.classList.remove('show');
   }, 3000);
 }
-// Заглушки для функций, которые могут вызываться
-function renderHomeGameBlocks() {
-    // Эта функция больше не нужна, так как global-fix.js сам обновляет главную страницу
-    console.log('renderHomeGameBlocks вызвана (заглушка)');
-}
 
-function renderHomeAppBlocks() {
-    // Эта функция больше не нужна, так как global-fix.js сам обновляет главную страницу
-    console.log('renderHomeAppBlocks вызвана (заглушка)');
-}
 // ==================== 12. ЭКСПОРТ ФУНКЦИЙ ====================
 
 window.initAdmin = initAdmin;
