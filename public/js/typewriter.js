@@ -1,6 +1,5 @@
-// typewriter.js - Цикличная анимация печатной машинки (без курсора)
+// typewriter.js - Цикличная анимация печатной машинки (без скачков)
 (function() {
-  // Массив фраз для циклического отображения
   const phrases = [
     "Привет! ;)",
     "Маркетплейс товаров",
@@ -10,15 +9,14 @@
     "Присоединяйся к нам!"  
   ];
   
-  let currentPhraseIndex = 0;     // Индекс текущей фразы
-  let currentCharIndex = 0;       // Индекс текущего символа
-  let isDeleting = false;          // Режим удаления
-  let typewriterElement = null;     // Ссылка на DOM-элемент
+  let currentPhraseIndex = 0;
+  let currentCharIndex = 0;
+  let isDeleting = false;
+  let typewriterElement = null;
   
-  // Скорость (в миллисекундах)
-  const TYPING_SPEED = 250;        // Скорость печати символа
-  const DELETING_SPEED = 80;       // Скорость удаления символа
-  const PAUSE_BETWEEN_PHRASES = 2000; // Пауза перед удалением/сменой фразы
+  const TYPING_SPEED = 250;
+  const DELETING_SPEED = 80;
+  const PAUSE_BETWEEN_PHRASES = 2000;
   
   function initTypewriter() {
     typewriterElement = document.getElementById('typewriterText');
@@ -27,11 +25,13 @@
       return;
     }
     
-    // Очищаем содержимое и добавляем класс
+    // ФИКС: устанавливаем фиксированную минимальную высоту
+    typewriterElement.style.minHeight = typewriterElement.offsetHeight + 'px';
+    typewriterElement.style.display = 'inline-block';
+    
     typewriterElement.innerHTML = '';
     typewriterElement.classList.add('typewriter-text');
     
-    // Запускаем анимацию
     setTimeout(typewriterEffect, 200);
   }
   
@@ -40,45 +40,36 @@
     
     const currentPhrase = phrases[currentPhraseIndex];
     
-    // РЕЖИМ ПЕЧАТИ
     if (!isDeleting) {
-      // Добавляем следующий символ
       typewriterElement.innerHTML = currentPhrase.substring(0, currentCharIndex + 1);
       currentCharIndex++;
       
-      // Если фраза полностью напечатана
       if (currentCharIndex === currentPhrase.length) {
         isDeleting = true;
-        // Пауза перед началом удаления
         setTimeout(typewriterEffect, PAUSE_BETWEEN_PHRASES);
         return;
       }
       
-      // Продолжаем печатать
       setTimeout(typewriterEffect, TYPING_SPEED);
     } 
-    // РЕЖИМ УДАЛЕНИЯ
     else {
-      // Удаляем последний символ
-      typewriterElement.innerHTML = currentPhrase.substring(0, currentCharIndex - 1);
-      currentCharIndex--;
-      
-      // Если фраза полностью удалена
-      if (currentCharIndex === 0) {
+      // ФИКС: при удалении последнего символа не делаем элемент пустым
+      if (currentCharIndex === 1) {
+        typewriterElement.innerHTML = '&nbsp;'; // невидимый пробел вместо пустоты
+        currentCharIndex = 0;
         isDeleting = false;
-        // Переключаемся на следующую фразу
         currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-        // Небольшая пауза перед печатью новой фразы
         setTimeout(typewriterEffect, TYPING_SPEED);
         return;
       }
       
-      // Продолжаем удалять
+      typewriterElement.innerHTML = currentPhrase.substring(0, currentCharIndex - 1);
+      currentCharIndex--;
+      
       setTimeout(typewriterEffect, DELETING_SPEED);
     }
   }
   
-  // Запускаем инициализацию после полной загрузки DOM
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTypewriter);
   } else {

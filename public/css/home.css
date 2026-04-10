@@ -1130,3 +1130,17 @@ html::-webkit-scrollbar-thumb:hover {
 .games-row, .games-row-second {
   display: none;
 }
+
+#typewriterText {
+    min-height: 40px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Для мобильных */
+@media (max-width: 480px) {
+    #typewriterText {
+        min-height: 32px;
+        font-size: 1.2rem;
+    }
+}
