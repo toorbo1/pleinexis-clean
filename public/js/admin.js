@@ -16,10 +16,10 @@ async function initAdmin() {
     await loadKeywords();
     await loadPendingProducts();
     await loadAdminProducts();
-    loadGameBlocks();
-    loadAppBlocks();
-    loadAdmins();
-    loadAdminDialogs();
+    await loadGameBlocks();   // <-- добавить await
+    await loadAppBlocks();    // <-- добавить await
+    await loadAdmins();
+    await loadAdminDialogs();
     renderGamesBlocks();
     renderAppsBlocks();
     renderAdminsList();
@@ -804,25 +804,21 @@ async function editGameBlock(id) {
     }
 }
 
-function loadAppBlocks() {
-  const stored = localStorage.getItem("apex_app_blocks");
-  if (stored) {
-    appBlocks = JSON.parse(stored);
-  } else {
-    appBlocks = [
-      { id: "app1", name: "Telegram", keywordId: "", icon: "fab fa-telegram", imageUrl: "" },
-      { id: "app2", name: "WhatsApp", keywordId: "", icon: "fab fa-whatsapp", imageUrl: "" },
-      { id: "app3", name: "Instagram", keywordId: "", icon: "fab fa-instagram", imageUrl: "" },
-      { id: "app4", name: "TikTok", keywordId: "", icon: "fab fa-tiktok", imageUrl: "" },
-      { id: "app5", name: "YouTube", keywordId: "", icon: "fab fa-youtube", imageUrl: "" },
-      { id: "app6", name: "Spotify", keywordId: "", icon: "fab fa-spotify", imageUrl: "" },
-      { id: "app7", name: "Netflix", keywordId: "", icon: "fas fa-tv", imageUrl: "" },
-      { id: "app8", name: "Discord", keywordId: "", icon: "fab fa-discord", imageUrl: "" }
-    ];
-    localStorage.setItem("apex_app_blocks", JSON.stringify(appBlocks));
-  }
-  renderAppsBlocks();
-  renderHomeAppBlocks();
+async function loadAppBlocks() {
+    try {
+        const response = await fetch('/api/app-blocks?_=' + Date.now());
+        if (!response.ok) throw new Error('Ошибка загрузки приложений');
+        appBlocks = await response.json();
+        renderAppsBlocks();
+        if (typeof renderHomeAppBlocks === 'function') {
+            renderHomeAppBlocks();
+        }
+        updateAppKeywordSelect();
+        console.log('✅ Загружено блоков приложений:', appBlocks.length);
+    } catch (error) {
+        console.error('Ошибка загрузки блоков приложений:', error);
+        appBlocks = [];
+    }
 }
 
 function renderAppsBlocks() {
@@ -858,133 +854,134 @@ function renderAppsBlocks() {
 }
 
 function renderHomeAppBlocks() {
-  const container = document.getElementById("appsScrollWrapper");
-  if (!container) return;
-  
-  if (appBlocks.length === 0) {
-    container.innerHTML = '<div style="color: var(--text-muted); padding: 20px;">Нет блоков</div>';
-    return;
-  }
-  
-  const midIndex = Math.ceil(appBlocks.length / 2);
-  const firstRow = appBlocks.slice(0, midIndex);
-  const secondRow = appBlocks.slice(midIndex);
-  
-  const firstRowHtml = firstRow.map(block => {
-    let keywordName = block.name;
-    let hasKeyword = false;
-    if (block.keywordId && block.keywordId !== "") {
-      const kw = keywords.find(k => k.id === block.keywordId);
-      if (kw) {
-        keywordName = kw.name;
-        hasKeyword = true;
-      }
-    }
-    return `
-      <div class="game-card" onclick="openKeywordPage('${escapeHtml(keywordName)}')">
-        <div class="game-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div class="game-name">${escapeHtml(block.name)}</div>
-        ${hasKeyword ? `<div class="game-keyword-badge">🔗 ${escapeHtml(keywordName)}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-  
-  const secondRowHtml = secondRow.map(block => {
-    let keywordName = block.name;
-    let hasKeyword = false;
-    if (block.keywordId && block.keywordId !== "") {
-      const kw = keywords.find(k => k.id === block.keywordId);
-      if (kw) {
-        keywordName = kw.name;
-        hasKeyword = true;
-      }
-    }
-    return `
-      <div class="game-card" onclick="openKeywordPage('${escapeHtml(keywordName)}')">
-        <div class="game-icon">
-          ${block.imageUrl ? 
-            `<img src="${escapeHtml(block.imageUrl)}" alt="${escapeHtml(block.name)}">` : 
-            `<i class="${block.icon}"></i>`
-          }
-        </div>
-        <div class="game-name">${escapeHtml(block.name)}</div>
-        ${hasKeyword ? `<div class="game-keyword-badge">🔗 ${escapeHtml(keywordName)}</div>` : ''}
-      </div>
-    `;
-  }).join('');
-  
-  container.innerHTML = `
-    <div class="games-row">${firstRowHtml}</div>
-    <div class="games-row-second">${secondRowHtml}</div>
-  `;
-}
-
-function addAppBlock() {
-  const name = document.getElementById("newAppName")?.value.trim();
-  const keywordId = document.getElementById("newAppKeyword")?.value;
-  const icon = document.getElementById("newAppIcon")?.value;
-  const imageUrl = document.getElementById("newAppImageUrl")?.value.trim();
-  
-  if (!name) {
-    alert("Введите название приложения");
-    return;
-  }
-  
-  const newBlock = {
-    id: "app_" + Date.now().toString(),
-    name: name,
-    keywordId: keywordId || "",
-    icon: icon || "fab fa-android",
-    imageUrl: imageUrl || ""
-  };
-  
-  appBlocks.push(newBlock);
-  localStorage.setItem("apex_app_blocks", JSON.stringify(appBlocks));
-  renderAppsBlocks();
-  renderHomeAppBlocks();
-  updateAppKeywordSelect();
-  
-  document.getElementById("newAppName").value = "";
-  document.getElementById("newAppKeyword").value = "";
-  document.getElementById("newAppIcon").value = "fab fa-android";
-  document.getElementById("newAppImageUrl").value = "";
-  
-  showToast("✅ Блок приложения добавлен!", "success");
-}
-
-function deleteAppBlock(id) {
-  if (confirm("Удалить этот блок?")) {
-    appBlocks = appBlocks.filter(b => b.id !== id);
-    localStorage.setItem("apex_app_blocks", JSON.stringify(appBlocks));
-    renderAppsBlocks();
-    renderHomeAppBlocks();
-    showToast("✅ Блок удален", "success");
-  }
-}
-
-function editAppBlock(id) {
-  const block = appBlocks.find(b => b.id === id);
-  if (!block) return;
-  
-  const newName = prompt("Введите новое название:", block.name);
-  if (newName && newName.trim()) {
-    block.name = newName.trim();
+    const wrapper = document.getElementById('appsScrollWrapper');
+    if (!wrapper) return;
     
-    const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.imageUrl || "");
-    if (newImageUrl !== null) {
-      block.imageUrl = newImageUrl.trim();
+    if (!appBlocks || appBlocks.length === 0) {
+        wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
+        return;
     }
     
-    localStorage.setItem("apex_app_blocks", JSON.stringify(appBlocks));
-    renderAppsBlocks();
-    renderHomeAppBlocks();
-    showToast("✅ Блок обновлен!", "success");
-  }
+    const midIndex = Math.ceil(appBlocks.length / 2);
+    const firstRow = appBlocks.slice(0, midIndex);
+    const secondRow = appBlocks.slice(midIndex);
+    
+    wrapper.innerHTML = `
+        <div class="games-row">
+            ${firstRow.map(block => `
+                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                    <div class="game-icon">
+                        ${block.image_url ? 
+                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
+                            `<i class="${block.icon || 'fab fa-android'}"></i>`
+                        }
+                    </div>
+                    <div class="game-name">${escapeHtml(block.name)}</div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="games-row-second">
+            ${secondRow.map(block => `
+                <div class="game-card" onclick="openKeywordPage('${escapeHtml(block.name)}')">
+                    <div class="game-icon">
+                        ${block.image_url ? 
+                            `<img src="${escapeHtml(block.image_url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                             <i class="${block.icon || 'fab fa-android'}" style="display: none;"></i>` : 
+                            `<i class="${block.icon || 'fab fa-android'}"></i>`
+                        }
+                    </div>
+                    <div class="game-name">${escapeHtml(block.name)}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+async function addAppBlock() {
+    const name = document.getElementById("newAppName")?.value.trim();
+    const keywordId = document.getElementById("newAppKeyword")?.value;
+    const icon = document.getElementById("newAppIcon")?.value;
+    const imageUrl = document.getElementById("newAppImageUrl")?.value.trim();
+    
+    if (!name) {
+        showToast("Введите название приложения", "error");
+        return;
+    }
+    
+    const newBlock = {
+        id: Date.now().toString(),
+        name: name,
+        keyword_id: keywordId || null,
+        icon: icon || "fab fa-android",
+        image_url: imageUrl || null,
+        sort_order: appBlocks.length
+    };
+    
+    try {
+        const response = await fetch('/api/app-blocks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newBlock)
+        });
+        if (!response.ok) throw new Error('Ошибка создания');
+        
+        await loadAppBlocks(); // Перезагружаем с сервера
+        
+        document.getElementById("newAppName").value = "";
+        document.getElementById("newAppKeyword").value = "";
+        document.getElementById("newAppIcon").value = "fab fa-android";
+        document.getElementById("newAppImageUrl").value = "";
+        
+        showToast("✅ Блок приложения добавлен!", "success");
+    } catch (error) {
+        showToast("❌ Ошибка: " + error.message, "error");
+    }
+}
+
+async function deleteAppBlock(id) {
+    if (confirm("Удалить этот блок?")) {
+        try {
+            const response = await fetch(`/api/app-blocks/${id}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Ошибка удаления');
+            
+            await loadAppBlocks(); // Перезагружаем с сервера
+            showToast("✅ Блок удален", "success");
+        } catch (error) {
+            showToast("❌ Ошибка: " + error.message, "error");
+        }
+    }
+}
+async function editAppBlock(id) {
+    const block = appBlocks.find(b => b.id === id);
+    if (!block) return;
+    
+    const newName = prompt("Введите новое название:", block.name);
+    if (newName && newName.trim()) {
+        const newImageUrl = prompt("Введите URL нового фото (оставьте пустым для использования иконки):", block.image_url || "");
+        
+        const updatedBlock = {
+            name: newName.trim(),
+            keyword_id: block.keyword_id,
+            icon: block.icon,
+            image_url: newImageUrl?.trim() || null,
+            sort_order: block.sort_order
+        };
+        
+        try {
+            const response = await fetch(`/api/app-blocks/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedBlock)
+            });
+            if (!response.ok) throw new Error('Ошибка обновления');
+            
+            await loadAppBlocks(); // Перезагружаем с сервера
+            showToast("✅ Блок обновлен!", "success");
+        } catch (error) {
+            showToast("❌ Ошибка: " + error.message, "error");
+        }
+    }
 }
 
 // ==================== КЛЮЧЕВЫЕ СЛОВА (СИНХРОНИЗАЦИЯ С СЕРВЕРОМ) ====================
@@ -1519,48 +1516,7 @@ function showAdminUI() {
     initAdmin();
   }
 }
-// ========== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ ==========
-async function refreshAllUsersData() {
-    // Отправляем событие в localStorage, которое перехватят другие вкладки
-    localStorage.setItem('force_refresh_blocks', Date.now().toString());
-    setTimeout(() => {
-        localStorage.removeItem('force_refresh_blocks');
-    }, 100);
-    
-    showToast("✅ Данные обновлены для всех пользователей", "success");
-}
 
-// Добавляем кнопку обновления в админку (в раздел Игры и Приложения)
-function addRefreshButtonToAdmin() {
-    const gamesSection = document.getElementById("adminGamesSection");
-    const appsSection = document.getElementById("adminAppsSection");
-    
-    if (gamesSection && !document.getElementById('refreshBlocksBtn')) {
-        const refreshBtn = document.createElement('button');
-        refreshBtn.id = 'refreshBlocksBtn';
-        refreshBtn.className = 'btn-glow';
-        refreshBtn.style.marginBottom = '20px';
-        refreshBtn.style.background = '#3b82f6';
-        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Обновить кеш у всех пользователей';
-        refreshBtn.onclick = refreshAllUsersData;
-        
-        const firstCard = gamesSection.querySelector('.admin-card');
-        if (firstCard) {
-            firstCard.insertBefore(refreshBtn, firstCard.firstChild);
-        }
-    }
-}
-
-// Вызываем при инициализации
-window.refreshAllUsersData = refreshAllUsersData;
-window.addRefreshButtonToAdmin = addRefreshButtonToAdmin;
-
-// Добавляем в initAdmin
-const originalInitAdmin = window.initAdmin;
-window.initAdmin = async function() {
-    await originalInitAdmin();
-    addRefreshButtonToAdmin();
-};
 // ==================== 11. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
 
 function escapeHtml(str) {
