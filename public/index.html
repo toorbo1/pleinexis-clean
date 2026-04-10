@@ -925,8 +925,21 @@
 <script src="js/products-manage.js"></script>
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
+
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Финальная инициализация');
+    
+    // Принудительно загружаем блоки игр
+    if (typeof window.loadGameBlocks === 'function') {
+        await window.loadGameBlocks();
+    }
+    if (typeof window.loadAppBlocks === 'function') {
+        await window.loadAppBlocks();
+    }
+    if (typeof window.loadProducts === 'function') {
+        await window.loadProducts();
+    }
+    
     if (typeof window.showPage === 'function') {
         window.showPage('home');
     }

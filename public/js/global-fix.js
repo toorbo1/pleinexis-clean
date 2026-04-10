@@ -2,10 +2,8 @@
 (function() {
     console.log('🌍 GLOBAL FIX - загрузка...');
 
-    // Глобальная переменная для товаров
     window.productsArray = [];
 
-    // ЗАГРУЗКА ТОВАРОВ С СЕРВЕРА (без кеша)
     window.loadProducts = async function() {
         console.log('🔄 loadProducts: запрос к API...');
         try {
@@ -47,18 +45,19 @@
         }
     };
 
-    // ЗАГРУЗКА ИГР С СЕРВЕРА (БЕЗ КЕША) - ИСПРАВЛЕНО
     window.loadGameBlocks = async function() {
         console.log('🔄 loadGameBlocks: запрос к API...');
         try {
             const response = await fetch('/api/game-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки игр');
             const blocks = await response.json();
-            console.log(`✅ Загружено ${blocks.length} блоков игр`);
+            console.log(`✅ Загружено ${blocks.length} блоков игр:`, blocks);
             
             window.gameBlocks = blocks;
             
             const wrapper = document.getElementById('gamesScrollWrapper');
+            console.log('gamesScrollWrapper найден?', !!wrapper);
+            
             if (wrapper) {
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет игр</div>';
@@ -89,14 +88,13 @@
         }
     };
 
-    // ЗАГРУЗКА ПРИЛОЖЕНИЙ С СЕРВЕРА (БЕЗ КЕША) - БЕЗ СКРОЛЛА
     window.loadAppBlocks = async function() {
         console.log('🔄 loadAppBlocks: запрос к API...');
         try {
             const response = await fetch('/api/app-blocks?_=' + Date.now());
             if (!response.ok) throw new Error('Ошибка загрузки приложений');
             const blocks = await response.json();
-            console.log(`✅ Загружено ${blocks.length} блоков приложений`);
+            console.log(`✅ Загружено ${blocks.length} блоков приложений:`, blocks);
             
             window.appBlocks = blocks;
             
@@ -105,7 +103,6 @@
                 if (!blocks.length) {
                     wrapper.innerHTML = '<div class="empty-state">Нет приложений</div>';
                 } else {
-                    // Без горизонтального скролла - перенос на следующую строку
                     wrapper.innerHTML = `
                         <div class="apps-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 8px;">
                             ${blocks.map(block => `
@@ -132,7 +129,6 @@
         }
     };
 
-    // ОТКРЫТИЕ СТРАНИЦЫ ПО КЛЮЧЕВОМУ СЛОВУ
     window.openKeywordPage = async function(keyword) {
         console.log('🔍 Открываем категорию:', keyword);
         const response = await fetch('/api/products?_=' + Date.now());
@@ -165,16 +161,6 @@
         if (typeof showPage === 'function') showPage("keywordPage");
     };
 
-    // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
-    window.refreshAllUsersData = function() {
-        localStorage.setItem('force_refresh_blocks', Date.now().toString());
-        setTimeout(() => {
-            localStorage.removeItem('force_refresh_blocks');
-        }, 100);
-        showToast("✅ Данные обновлены для всех пользователей", "success");
-    };
-
-    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
@@ -192,7 +178,6 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // ПРОВЕРКА API
     async function testAPI() {
         try {
             const response = await fetch('/api/test');
@@ -205,7 +190,6 @@
         }
     }
 
-    // ГЛАВНАЯ ИНИЦИАЛИЗАЦИЯ
     async function init() {
         console.log('🚀 GLOBAL FIX инициализация...');
         
@@ -213,6 +197,11 @@
         if (!apiStatus || apiStatus.status !== 'ok') {
             console.error('❌ API не работает! Проверьте сервер.');
             return;
+        }
+        
+        // Ждем полной загрузки DOM
+        if (document.readyState !== 'complete') {
+            await new Promise(resolve => window.addEventListener('load', resolve));
         }
         
         await Promise.all([
@@ -224,7 +213,6 @@
         console.log('✅ Глобальная инициализация завершена');
     }
     
-    // СЛУШАЕМ ОБНОВЛЕНИЯ ОТ ДРУГИХ ВКЛАДОК
     window.addEventListener('storage', (e) => {
         if (e.key === 'force_refresh_blocks') {
             console.log('🔄 Принудительное обновление блоков...');
