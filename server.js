@@ -3,7 +3,11 @@ const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
-app.use(express.json());
+
+// ========== УВЕЛИЧИВАЕМ ЛИМИТ ДЛЯ БОЛЬШИХ ИЗОБРАЖЕНИЙ ==========
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(express.static('public'));
 
 // ========== ПОДКЛЮЧЕНИЕ К POSTGRESQL ==========
