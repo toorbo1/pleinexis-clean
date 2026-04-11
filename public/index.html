@@ -658,13 +658,7 @@
           <div class="admin-stat-label">Чатов поддержки</div>
         </div>
       </div>
-      <!-- ===== 9. ЗАЯВКИ НА ВИТРИНУ ===== -->
-<div id="adminShopSection" class="admin-section" style="display: none;">
-  <div class="admin-card">
-    <h3><i class="fas fa-store"></i> Заявки на подключение витрины</h3>
-    <div id="shopApplicationsList" class="shop-applications-list"></div>
-  </div>
-</div>
+      
       <div class="admin-quick-actions">
         <h3>Быстрые действия</h3>
         <div class="quick-buttons">
@@ -673,6 +667,9 @@
           </button>
           <button class="quick-btn" onclick="showAdminSection('adminChatSection')">
             <i class="fas fa-headset"></i> Чаты
+          </button>
+          <button class="quick-btn" onclick="showAdminSection('adminShopSection')">
+            <i class="fas fa-store"></i> Витрины
           </button>
           <button class="quick-btn" onclick="showAdminSection('adminSlidersSection')">
             <i class="fas fa-images"></i> Слайдеры
@@ -689,7 +686,18 @@
           <button class="quick-btn" onclick="showAdminSection('adminProductsSection')">
             <i class="fas fa-box"></i> Товары
           </button>
+          <button class="quick-btn" onclick="showAdminSection('adminKeywordsSection')">
+            <i class="fas fa-tags"></i> Ключевые слова
+          </button>
         </div>
+      </div>
+    </div>
+    
+    <!-- ===== 9. ЗАЯВКИ НА ВИТРИНУ ===== -->
+    <div id="adminShopSection" class="admin-section" style="display: none;">
+      <div class="admin-card">
+        <h3><i class="fas fa-store"></i> Заявки на подключение витрины</h3>
+        <div id="shopApplicationsList" class="shop-applications-list"></div>
       </div>
     </div>
     
@@ -833,7 +841,7 @@
             <option value="fas fa-dragon">🐉 Crimson Desert</option>
             <option value="fas fa-tank">🚀 Танки</option>
           </select>
-          <input type="text" id="newGameImageUrl" class="input-modern" placeholder="URL фото (необязательно)">
+          <input type="text" id="newGameImageUrl" class="input-modern" placeholder="URL фото (обязательно)">
           <button class="btn-glow" onclick="addGameBlock()">
             <i class="fas fa-plus"></i> Добавить блок
           </button>
@@ -862,16 +870,13 @@
             <option value="fas fa-tv">📺 Netflix</option>
             <option value="fab fa-discord">💬 Discord</option>
           </select>
-          <input type="text" id="newAppImageUrl" class="input-modern" placeholder="URL фото (необязательно)">
+          <input type="text" id="newAppImageUrl" class="input-modern" placeholder="URL фото (обязательно)">
           <button class="btn-glow" onclick="addAppBlock()">
             <i class="fas fa-plus"></i> Добавить блок
           </button>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
     
     <!-- ===== 8. УПРАВЛЕНИЕ КЛЮЧЕВЫМИ СЛОВАМИ ===== -->
     <div id="adminKeywordsSection" class="admin-section" style="display: none;">
@@ -891,8 +896,9 @@
       </div>
     </div>
     
-  </div> <!-- Это закрывающий тег admin-container -->
-</div> <!-- Это закрывающий тег admin page -->
+  </div> <!-- Закрывающий тег admin-container -->
+</div> <!-- Закрывающий тег admin page -->
+
 <!-- МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТОРА СЛАЙДЕРОВ -->
 <div id="sliderEditorModal" class="modal-glass">
   <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">

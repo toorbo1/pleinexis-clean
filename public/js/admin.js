@@ -657,7 +657,7 @@ function showAdminSection(sectionId) {
   const sections = [
     "adminMainSection", "adminAdminsSection", "adminKeywordsSection",
     "adminModerationSection", "adminSlidersSection", "adminChatSection", 
-    "adminProductsSection", "adminGamesSection", "adminAppsSection", "adminShopSection" // <-- ДОБАВИТЬ
+    "adminProductsSection", "adminGamesSection", "adminAppsSection", "adminShopSection"
   ];
   
   sections.forEach(id => {
