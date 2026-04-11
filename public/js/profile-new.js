@@ -808,10 +808,9 @@
       setTimeout(initNewProfile, 100);
     }
   }
-})();
 
-// ========== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ КНОПКИ АДМИНА ==========
-window.forceShowAdminButton = function() {
+// ========== ФОРСИРОВАННЫЙ ПОКАЗ КНОПКИ АДМИНА ==========
+function forceShowAdminButton() {
   console.log('🔴 forceShowAdminButton вызвана');
   
   const adminBtn = document.getElementById('adminProfileBtn');
@@ -823,19 +822,8 @@ window.forceShowAdminButton = function() {
   const currentUser = localStorage.getItem('apex_user') || 'Гость';
   console.log('Текущий пользователь:', currentUser);
   
-  // Проверяем админов в localStorage
-  let admins = [];
-  const stored = localStorage.getItem('apex_admins');
-  if (stored) {
-    admins = JSON.parse(stored);
-  }
-  console.log('Список админов:', admins);
-  
-  const isAdmin = admins.some(a => a.username === currentUser);
-  console.log('Является админом?', isAdmin);
-  
-  // Принудительно показываем кнопку для пользователя "Admin"
-  if (currentUser === 'Admin' || isAdmin) {
+  // Принудительно показываем для пользователя "оол" или "Admin"
+  if (currentUser === 'оол' || currentUser === 'Admin') {
     adminBtn.style.display = 'flex';
     adminBtn.style.visibility = 'visible';
     adminBtn.style.opacity = '1';
@@ -846,33 +834,81 @@ window.forceShowAdminButton = function() {
     
     newBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      console.log('🖱️ Клик по кнопке админа в профиле');
+      console.log('🖱️ Открытие админ-панели');
       if (typeof window.showPage === 'function') {
         window.showPage('admin');
       }
     });
-    console.log('✅ Кнопка админа показана');
+    console.log('✅ Кнопка админа показана для пользователя:', currentUser);
   } else {
     adminBtn.style.display = 'none';
-    console.log('❌ Кнопка админа скрыта');
+    console.log('❌ Кнопка админа скрыта для пользователя:', currentUser);
   }
-};
+}
 
-// Вызываем принудительно через 1 секунду после загрузки
+// Добавляем пользователя в админы принудительно
+function ensureAdmin() {
+  const currentUser = localStorage.getItem('apex_user') || 'Гость';
+  
+  if (currentUser === 'оол' || currentUser === 'Admin') {
+    let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+    
+    if (!admins.some(a => a.username === currentUser)) {
+      admins.push({
+        id: 'admin_' + Date.now(),
+        username: currentUser,
+        isOwner: true,
+        hiredBy: 'system',
+        hiredAt: new Date().toISOString()
+      });
+      localStorage.setItem('apex_admins', JSON.stringify(admins));
+      console.log('✅ Пользователь', currentUser, 'добавлен в админы');
+    }
+  }
+}
+
+// Запускаем принудительно
 setTimeout(function() {
-  console.log('🔄 Принудительная проверка кнопки админа...');
-  if (typeof window.forceShowAdminButton === 'function') {
-    window.forceShowAdminButton();
-  }
-}, 1000);
+  ensureAdmin();
+  forceShowAdminButton();
+}, 500);
 
-// Также вызываем при каждой смене страницы
+// При каждом открытии профиля
 const originalShowPage = window.showPage;
 if (originalShowPage) {
   window.showPage = function(pageId) {
     originalShowPage(pageId);
     if (pageId === 'profile') {
-      setTimeout(window.forceShowAdminButton, 100);
+      setTimeout(forceShowAdminButton, 100);
     }
   };
+}// ========== КНОПКА ВЫХОДА ==========
+function addLogoutButtonToProfile() {
+  if (document.getElementById('logoutProfileBtn')) return;
+  
+  const container = document.querySelector('.profile-payment-methods');
+  if (!container) return;
+  
+  const logoutBtn = document.createElement('button');
+  logoutBtn.id = 'logoutProfileBtn';
+  logoutBtn.className = 'shop-window-btn';
+  logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Выйти из аккаунта';
+  logoutBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
+  logoutBtn.style.marginTop = '16px';
+  
+  logoutBtn.addEventListener('click', function() {
+    if (confirm('Вы уверены, что хотите выйти?')) {
+      localStorage.removeItem('apex_user');
+      localStorage.removeItem('apex_user_id');
+      localStorage.removeItem('apex_admins');
+      localStorage.removeItem('apex_profile');
+      window.location.reload();
+    }
+  });
+  
+  container.insertAdjacentElement('afterend', logoutBtn);
 }
+
+// Вызываем
+setTimeout(addLogoutButtonToProfile, 500);
+})();

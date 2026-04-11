@@ -721,7 +721,6 @@ window.nextPhoto = nextPhoto;
 
 // Автоинициализация
 document.addEventListener('DOMContentLoaded', function() {
-//   addReviewsLinkToNav();
   
   // Инициализация при открытии страницы
   const observer = new MutationObserver(function(mutations) {
