@@ -783,7 +783,56 @@ document.addEventListener('DOMContentLoaded', loadProfileData);
     
     modal.classList.add('active');
   }
+  // ========== ПОКАЗ КНОПКИ АДМИН-ПАНЕЛИ В ПРОФИЛЕ ==========
+
+function showAdminButtonInProfile() {
+  const adminBtn = document.getElementById('adminProfileBtn');
+  if (!adminBtn) return;
   
+  const currentUser = localStorage.getItem('apex_user') || 'Гость';
+  const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+  const isAdmin = admins.some(a => a.username === currentUser);
+  
+  if (isAdmin) {
+    adminBtn.style.display = 'flex';
+    
+    // Удаляем старый обработчик и добавляем новый
+    const newBtn = adminBtn.cloneNode(true);
+    adminBtn.parentNode.replaceChild(newBtn, adminBtn);
+    
+    newBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (typeof window.showPage === 'function') {
+        window.showPage('admin');
+      } else if (typeof navigate === 'function') {
+        navigate('admin');
+      }
+    });
+  } else {
+    adminBtn.style.display = 'none';
+  }
+}
+
+// Вызываем при загрузке профиля
+if (typeof window.initNewProfile === 'function') {
+  const originalInit = window.initNewProfile;
+  window.initNewProfile = function() {
+    originalInit();
+    showAdminButtonInProfile();
+  };
+}
+
+// Также вызываем при загрузке DOM
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(showAdminButtonInProfile, 500);
+});
+
+// Следим за изменением пользователя
+window.addEventListener('storage', function(e) {
+  if (e.key === 'apex_user' || e.key === 'apex_admins') {
+    setTimeout(showAdminButtonInProfile, 100);
+  }
+});
   function saveProductEdit(productId) {
     const newTitle = document.getElementById('editTitle').value.trim();
     const newPrice = document.getElementById('editPrice').value.trim();
