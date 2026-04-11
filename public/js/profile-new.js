@@ -1,8 +1,18 @@
-// ========== НОВЫЙ ДИЗАЙН ПРОФИЛЯ (адаптив под ПК) ==========
+// ========== НОВЫЙ ДИЗАЙН ПРОФИЛЯ (ФИКС ДЛЯ РАЗНЫХ АККАУНТОВ) ==========
 
 (function() {
-  let profileHeroBg = localStorage.getItem('profileHeroBg') || null;
-  let profileAvatarBg = localStorage.getItem('profileAvatarBg') || null;
+  // Функция для получения имени пользователя
+  function getCurrentUser() {
+    return localStorage.getItem('apex_user') || 'Гость';
+  }
+
+  // Ключи для хранения с учетом пользователя
+  function getUserKey(baseKey) {
+    return baseKey + '_' + getCurrentUser();
+  }
+
+  let profileHeroBg = localStorage.getItem(getUserKey('profileHeroBg')) || null;
+  let profileAvatarBg = localStorage.getItem(getUserKey('profileAvatarBg')) || null;
   
   // Фоновые пресеты для hero-секции
   const heroBgPresets = [
@@ -28,11 +38,18 @@
   ];
   
   function initNewProfile() {
+    // Обновляем ссылки на текущие сохраненные значения
+    profileHeroBg = localStorage.getItem(getUserKey('profileHeroBg')) || null;
+    profileAvatarBg = localStorage.getItem(getUserKey('profileAvatarBg')) || null;
+
     const heroSection = document.getElementById('profileHeroSection');
     if (heroSection && profileHeroBg) {
       heroSection.style.background = profileHeroBg;
       heroSection.style.backgroundSize = 'cover';
       heroSection.style.backgroundPosition = 'center';
+    } else if (heroSection) {
+      // Сбрасываем на дефолтный, если нет сохраненного
+      heroSection.style.background = 'linear-gradient(135deg, #11131f, #0a0c16)';
     }
     
     const avatarCircle = document.getElementById('profileAvatarCircle');
@@ -41,6 +58,16 @@
       avatarCircle.style.backgroundSize = 'cover';
       avatarCircle.style.backgroundPosition = 'center';
       avatarCircle.classList.add('has-bg');
+    } else if (avatarCircle) {
+      // Сбрасываем аватар
+      avatarCircle.style.backgroundImage = '';
+      avatarCircle.style.background = '';
+      avatarCircle.classList.remove('has-bg');
+      const span = avatarCircle.querySelector('span');
+      if (span) {
+        span.style.display = 'flex';
+        span.innerText = getCurrentUser().charAt(0).toUpperCase();
+      }
     }
     
     setupHeroBgButton();
@@ -49,22 +76,14 @@
     setupReviewsClick();
     setupShopWindowButton();
     
-    // Перестраиваем HTML hero-секции под горизонтальный макет
     rebuildHeroLayout();
-    
-    // Сбрасываем статистику на нули
     resetProfileStats();
-    
-    // ПОКАЗЫВАЕМ КНОПКУ АДМИНА
     showAdminButtonInProfile();
-    
-    // ДОБАВЛЯЕМ КНОПКУ ВЫХОДА
     addLogoutButton();
   }
   
   // ========== КНОПКА ВЫХОДА ИЗ АККАУНТА ==========
   function addLogoutButton() {
-    // Проверяем, есть ли уже кнопка
     if (document.getElementById('logoutProfileBtn')) return;
     
     const paymentMethods = document.querySelector('.profile-payment-methods');
@@ -80,15 +99,11 @@
     logoutBtn.addEventListener('click', function(e) {
       e.preventDefault();
       if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-        // Очищаем все данные пользователя
         localStorage.removeItem('apex_user');
         localStorage.removeItem('apex_user_id');
         localStorage.removeItem('apex_user_email');
         localStorage.removeItem('apex_user_picture');
-        localStorage.removeItem('apex_profile');
-        localStorage.removeItem('apex_admins');
-        
-        // Перезагружаем страницу
+        // Не удаляем настройки профиля, они привязаны к старому ключу и не помешают новому
         window.location.reload();
       }
     });
@@ -96,17 +111,11 @@
     paymentMethods.insertAdjacentElement('afterend', logoutBtn);
   }
   
-  // ========== ПОКАЗ КНОПКИ АДМИН-ПАНЕЛИ В ПРОФИЛЕ ==========
   function showAdminButtonInProfile() {
     const adminBtn = document.getElementById('adminProfileBtn');
-    if (!adminBtn) {
-      console.warn('Кнопка админа не найдена в DOM');
-      return;
-    }
+    if (!adminBtn) return;
     
-    const currentUser = localStorage.getItem('apex_user') || 'Гость';
-    
-    // Получаем список админов с сервера или из localStorage
+    const currentUser = getCurrentUser();
     let admins = [];
     const storedAdmins = localStorage.getItem('apex_admins');
     if (storedAdmins) {
@@ -117,21 +126,15 @@
     }
     
     const isAdmin = admins.some(a => a.username === currentUser);
-    console.log('Проверка админа:', currentUser, 'isAdmin:', isAdmin);
     
     if (isAdmin) {
       adminBtn.style.display = 'flex';
-      
-      // Удаляем старый обработчик и добавляем новый
       const newBtn = adminBtn.cloneNode(true);
       adminBtn.parentNode.replaceChild(newBtn, adminBtn);
-      
       newBtn.addEventListener('click', function(e) {
         e.preventDefault();
         if (typeof window.showPage === 'function') {
           window.showPage('admin');
-        } else if (typeof navigate === 'function') {
-          navigate('admin');
         }
       });
     } else {
@@ -147,7 +150,7 @@
     shopBtn.parentNode.replaceChild(newBtn, shopBtn);
     
     newBtn.addEventListener('click', () => {
-      const user = localStorage.getItem('apex_user') || 'Гость';
+      const user = getCurrentUser();
       const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
       const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
       
@@ -168,21 +171,16 @@
     });
   }
   
-  // Сброс статистики профиля
   function resetProfileStats() {
     if (window.userProfile) {
       const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
-      const userProducts = products.filter(p => p.seller === window.currentUser);
+      const userProducts = products.filter(p => p.seller === getCurrentUser());
       
       window.userProfile.productsCount = userProducts.length;
       window.userProfile.purchasesCount = 0;
       window.userProfile.salesCount = 0;
-      
-      const activeProducts = userProducts.filter(p => p.status !== 'completed');
-      const completedProducts = userProducts.filter(p => p.status === 'completed');
-      
-      window.userProfile.activeOrders = activeProducts.length;
-      window.userProfile.completedOrders = completedProducts.length;
+      window.userProfile.activeOrders = userProducts.filter(p => p.status !== 'completed').length;
+      window.userProfile.completedOrders = userProducts.filter(p => p.status === 'completed').length;
       window.userProfile.balance = 0;
       window.userProfile.rating = 5.0;
       window.userProfile.reviewsCount = 0;
@@ -190,21 +188,14 @@
     }
     
     updateNewProfileStats(window.userProfile || {
-      productsCount: 0,
-      purchasesCount: 0,
-      salesCount: 0,
-      activeOrders: 0,
-      completedOrders: 0,
-      balance: 0,
-      joinedDate: "января 2026",
-      reviewsCount: 0
+      productsCount: 0, purchasesCount: 0, salesCount: 0, activeOrders: 0, completedOrders: 0, balance: 0,
+      joinedDate: "января 2026", reviewsCount: 0
     });
   }
   
   function rebuildHeroLayout() {
     const heroSection = document.getElementById('profileHeroSection');
-    if (!heroSection) return;
-    if (heroSection.querySelector('.hero-content')) return;
+    if (!heroSection || heroSection.querySelector('.hero-content')) return;
     
     const avatarHtml = heroSection.querySelector('.avatar-centered')?.outerHTML || '';
     const infoHtml = heroSection.querySelector('.hero-info')?.outerHTML || '';
@@ -225,7 +216,9 @@
   function setupHeroBgButton() {
     const changeBtn = document.getElementById('changeHeroBgBtn');
     if (!changeBtn) return;
-    changeBtn.addEventListener('click', () => openHeroBgModal());
+    const newBtn = changeBtn.cloneNode(true);
+    changeBtn.parentNode.replaceChild(newBtn, changeBtn);
+    newBtn.addEventListener('click', () => openHeroBgModal());
   }
   
   function openHeroBgModal() {
@@ -258,7 +251,7 @@
             heroSection.style.background = preset.style;
             heroSection.style.backgroundSize = 'cover';
             heroSection.style.backgroundPosition = 'center';
-            localStorage.setItem('profileHeroBg', preset.style);
+            localStorage.setItem(getUserKey('profileHeroBg'), preset.style);
           }
           modal.classList.remove('active');
         });
@@ -269,17 +262,13 @@
         const heroSection = document.getElementById('profileHeroSection');
         if (heroSection) {
           heroSection.style.background = 'linear-gradient(135deg, #11131f, #0a0c16)';
-          localStorage.removeItem('profileHeroBg');
+          localStorage.removeItem(getUserKey('profileHeroBg'));
         }
         modal.classList.remove('active');
       });
       
-      modal.querySelector('#closeHeroBgModal').addEventListener('click', () => {
-        modal.classList.remove('active');
-      });
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
+      modal.querySelector('#closeHeroBgModal').addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
     }
     modal.classList.add('active');
   }
@@ -329,7 +318,7 @@
             avatarCircle.style.backgroundSize = 'cover';
             avatarCircle.style.backgroundPosition = 'center';
             avatarCircle.classList.add('has-bg');
-            localStorage.setItem('profileAvatarBg', preset.style);
+            localStorage.setItem(getUserKey('profileAvatarBg'), preset.style);
           }
           modal.classList.remove('active');
         });
@@ -342,17 +331,13 @@
           avatarCircle.style.backgroundImage = '';
           avatarCircle.style.background = '';
           avatarCircle.classList.remove('has-bg');
-          localStorage.removeItem('profileAvatarBg');
+          localStorage.removeItem(getUserKey('profileAvatarBg'));
         }
         modal.classList.remove('active');
       });
       
-      modal.querySelector('#closeAvatarBgModal').addEventListener('click', () => {
-        modal.classList.remove('active');
-      });
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
+      modal.querySelector('#closeAvatarBgModal').addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
     }
     modal.classList.add('active');
   }
@@ -367,12 +352,6 @@
     newBalanceCard.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
-      
-      const withdrawPage = document.getElementById('withdrawPage');
-      if (!withdrawPage) {
-        alert('Страница вывода временно недоступна');
-        return;
-      }
       
       if (typeof window.showPage === 'function') {
         window.showPage('withdrawPage');
@@ -397,46 +376,8 @@
       if (typeof window.showPage === 'function') {
         if (typeof window.initReviewsPage === 'function') setTimeout(() => window.initReviewsPage(), 50);
         window.showPage('reviewsPage');
-      } else if (typeof navigate === 'function') {
-        navigate('reviewsPage');
       }
     });
-    
-    updateReviewsLinkAppearance();
-  }
-  
-  function updateReviewsLinkAppearance() {
-    const link = document.getElementById('profileReviewsLink');
-    if (!link) return;
-    
-    const reviewsCount = window.userProfile?.reviewsCount || 0;
-    const rating = window.userProfile?.rating || 0;
-    
-    if (reviewsCount > 0) {
-      const word = getReviewWord(reviewsCount);
-      link.textContent = `${reviewsCount} ${word}`;
-      link.classList.add('has-reviews');
-      link.style.display = 'inline';
-    } else {
-      link.textContent = '0 отзывов';
-      link.classList.remove('has-reviews');
-    }
-    
-    const ratingEl = document.querySelector('.hero-rating-value');
-    const starsEl = document.querySelector('.hero-stars');
-    
-    if (ratingEl) ratingEl.textContent = rating.toFixed(1);
-    if (starsEl) {
-      const ratingPercent = (rating / 5) * 100;
-      starsEl.style.setProperty('--rating-percent', ratingPercent + '%');
-      starsEl.textContent = '★★★★★';
-    }
-  }
-  
-  function getReviewWord(count) {
-    if (count % 10 === 1 && count % 100 !== 11) return 'отзыв';
-    if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'отзыва';
-    return 'отзывов';
   }
   
   function updateNewProfileStats(profileData) {
@@ -448,9 +389,6 @@
     const balanceEl = document.getElementById('profileBalance');
     const usernameEl = document.getElementById('profileUsername');
     const joinedEl = document.getElementById('profileJoined');
-    const reviewsCountEl = document.getElementById('profileReviewsLink');
-    const ratingValueEl = document.querySelector('.hero-rating-value');
-    const starsEl = document.querySelector('.hero-stars');
     
     if (productsCountEl) productsCountEl.innerText = profileData.productsCount || 0;
     if (purchasesCountEl) purchasesCountEl.innerText = profileData.purchasesCount || 0;
@@ -458,430 +396,25 @@
     if (activeCountEl) activeCountEl.innerText = profileData.activeOrders || 0;
     if (completedCountEl) completedCountEl.innerText = profileData.completedOrders || 0;
     if (balanceEl) balanceEl.innerText = (profileData.balance || 0).toFixed(2) + ' ₽';
-    if (usernameEl && window.currentUser) usernameEl.innerText = window.currentUser;
+    if (usernameEl) usernameEl.innerText = getCurrentUser();
     if (joinedEl && profileData.joinedDate) joinedEl.innerText = `на Плейнексис с ${profileData.joinedDate}`;
-    if (reviewsCountEl) reviewsCountEl.innerText = (profileData.reviewsCount || 0) + ' отзыва';
-    if (ratingValueEl) ratingValueEl.innerText = (profileData.rating || 0).toFixed(1);
-    if (starsEl) starsEl.innerHTML = '★★★★★';
     
     const avatarSpan = document.querySelector('#profileAvatarCircle span');
-    if (avatarSpan && window.currentUser) {
-      avatarSpan.innerText = window.currentUser.charAt(0).toUpperCase();
+    if (avatarSpan) {
+      avatarSpan.innerText = getCurrentUser().charAt(0).toUpperCase();
     }
   }
-  
-  function updateProfileRating(rating, reviewsCount) {
-    const starsElement = document.querySelector('.hero-stars');
-    const ratingValueElement = document.querySelector('.hero-rating-value');
-    const reviewsElement = document.getElementById('profileReviewsLink');
-    
-    if (ratingValueElement) ratingValueElement.textContent = rating.toFixed(1);
-    if (starsElement) {
-      const ratingPercent = (rating / 5) * 100;
-      starsElement.style.setProperty('--rating-percent', ratingPercent);
-      starsElement.textContent = '★★★★★';
-    }
-    if (reviewsElement) {
-      if (reviewsCount > 0) {
-        reviewsElement.textContent = `${reviewsCount} ${getReviewWord(reviewsCount)}`;
-        reviewsElement.classList.add('has-reviews');
-        reviewsElement.style.display = 'inline';
-      } else {
-        reviewsElement.classList.remove('has-reviews');
-        reviewsElement.style.display = 'none';
-      }
-    }
-  }
-  
-  function loadProfileData() {
-    const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"rating": 0, "reviewsCount": 0}');
-    updateProfileRating(userProfile.rating || 0, userProfile.reviewsCount || 0);
-  }
-  
-  function updateActiveCompletedCounts() {
-    const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
-    const userProducts = products.filter(p => p.seller === window.currentUser);
-    
-    const activeProducts = userProducts.filter(p => p.status !== 'completed');
-    const completedProducts = userProducts.filter(p => p.status === 'completed');
-    
-    const activeCountEl = document.getElementById('activeCount');
-    const completedCountEl = document.getElementById('completedCount');
-    
-    if (activeCountEl) activeCountEl.innerText = activeProducts.length;
-    if (completedCountEl) completedCountEl.innerText = completedProducts.length;
-    
-    if (window.userProfile) {
-      window.userProfile.activeOrders = activeProducts.length;
-      window.userProfile.completedOrders = completedProducts.length;
-      localStorage.setItem("apex_profile", JSON.stringify(window.userProfile));
-    }
-  }
-  
-  async function loadUserProductsInProfile() {
-    const container = document.getElementById('profileProductsList');
-    if (!container) return;
-    
-    const currentUser = localStorage.getItem('apex_user') || 'Гость';
-    const products = await API.getProducts();
-    const userProducts = products.filter(p => p.seller === currentUser);
-    
-    if (window.userProfile) {
-      window.userProfile.productsCount = userProducts.length;
-      localStorage.setItem("apex_profile", JSON.stringify(window.userProfile));
-      if (typeof updateNewProfileStats === 'function') updateNewProfileStats(window.userProfile);
-    }
-    
-// Вместо window.openModal() используем переход на страницу товаров
-if (userProducts.length === 0) {
-  container.innerHTML = `
-    <div class="empty-products">
-      <i class="fas fa-box-open"></i>
-      <p>Нет товаров</p>
-      <button class="btn-glow sell-btn" onclick="window.showPage('products-manage')">Выставить товар</button>
-    </div>
-  `;
-  return;
-}
-    
-    container.innerHTML = userProducts.map(product => `
-      <div class="profile-product-item" style="position: relative; cursor: pointer;" onclick="window.openProductDetailById('${product.id}')">
-        <img class="profile-product-img" src="${escapeHtml(product.image_url || 'https://picsum.photos/id/42/50/50')}" alt="${escapeHtml(product.title)}">
-        <div class="profile-product-info">
-          <div class="profile-product-title">${escapeHtml(product.title)}</div>
-          <div class="profile-product-price">${escapeHtml(product.price)}</div>
-          <div class="profile-product-status status-active">● Активен</div>
-        </div>
-      </div>
-    `).join('');
-  }
-  
-  function loadActiveProducts() {
-    const container = document.getElementById('profileProductsList');
-    if (!container) return;
-    const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
-    const userProducts = products.filter(p => p.seller === window.currentUser && p.status !== 'completed');
-    
-    updateActiveCompletedCounts();
-    
-    if (userProducts.length === 0) {
-      container.innerHTML = `
-        <div class="empty-products">
-          <i class="fas fa-box-open"></i>
-          <p>Нет активных товаров</p>
-          <button class="btn-glow sell-btn" onclick="window.showPage('products-manage')">Выставить товар</button>
-        </div>
-      `;
-      return;
-    }
-    
-    container.innerHTML = userProducts.map(product => `
-      <div class="profile-product-item" style="position: relative;">
-        <img class="profile-product-img" src="${escapeHtml(product.imageUrl || 'https://picsum.photos/id/42/50/50')}" alt="${escapeHtml(product.title)}" onclick="window.openProductDetailById('${product.id}')">
-        <div class="profile-product-info" onclick="window.openProductDetailById('${product.id}')" style="cursor: pointer;">
-          <div class="profile-product-title">${escapeHtml(product.title)}</div>
-          <div class="profile-product-price">${escapeHtml(product.price)}</div>
-          <div class="profile-product-status status-active">● Активен</div>
-        </div>
-        <button class="edit-product-btn" onclick="editProductFromProfile('${product.id}')">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
-    `).join('');
-  }
-  
-  function loadCompletedProducts() {
-    const container = document.getElementById('profileProductsList');
-    if (!container) return;
-    const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
-    const userProducts = products.filter(p => p.seller === window.currentUser && p.status === 'completed');
-    
-    updateActiveCompletedCounts();
-    
-    if (userProducts.length === 0) {
-      container.innerHTML = `
-        <div class="empty-products">
-          <i class="fas fa-check-circle"></i>
-          <p>Нет завершенных товаров</p>
-        </div>
-      `;
-      return;
-    }
-    
-    container.innerHTML = userProducts.map(product => `
-      <div class="profile-product-item" style="position: relative;">
-        <img class="profile-product-img" src="${escapeHtml(product.imageUrl || 'https://picsum.photos/id/42/50/50')}" alt="${escapeHtml(product.title)}" onclick="window.openProductDetailById('${product.id}')">
-        <div class="profile-product-info" onclick="window.openProductDetailById('${product.id}')" style="cursor: pointer;">
-          <div class="profile-product-title">${escapeHtml(product.title)}</div>
-          <div class="profile-product-price">${escapeHtml(product.price)}</div>
-          <div class="profile-product-status status-completed">● Завершён</div>
-        </div>
-        <button class="edit-product-btn" onclick="editProductFromProfile('${product.id}')">
-          <i class="fas fa-edit"></i>
-        </button>
-      </div>
-    `).join('');
-  }
-  
-  function editProductFromProfile(productId) {
-    const products = JSON.parse(localStorage.getItem("apex_products") || "[]");
-    const product = products.find(p => p.id === productId);
-    
-    if (!product) {
-      alert("Товар не найден");
-      return;
-    }
-    
-    if (product.seller !== window.currentUser) {
-      alert("Вы можете редактировать только свои товары");
-      return;
-    }
-    
-    openEditProductModal(product);
-  }
-  
-  function openEditProductModal(product) {
-    let modal = document.getElementById('editProductModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'editProductModal';
-      modal.className = 'profile-modal';
-      modal.innerHTML = `
-        <div class="profile-modal-card" style="max-width: 500px; width: 90%;">
-          <h4>✏️ Редактировать товар</h4>
-          <div style="margin-bottom: 12px;">
-            <input type="text" id="editTitle" class="input-modern" placeholder="Название товара" style="width: 100%; margin-bottom: 10px;">
-            <input type="text" id="editPrice" class="input-modern" placeholder="Цена" style="width: 100%; margin-bottom: 10px;">
-            <input type="text" id="editDiscount" class="input-modern" placeholder="Скидка (например: 20% или 100)" style="width: 100%; margin-bottom: 10px;">
-            <textarea id="editDescription" class="input-modern" rows="3" placeholder="Описание товара" style="width: 100%; margin-bottom: 10px;"></textarea>
-            <input type="text" id="editImageUrl" class="input-modern" placeholder="URL фото" style="width: 100%; margin-bottom: 10px;">
-            <select id="editKeyword" class="input-modern" style="width: 100%; margin-bottom: 10px;"></select>
-          </div>
-          <div class="modal-actions" style="display: flex; gap: 10px; justify-content: center;">
-            <button class="modal-btn" id="saveEditBtn">💾 Сохранить</button>
-            <button class="modal-btn danger" id="cancelEditBtn">Отмена</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      
-      const keywordSelect = modal.querySelector('#editKeyword');
-      const storedKeywords = localStorage.getItem("apex_keywords");
-      let keywords = [];
-      if (storedKeywords) {
-        keywords = JSON.parse(storedKeywords);
-      } else {
-        keywords = [
-          { id: "1", name: "Discord", type: "Nitro" },
-          { id: "2", name: "Discord", type: "Turbo" },
-          { id: "3", name: "Steam", type: "Premium" }
-        ];
-      }
-      
-      keywordSelect.innerHTML = '<option value="">Выберите категорию</option>';
-      keywords.forEach(k => {
-        keywordSelect.innerHTML += `<option value="${k.id}">${k.name} - ${k.type}</option>`;
-      });
-      
-      modal.querySelector('#saveEditBtn').addEventListener('click', () => saveProductEdit(product.id));
-      modal.querySelector('#cancelEditBtn').addEventListener('click', () => modal.classList.remove('active'));
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
-    }
-    
-    document.getElementById('editTitle').value = product.title || '';
-    document.getElementById('editPrice').value = product.price || '';
-    document.getElementById('editDiscount').value = product.discount || '';
-    document.getElementById('editDescription').value = (product.fullDesc || '').replace(' Моментальная выдача. Гарантия качества.', '');
-    document.getElementById('editImageUrl').value = product.imageUrl || '';
-    
-    const keywordSelect = document.getElementById('editKeyword');
-    if (product.keywordId) {
-      keywordSelect.value = product.keywordId;
-    } else {
-      keywordSelect.value = '';
-    }
-    
-    modal.classList.add('active');
-  }
-  
-  function saveProductEdit(productId) {
-    const newTitle = document.getElementById('editTitle').value.trim();
-    const newPrice = document.getElementById('editPrice').value.trim();
-    const newDiscount = document.getElementById('editDiscount').value.trim();
-    const newDescription = document.getElementById('editDescription').value.trim();
-    const newImageUrl = document.getElementById('editImageUrl').value.trim();
-    const keywordId = document.getElementById('editKeyword').value;
-    
-    if (!newTitle) {
-      alert("Введите название товара");
-      return;
-    }
-    if (!newPrice) {
-      alert("Введите цену");
-      return;
-    }
-    
-    let products = JSON.parse(localStorage.getItem("apex_products") || "[]");
-    const productIndex = products.findIndex(p => p.id === productId);
-    
-    if (productIndex === -1) {
-      alert("Товар не найден");
-      document.getElementById('editProductModal').classList.remove('active');
-      return;
-    }
-    
-    let keywordName = "";
-    if (keywordId) {
-      const storedKeywords = localStorage.getItem("apex_keywords");
-      if (storedKeywords) {
-        const keywords = JSON.parse(storedKeywords);
-        const selected = keywords.find(k => k.id === keywordId);
-        if (selected) keywordName = selected.name;
-      }
-    }
-    
-    products[productIndex] = {
-      ...products[productIndex],
-      title: newTitle,
-      price: newPrice,
-      discount: newDiscount || null,
-      fullDesc: newDescription ? `${newDescription} Моментальная выдача. Гарантия качества.` : products[productIndex].fullDesc,
-      imageUrl: newImageUrl || products[productIndex].imageUrl,
-      keywordId: keywordId || products[productIndex].keywordId,
-      keyword: keywordName || products[productIndex].keyword
-    };
-    
-    localStorage.setItem("apex_products", JSON.stringify(products));
-    
-    if (window.productsArray) {
-      window.productsArray = products;
-    }
-    
-    const modal = document.getElementById('editProductModal');
-    if (modal) modal.classList.remove('active');
-    
-    loadUserProductsInProfile();
-    
-    const activeTab = document.querySelector('.profile-tab-btn.active');
-    if (activeTab && activeTab.getAttribute('data-tab') === 'active') {
-      loadActiveProducts();
-    } else if (activeTab && activeTab.getAttribute('data-tab') === 'completed') {
-      loadCompletedProducts();
-    } else {
-      loadUserProductsInProfile();
-    }
-    
-    alert("✅ Товар успешно обновлен!");
-  }
-  
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
-  
-  // Экспорт функций
+
+  // Экспорт
   window.initNewProfile = initNewProfile;
   window.updateNewProfileStats = updateNewProfileStats;
-  window.loadUserProductsInProfile = loadUserProductsInProfile;
-  window.loadActiveProducts = loadActiveProducts;
-  window.loadCompletedProducts = loadCompletedProducts;
-  window.editProductFromProfile = editProductFromProfile;
-  window.saveProductEdit = saveProductEdit;
-  window.updateActiveCompletedCounts = updateActiveCompletedCounts;
-  window.showAdminButtonInProfile = showAdminButtonInProfile;
   
   // Запуск
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      if (document.getElementById('profileHeroSection')) {
-        setTimeout(initNewProfile, 100);
-      }
+      if (document.getElementById('profileHeroSection')) setTimeout(initNewProfile, 100);
     });
   } else {
-    if (document.getElementById('profileHeroSection')) {
-      setTimeout(initNewProfile, 100);
-    }
+    if (document.getElementById('profileHeroSection')) setTimeout(initNewProfile, 100);
   }
-
-// ========== ПОКАЗ КНОПКИ АДМИНА ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ ==========
-function forceShowAdminButton() {
-  console.log('🔴 forceShowAdminButton вызвана');
-  
-  const adminBtn = document.getElementById('adminProfileBtn');
-  if (!adminBtn) {
-    console.log('❌ Кнопка админа не найдена в DOM');
-    return;
-  }
-  
-  // Убираем проверку на админа - показываем кнопку ВСЕМ
-  adminBtn.style.display = 'flex';
-  adminBtn.style.visibility = 'visible';
-  adminBtn.style.opacity = '1';
-  
-  // Удаляем старый обработчик
-  const newBtn = adminBtn.cloneNode(true);
-  adminBtn.parentNode.replaceChild(newBtn, adminBtn);
-  
-  newBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log('🖱️ Открытие админ-панели');
-    
-    // Проверяем существование страницы админки
-    if (typeof window.showPage === 'function') {
-      window.showPage('admin');
-    } else if (typeof navigate === 'function') {
-      navigate('admin');
-    } else {
-      // Фолбэк
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const adminPage = document.getElementById('admin');
-      if (adminPage) adminPage.classList.add('active');
-    }
-  });
-  
-  console.log('✅ Кнопка админа показана (для всех пользователей)');
-}
-
-// Запускаем принудительно
-setTimeout(function() {
-  forceShowAdminButton();
-}, 500);
-
-// При каждом открытии профиля
-const originalShowPage = window.showPage;
-if (originalShowPage) {
-  window.showPage = function(pageId) {
-    originalShowPage(pageId);
-    if (pageId === 'profile') {
-      setTimeout(forceShowAdminButton, 100);
-    }
-  };
-}
-
-// Также запускаем при каждой смене вкладки
-if (window.MutationObserver) {
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        const profilePage = document.getElementById('profile');
-        if (profilePage && profilePage.classList.contains('active')) {
-          setTimeout(forceShowAdminButton, 100);
-        }
-      }
-    });
-  });
-  
-  const profilePage = document.getElementById('profile');
-  if (profilePage) {
-    observer.observe(profilePage, { attributes: true });
-  }
-}
 })();
