@@ -409,7 +409,7 @@ function setupShopWindowButton() {
     modal.classList.add('active');
   }
   
-  function setupBalanceClick() {
+function setupBalanceClick() {
     const balanceCard = document.querySelector('.profile-balance-card');
     if (!balanceCard) return;
     
@@ -417,18 +417,29 @@ function setupShopWindowButton() {
     balanceCard.parentNode.replaceChild(newBalanceCard, balanceCard);
     
     newBalanceCard.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (typeof window.showPage === 'function') {
-        window.showPage('withdrawPage');
-        setTimeout(() => {
-          if (typeof window.initWithdrawPage === 'function') window.initWithdrawPage();
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('💰 Клик по балансу, открываем страницу вывода');
+        
+        // Показываем страницу вывода
+        if (typeof window.showPage === 'function') {
+            window.showPage('withdrawPage');
+        }
+        
+        // Инициализируем страницу вывода после того, как она отобразится
+        setTimeout(function() {
+            if (typeof window.initWithdrawPage === 'function') {
+                window.initWithdrawPage();
+                console.log('✅ withdrawPage инициализирована');
+            } else {
+                console.error('❌ initWithdrawPage не найдена');
+            }
         }, 100);
-      }
     });
-  }
-  
+}
+
+
   function setupReviewsClick() {
     const reviewsLink = document.getElementById('profileReviewsLink');
     if (!reviewsLink) return;

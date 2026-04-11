@@ -219,3 +219,24 @@
     initWithdrawPage();
   }
 })();
+// Автоматическая инициализация при открытии страницы через MutationObserver
+(function() {
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                const withdrawPage = document.getElementById('withdrawPage');
+                if (withdrawPage && withdrawPage.classList.contains('active')) {
+                    console.log('📄 withdrawPage стала активной, инициализируем...');
+                    if (typeof window.initWithdrawPage === 'function') {
+                        window.initWithdrawPage();
+                    }
+                }
+            }
+        });
+    });
+    
+    const withdrawPage = document.getElementById('withdrawPage');
+    if (withdrawPage) {
+        observer.observe(withdrawPage, { attributes: true });
+    }
+})();
