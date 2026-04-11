@@ -1070,6 +1070,7 @@
 }
 
 /* Кнопка админ-панели в профиле */
+/* Кнопка админ-панели в профиле - всегда видна */
 .admin-profile-btn {
   background: linear-gradient(105deg, #ef4444, #dc2626) !important;
   border: none;
@@ -1078,7 +1079,7 @@
   color: white;
   font-weight: 700;
   font-size: 1rem;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -1093,7 +1094,6 @@
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
 }
-
 /* Кнопка выхода из аккаунта */
 #logoutProfileBtn {
   background: linear-gradient(105deg, #ef4444, #dc2626) !important;
