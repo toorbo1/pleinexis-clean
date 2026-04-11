@@ -4,34 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Плейнексис — Цифровой маркетплейс</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Предзагрузка критических шрифтов и стилей -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
+  
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" media="print" onload="this.media='all'">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Anonymous+Pro:wght@400;700&display=swap" rel="stylesheet">
-  <!-- В конец секции head в index.html -->
-   <link rel="stylesheet" href="premium-bg.css">
-<link rel="stylesheet" href="css/premium-mobile.css">
-  <!-- CSS файлы -->
+  
+  <!-- Основные стили загружаем асинхронно (кроме критических) -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/header.css">
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/home.css">
-  <link rel="stylesheet" href="css/products.css">
-  <link rel="stylesheet" href="css/profile.css">
-  <link rel="stylesheet" href="css/chat.css">
-  <link rel="stylesheet" href="css/admin.css">
-  <link rel="stylesheet" href="css/modals.css">
-  <link rel="stylesheet" href="css/detail-page.css">
+  <link rel="stylesheet" href="css/products.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/profile.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/chat.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/admin.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/modals.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/detail-page.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="css/bottom-nav.css">
-  <link rel="stylesheet" href="css/payment.css">
-  <link rel="stylesheet" href="css/products-manage.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/tasks-create.css">
-  <link rel="stylesheet" href="css/withdraw.css">
-</head>
+  <link rel="stylesheet" href="css/payment.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/products-manage.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/responsive.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/tasks-create.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="css/withdraw.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="premium-bg.css">
+  <link rel="stylesheet" href="css/premium-mobile.css" media="print" onload="this.media='all'">
+  
 <style>
-  /* дополнительные стили именно для страницы (демо) */
-    .demo-content {
-      text-align: center;
-    }
+  /* Критические стили для мгновенного отображения шапки */
+  body { background: #000; margin: 0; font-family: 'Inter', sans-serif; }
+  .header { display: flex; padding: 12px 20px; background: rgba(0,0,0,0.95); }
+  
+  /* Скрываем до загрузки кастомных шрифтов, но не картинки! */
+  body:not(.fonts-loaded) .hero-logo-text,
+  body:not(.fonts-loaded) .nav-label,
+  body:not(.fonts-loaded) .company-name {
+    opacity: 0;
+  }
+  
+  /* После загрузки — показываем */
+  body.fonts-loaded .hero-logo-text,
+  body.fonts-loaded .nav-label,
+  body.fonts-loaded .company-name {
+    opacity: 1;
+  }
     
     .btn {
       margin-top: 24px;
@@ -160,6 +179,9 @@
         overflow: visible !important;
     }
 </style>
+
+</head>
+
 <body>
 
 <!-- ХЕДЕР -->
@@ -1015,68 +1037,104 @@
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
+
+<!-- КРИТИЧЕСКИЕ СКРИПТЫ (загружаются сразу) -->
 <script src="js/api.js"></script>
 <script src="js/global-fix.js"></script>
 <script src="js/auth-fix.js"></script>
-<script src="js/detail-page.js"></script>  <!-- ДОБАВИТЬ СЮДА, ПЕРЕД ОСТАЛЬНЫМИ -->
-<script src="js/slider.js"></script>
-<script src="js/chats.js"></script>
-<script src="js/typewriter.js"></script>
-<script src="js/bottom-nav-blob.js"></script>
-<script src="js/profile-avatar-upload.js"></script>
-<script src="js/withdraw.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/app.js"></script>
-<script src="js/profile-new.js"></script>
-<script src="js/products-manage.js"></script>
-<!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
-<script>
-(function() {
-  console.log('🎯 Запуск подсветки центральной карточки...');
-  
-  const carousel = document.querySelector('.my-carousel');
-  const slides = document.querySelectorAll('.my-carousel-slide');
-  
-  if (!carousel || slides.length === 0) {
-    console.error('❌ Элементы карусели не найдены');
-    return;
-  }
-  
-  console.log(`✅ Найдено ${slides.length} слайдов`);
-  
-  function highlightCenterSlide() {
-    const carouselRect = carousel.getBoundingClientRect();
-    const centerX = carouselRect.left + carouselRect.width / 2;
-    
-    let closestSlide = null;
-    let minDistance = Infinity;
-    
-    slides.forEach(slide => {
-      const rect = slide.getBoundingClientRect();
-      const slideCenterX = rect.left + rect.width / 2;
-      const distance = Math.abs(centerX - slideCenterX);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestSlide = slide;
-      }
-    });
-    
-    if (closestSlide) {
-      slides.forEach(s => s.classList.remove('active'));
-      closestSlide.classList.add('active');
-    }
-  }
-  
-  // Запускаем подсветку каждые 50 мс для плавности
-  setInterval(highlightCenterSlide, 50);
-  
-  // Первая подсветка
-  setTimeout(highlightCenterSlide, 50);
-  
-  console.log('✅ Подсветка работает!');
-})();
+<script src="js/detail-page.js"></script>
 
+<!-- ОСТАЛЬНЫЕ СКРИПТЫ С ОТЛОЖЕННОЙ ЗАГРУЗКОЙ -->
+<script>
+  // Загружаем тяжелые скрипты после отрисовки страницы
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+  }
+  
+  // Загружаем остальные скрипты последовательно
+  window.addEventListener('load', async function() {
+    const scripts = [
+      'js/slider.js',
+      'js/chats.js',
+      'js/typewriter.js',
+      'js/bottom-nav-blob.js',
+      'js/profile-avatar-upload.js',
+      'js/withdraw.js',
+      'js/admin.js',
+      'js/app.js',
+      'js/profile-new.js',
+      'js/products-manage.js'
+    ];
+    
+    for (const src of scripts) {
+      try {
+        await loadScript(src);
+      } catch(e) {
+        console.warn('Ошибка загрузки:', src, e);
+      }
+    }
+    
+    console.log('✅ Все скрипты загружены');
+    
+    // 🔥 ВАЖНО: Разблокируем карусель и текст после загрузки
+    document.body.classList.add('fonts-loaded');
+    
+    // 🎯 Запуск подсветки центральной карточки
+    console.log('🎯 Запуск подсветки центральной карточки...');
+    
+    const carousel = document.querySelector('.my-carousel');
+    const slides = document.querySelectorAll('.my-carousel-slide');
+    
+    if (!carousel || slides.length === 0) {
+      console.error('❌ Элементы карусели не найдены');
+      return;
+    }
+    
+    console.log(`✅ Найдено ${slides.length} слайдов`);
+    
+    function highlightCenterSlide() {
+      const carouselRect = carousel.getBoundingClientRect();
+      const centerX = carouselRect.left + carouselRect.width / 2;
+      
+      let closestSlide = null;
+      let minDistance = Infinity;
+      
+      slides.forEach(slide => {
+        const rect = slide.getBoundingClientRect();
+        const slideCenterX = rect.left + rect.width / 2;
+        const distance = Math.abs(centerX - slideCenterX);
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSlide = slide;
+        }
+      });
+      
+      if (closestSlide) {
+        slides.forEach(s => s.classList.remove('active'));
+        closestSlide.classList.add('active');
+      }
+    }
+    
+    // Запускаем подсветку каждые 50 мс для плавности
+    setInterval(highlightCenterSlide, 50);
+    
+    // Первая подсветка
+    setTimeout(highlightCenterSlide, 50);
+    
+    console.log('✅ Подсветка работает!');
+  });
+</script>
+
+<!-- Финальная инициализация данных -->
+<script>
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Финальная инициализация');
     
@@ -1096,6 +1154,5 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 </script>
-
 </body>
 </html>
