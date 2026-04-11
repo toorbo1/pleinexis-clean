@@ -1424,6 +1424,80 @@
 <script src="js/reviews.js"></script>
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
+    // Принудительное обновление версии (очистка кэша)
+  (function() {
+    const APP_VERSION = '2.1.0';
+    const savedVersion = localStorage.getItem('app_version');
+    
+    if (savedVersion !== APP_VERSION) {
+      console.log('🔄 Обнаружена новая версия, очищаем кэш...');
+      localStorage.setItem('app_version', APP_VERSION);
+      
+      // Очищаем только старые данные профиля
+      const oldProfile = localStorage.getItem('apex_profile');
+      if (oldProfile) {
+        try {
+          const profile = JSON.parse(oldProfile);
+          // Сохраняем только базовые данные, сбрасываем кэшированные стили
+          const newProfile = {
+            ...profile,
+            balance: profile.balance || 0,
+            rating: 5.0,
+            reviewsCount: 0
+          };
+          localStorage.setItem('apex_profile', JSON.stringify(newProfile));
+        } catch(e) {}
+      }
+      
+      // Обновляем список админов
+      let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+      const currentUser = localStorage.getItem('apex_user') || 'Гость';
+      
+      if (currentUser === 'Admin' && !admins.some(a => a.username === 'Admin')) {
+        admins.push({
+          id: 'admin_' + Date.now(),
+          username: 'Admin',
+          isOwner: true,
+          hiredBy: 'system',
+          hiredAt: new Date().toISOString()
+        });
+        localStorage.setItem('apex_admins', JSON.stringify(admins));
+      }
+      
+      // Перезагружаем страницу
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+  })();
+
+
+  function addCacheResetButton() {
+  const paymentMethods = document.querySelector('.profile-payment-methods');
+  if (!paymentMethods) return;
+  
+  // Проверяем, есть ли уже
+  if (document.getElementById('cacheResetBtn')) return;
+  
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'cacheResetBtn';
+  resetBtn.className = 'shop-window-btn';
+  resetBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Обновить интерфейс (сброс кэша)';
+  resetBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
+  resetBtn.style.marginTop = '12px';
+  
+  resetBtn.addEventListener('click', function() {
+    if (confirm('Сбросить кэш и обновить интерфейс? Это может помочь решить проблемы с отображением.')) {
+      localStorage.setItem('app_version', '2.1.0');
+      window.location.reload();
+    }
+  });
+  
+  paymentMethods.insertAdjacentElement('afterend', resetBtn);
+}
+
+// Вызовите в initNewProfile
+addCacheResetButton();
   (function() {
     console.log('🔥 Карусель запущена');
     

@@ -55,6 +55,19 @@ function loadAdmins() {
     ];
     localStorage.setItem("apex_admins", JSON.stringify(admins));
   }
+  
+  // ДОБАВЬТЕ ЭТОТ БЛОК - проверяем, не является ли текущий пользователь админом
+  const currentUser = localStorage.getItem("apex_user") || "Гость";
+  if (currentUser === "Admin" && !admins.some(a => a.username === "Admin")) {
+    admins.push({
+      id: "admin_" + Date.now(),
+      username: "Admin",
+      isOwner: true,
+      hiredBy: "system",
+      hiredAt: new Date().toISOString()
+    });
+    localStorage.setItem("apex_admins", JSON.stringify(admins));
+  }
 }
 
 function saveAdmins() {

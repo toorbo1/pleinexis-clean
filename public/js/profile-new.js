@@ -809,3 +809,70 @@
     }
   }
 })();
+
+// ========== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ КНОПКИ АДМИНА ==========
+window.forceShowAdminButton = function() {
+  console.log('🔴 forceShowAdminButton вызвана');
+  
+  const adminBtn = document.getElementById('adminProfileBtn');
+  if (!adminBtn) {
+    console.log('❌ Кнопка админа не найдена в DOM');
+    return;
+  }
+  
+  const currentUser = localStorage.getItem('apex_user') || 'Гость';
+  console.log('Текущий пользователь:', currentUser);
+  
+  // Проверяем админов в localStorage
+  let admins = [];
+  const stored = localStorage.getItem('apex_admins');
+  if (stored) {
+    admins = JSON.parse(stored);
+  }
+  console.log('Список админов:', admins);
+  
+  const isAdmin = admins.some(a => a.username === currentUser);
+  console.log('Является админом?', isAdmin);
+  
+  // Принудительно показываем кнопку для пользователя "Admin"
+  if (currentUser === 'Admin' || isAdmin) {
+    adminBtn.style.display = 'flex';
+    adminBtn.style.visibility = 'visible';
+    adminBtn.style.opacity = '1';
+    
+    // Удаляем старый обработчик
+    const newBtn = adminBtn.cloneNode(true);
+    adminBtn.parentNode.replaceChild(newBtn, adminBtn);
+    
+    newBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('🖱️ Клик по кнопке админа в профиле');
+      if (typeof window.showPage === 'function') {
+        window.showPage('admin');
+      }
+    });
+    console.log('✅ Кнопка админа показана');
+  } else {
+    adminBtn.style.display = 'none';
+    console.log('❌ Кнопка админа скрыта');
+  }
+};
+
+// Вызываем принудительно через 1 секунду после загрузки
+setTimeout(function() {
+  console.log('🔄 Принудительная проверка кнопки админа...');
+  if (typeof window.forceShowAdminButton === 'function') {
+    window.forceShowAdminButton();
+  }
+}, 1000);
+
+// Также вызываем при каждой смене страницы
+const originalShowPage = window.showPage;
+if (originalShowPage) {
+  window.showPage = function(pageId) {
+    originalShowPage(pageId);
+    if (pageId === 'profile') {
+      setTimeout(window.forceShowAdminButton, 100);
+    }
+  };
+}
