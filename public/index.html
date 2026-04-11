@@ -6,7 +6,8 @@
   <title>Плейнексис — Цифровой маркетплейс</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Anonymous+Pro:wght@400;700&display=swap" rel="stylesheet">
-  
+  <!-- В конец секции head в index.html -->
+<link rel="stylesheet" href="css/premium-mobile.css">
   <!-- CSS файлы -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/header.css">
@@ -47,7 +48,7 @@
   <div class="header-left">
     <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
   </div>
-  <div class="header-right">
+<div class="header-right">
     <div class="header-search">
       <i class="fas fa-search"></i>
       <input id="globalSearchInput" placeholder="Поиск товаров..." class="global-search-input">
@@ -56,7 +57,7 @@
     <button class="admin-toggle-btn" onclick="toggleAdminPanel()" id="adminToggleBtn">
       <i class="fas fa-user-shield"></i>
     </button>
-  </div>
+</div>
   <div class="nav-links" id="desktopNav">
     <button class="nav-link active" data-nav="home"><i class="fas fa-home"></i><span>Главная</span></button>
     <button class="nav-link" data-nav="chat"><i class="fab fa-telegram"></i><span>Чаты</span></button>
@@ -112,96 +113,34 @@
     <div class="hero-logo-subtitle">Цифровой маркетплейс</div>
   </div>
 
-  <!-- СЛАЙДЕР (КАРУСЕЛЬ) -->
-  <div class="sliders-container">
-    <button class="slider-scroll-btn" id="scrollLeftBtn">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    
-    <div class="hero-sliders-wrapper" id="heroSlidersWrapper">
-      <div class="hero-sliders" id="heroSliders">
-        
-        <!-- Слайд 1 -->
-        <div class="slider-card">
-          <div class="mini-slider" data-slider="0">
-            <div class="mini-slider-wrapper">
-              <div class="mini-slider-images" id="slider0Images">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide 1">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide 2">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide 3">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide 4">
-              </div>
-            </div>
-            <div class="mini-slider-dots" id="slider0Dots"></div>
-          </div>
-        </div>
-        
-        <!-- Слайд 2 -->
-        <div class="slider-card">
-          <div class="mini-slider" data-slider="1">
-            <div class="mini-slider-wrapper">
-              <div class="mini-slider-images" id="slider1Images">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/40/78/e5/4078e5daa067fa17b71eb40261e106da.jpg" alt="slide 1">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/69/68/96/696896bfa0a5613f0ebe4b4d5481f5a8.jpg" alt="slide 2">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/fe/a8/8e/fea88e7cfac8a4ba70a87e022836dc05.jpg" alt="slide 3">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/31/0e/31/310e31770e6f9d02b3a5e2de008b58dc.jpg" alt="slide 4">
-              </div>
-            </div>
-            <div class="mini-slider-dots" id="slider1Dots"></div>
-          </div>
-        </div>
-        
-        <!-- Слайд 3 -->
-        <div class="slider-card">
-          <div class="mini-slider" data-slider="2">
-            <div class="mini-slider-wrapper">
-              <div class="mini-slider-images" id="slider2Images">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/de/f7/2b/def72b229b868259fd68d2122fdd162f.jpg" alt="slide 1">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/fb/e5/22/fbe5225d0d30b4a4250cbd16306311ee.jpg" alt="slide 2">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/33/f7/5a/33f75aee717c9220980be296efa46289.jpg" alt="slide 3">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/0e/0e/50/0e0e50e31b6abbeb0b835141fce5853f.jpg" alt="slide 4">
-              </div>
-            </div>
-            <div class="mini-slider-dots" id="slider2Dots"></div>
-          </div>
-        </div>
-        
-        <!-- Слайд 4 -->
-        <div class="slider-card">
-          <div class="mini-slider" data-slider="3">
-            <div class="mini-slider-wrapper">
-              <div class="mini-slider-images" id="slider3Images">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/8e/5b/0f/8e5b0f9fd6009019f19b0c7930979baa.jpg" alt="slide 1">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/47/f0/23/47f023d2b2e5944fbabf18cb079d9c6d.jpg" alt="slide 2">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/1d/68/ae/1d68ae89b43e171904a6a565f0b758af.jpg" alt="slide 3">
-                <img class="mini-slide-img" src="https://i.pinimg.com/736x/96/85/ed/9685edf6785e3f3bba563d3e4d2eb366.jpg" alt="slide 4">
-              </div>
-            </div>
-            <div class="mini-slider-dots" id="slider3Dots"></div>
-          </div>
-        </div>
-                <!-- Слайд 5 -->
-        <div class="slider-card">
-          <div class="mini-slider" data-slider="4">
-            <div class="mini-slider-wrapper">
-              <div class="mini-slider-images" id="slider4Images">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide 1">
-                <img class="mini-slide-img" src="https://i.pinimg.com/1200x/82/23/36/822336fff205caae3c2caca3f18814eb.jpg" alt="slide 2">
-                <img class="mini-slide-img" src="https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/c_scale,w_300/store/software/switch/70050000022577/09fde58766118f7aec9f6ff30f3a8d6e7ba37ace336e79097643431c911d99c1" alt="slide 3">
-                <img class="mini-slide-img" src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/292030/96b8627588997030e5a6b56ca5e9944756c8f288/capsule_616x353.jpg?t=1768303991" alt="slide 4">
-              </div>
-            </div>
-            <div class="mini-slider-dots" id="slider4Dots"></div>
-          </div>
-        </div>
+ <!-- КАРУСЕЛЬ -->
+<div class="carousel-wrapper">
+  <div class="carousel-container" id="carouselContainer">
+    <div class="carousel-track" id="carouselTrack">
+      
+      <div class="carousel-slide">
+        <img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide">
       </div>
+      
+      <div class="carousel-slide">
+        <img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide">
+      </div>
+      
+      <div class="carousel-slide">
+        <img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide">
+      </div>
+      
+      <div class="carousel-slide">
+        <img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide">
+      </div>
+      
+      <div class="carousel-slide">
+        <img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide">
+      </div>
+      
     </div>
-    
-    <button class="slider-scroll-btn" id="scrollRightBtn">
-      <i class="fas fa-chevron-right"></i>
-    </button>
   </div>
-  
+</div>
   <!-- ПОПОЛНЕНИЕ БАЛАНСА STEAM -->
   <div class="card-modern">
     <h3>Пополнить баланс <strong>Steam</strong></h3>
