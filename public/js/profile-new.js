@@ -426,6 +426,8 @@ function getReviewWord(count) {
 
 // ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
 
+// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+
 function setupShopWindowButton() {
   const shopBtn = document.getElementById('connectShopBtn') || document.querySelector('.shop-window-btn');
   
@@ -443,6 +445,7 @@ function setupShopWindowButton() {
   
   newBtn.addEventListener('click', function(e) {
     e.preventDefault();
+    e.stopPropagation();
     
     const user = localStorage.getItem('apex_user') || 'Гость';
     
@@ -457,7 +460,23 @@ function setupShopWindowButton() {
       return;
     }
     
-    // Открываем страницу подключения витрины
+    // Проверяем статус заявки
+    const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+    
+    if (application && application.status === 'pending') {
+      // Заявка на рассмотрении - показываем статус
+      if (typeof showPage === 'function') {
+        showPage('shopConnectPage');
+        setTimeout(() => {
+          if (typeof initShopConnectPage === 'function') {
+            initShopConnectPage();
+          }
+        }, 50);
+      }
+      return;
+    }
+    
+    // Нет заявки или отклонена - открываем форму подключения
     if (typeof showPage === 'function') {
       showPage('shopConnectPage');
       
@@ -476,7 +495,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setupShopWindowButton();
   setupReviewsClick();
 });
-
 // Функция для обновления отображения рейтинга
 function updateProfileRating(rating, reviewsCount) {
   const starsElement = document.querySelector('.hero-stars');
