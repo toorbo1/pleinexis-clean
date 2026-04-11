@@ -56,44 +56,75 @@
     resetProfileStats();
   }
   
+// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+
 function setupShopWindowButton() {
-  const shopBtn = document.querySelector('.shop-window-btn');
-  if (shopBtn) {
-    // Удаляем старый обработчик
-    const newBtn = shopBtn.cloneNode(true);
-    shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+  const shopBtn = document.getElementById('connectShopBtn') || document.querySelector('.shop-window-btn');
+  
+  if (!shopBtn) {
+    console.warn('Кнопка витрины не найдена');
+    return;
+  }
+  
+  // Удаляем старый onclick если есть
+  shopBtn.removeAttribute('onclick');
+  
+  // Клонируем чтобы убрать старые обработчики
+  const newBtn = shopBtn.cloneNode(true);
+  shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+  
+  newBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
     
-    newBtn.addEventListener('click', () => {
-      const user = localStorage.getItem('apex_user') || 'Гость';
-      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-      const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
-      
-      // Если уже есть одобренная заявка
-      if (sellers.includes(user)) {
-        if (typeof showPage === 'function') {
-          showPage('products-manage');
-        }
-        return;
+    const user = localStorage.getItem('apex_user') || 'Гость';
+    
+    // Проверяем, является ли пользователь уже продавцом
+    const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+    
+    if (sellers.includes(user)) {
+      // Уже продавец - открываем управление товарами
+      if (typeof showPage === 'function') {
+        showPage('products-manage');
       }
-      
-      // Если заявка на рассмотрении
-      if (application && application.status === 'pending') {
-        if (typeof showPage === 'function') {
-          showPage('shopConnectPage');
-        }
-        return;
-      }
-      
-      // Если заявка отклонена или нет заявки
+      return;
+    }
+    
+    // Проверяем статус заявки
+    const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+    
+    if (application && application.status === 'pending') {
+      // Заявка на рассмотрении - показываем статус
       if (typeof showPage === 'function') {
         showPage('shopConnectPage');
-        if (typeof initShopConnectPage === 'function') {
-          setTimeout(initShopConnectPage, 50);
-        }
+        setTimeout(() => {
+          if (typeof initShopConnectPage === 'function') {
+            initShopConnectPage();
+          }
+        }, 50);
       }
-    });
-  }
+      return;
+    }
+    
+    // Нет заявки или отклонена - открываем форму подключения
+    if (typeof showPage === 'function') {
+      showPage('shopConnectPage');
+      
+      // Инициализируем страницу после перехода
+      setTimeout(() => {
+        if (typeof initShopConnectPage === 'function') {
+          initShopConnectPage();
+        }
+      }, 100);
+    }
+  });
 }
+
+// Вызываем при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+  setupShopWindowButton();
+  setupReviewsClick();
+});
   // Сброс статистики профиля
   function resetProfileStats() {
     if (window.userProfile) {
