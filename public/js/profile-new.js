@@ -532,16 +532,17 @@
       if (typeof updateNewProfileStats === 'function') updateNewProfileStats(window.userProfile);
     }
     
-    if (userProducts.length === 0) {
-      container.innerHTML = `
-        <div class="empty-products">
-          <i class="fas fa-box-open"></i>
-          <p>Нет товаров</p>
-          <button class="btn-glow sell-btn" onclick="window.openModal()">Выставить товар</button>
-        </div>
-      `;
-      return;
-    }
+// Вместо window.openModal() используем переход на страницу товаров
+if (userProducts.length === 0) {
+  container.innerHTML = `
+    <div class="empty-products">
+      <i class="fas fa-box-open"></i>
+      <p>Нет товаров</p>
+      <button class="btn-glow sell-btn" onclick="window.showPage('products-manage')">Выставить товар</button>
+    </div>
+  `;
+  return;
+}
     
     container.innerHTML = userProducts.map(product => `
       <div class="profile-product-item" style="position: relative; cursor: pointer;" onclick="window.openProductDetailById('${product.id}')">
@@ -568,7 +569,7 @@
         <div class="empty-products">
           <i class="fas fa-box-open"></i>
           <p>Нет активных товаров</p>
-          <button class="btn-glow sell-btn" onclick="window.openModal()">Выставить товар</button>
+          <button class="btn-glow sell-btn" onclick="window.showPage('products-manage')">Выставить товар</button>
         </div>
       `;
       return;
