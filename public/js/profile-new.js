@@ -287,31 +287,48 @@ function setupShopWindowButton() {
   
 function setupBalanceClick() {
   const balanceCard = document.querySelector('.profile-balance-card');
-  if (balanceCard) {
-    // Удаляем старый обработчик, если есть
-    const newBalanceCard = balanceCard.cloneNode(true);
-    balanceCard.parentNode.replaceChild(newBalanceCard, balanceCard);
-    
-    newBalanceCard.addEventListener('click', () => {
-      // Открываем страницу вывода средств
-      if (typeof window.showPage === 'function') {
-        // Убеждаемся что страница вывода существует
-        let withdrawPage = document.getElementById('withdrawPage');
-        if (!withdrawPage) {
-          console.warn('Страница вывода не найдена в DOM');
-          alert('Страница вывода временно недоступна');
-          return;
-        }
-        window.showPage('withdrawPage');
-        // Инициализируем страницу вывода
-        if (typeof window.initWithdrawPage === 'function') {
-          setTimeout(window.initWithdrawPage, 50);
-        }
-      } else {
-        alert('💰 Баланс: ' + (window.userProfile?.balance?.toFixed(2) || '0') + ' ₽\nПополнение и вывод средств');
-      }
-    });
+  if (!balanceCard) {
+    console.error('❌ Карточка баланса не найдена');
+    return;
   }
+  
+  // Удаляем старый обработчик
+  const newBalanceCard = balanceCard.cloneNode(true);
+  balanceCard.parentNode.replaceChild(newBalanceCard, balanceCard);
+  
+  newBalanceCard.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('💰 Клик по карточке баланса');
+    
+    // Проверяем существование страницы вывода
+    const withdrawPage = document.getElementById('withdrawPage');
+    if (!withdrawPage) {
+      console.error('❌ Страница вывода не найдена в DOM');
+      alert('Страница вывода временно недоступна');
+      return;
+    }
+    
+    // Используем глобальную функцию навигации
+    if (typeof window.showPage === 'function') {
+      window.showPage('withdrawPage');
+      
+      // Инициализируем страницу вывода после перехода
+      setTimeout(() => {
+        if (typeof window.initWithdrawPage === 'function') {
+          window.initWithdrawPage();
+        } else {
+          console.warn('⚠️ Функция initWithdrawPage не найдена');
+        }
+      }, 100);
+    } else {
+      console.error('❌ Функция showPage не найдена');
+      alert('Ошибка навигации');
+    }
+  });
+  
+  console.log('✅ Обработчик карточки баланса установлен');
 }
 
 // ========== ЗАМЕНИТЕ ЭТУ ФУНКЦИЮ В profile-new.js ==========

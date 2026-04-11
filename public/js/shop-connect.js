@@ -17,6 +17,15 @@ function initShopConnectPage() {
   const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
   if (application) {
     showApplicationStatus(application);
+  } else {
+    // Показываем форму, скрываем статус
+    const formCard = document.getElementById('shopFormCard');
+    const infoCard = document.querySelector('.shop-info-card');
+    const statusCard = document.getElementById('shopStatusCard');
+    
+    if (formCard) formCard.style.display = 'block';
+    if (infoCard) infoCard.style.display = 'block';
+    if (statusCard) statusCard.style.display = 'none';
   }
   
   // Настройка загрузки документов
@@ -31,10 +40,6 @@ function setupDocumentsUpload() {
   const uploadArea = document.getElementById('documentsUploadArea');
   const fileInput = document.getElementById('documentsInput');
   
-  console.log('📎 Настройка загрузки документов');
-  console.log('uploadArea:', uploadArea);
-  console.log('fileInput:', fileInput);
-  
   if (!uploadArea || !fileInput) {
     console.error('❌ Элементы загрузки не найдены!');
     return;
@@ -42,7 +47,6 @@ function setupDocumentsUpload() {
   
   // Клик по области
   uploadArea.addEventListener('click', function(e) {
-    console.log('🖱️ Клик по области загрузки');
     fileInput.click();
   });
   
@@ -65,15 +69,13 @@ function setupDocumentsUpload() {
     uploadArea.style.background = 'rgba(0, 0, 0, 0.2)';
     
     const files = Array.from(e.dataTransfer.files);
-    console.log('📁 Файлы через drop:', files.length);
     addDocuments(files);
   });
   
   // Выбор файлов через input
   fileInput.addEventListener('change', function(e) {
-    console.log('📁 Файлы через input:', e.target.files.length);
     addDocuments(Array.from(e.target.files));
-    fileInput.value = ''; // Очищаем чтобы можно было выбрать тот же файл повторно
+    fileInput.value = '';
   });
   
   console.log('✅ Загрузка документов настроена');
@@ -86,12 +88,6 @@ function addDocuments(files) {
     // Проверка размера
     if (file.size > 10 * 1024 * 1024) {
       showToast(`Файл "${file.name}" превышает 10 МБ`, 'error');
-      continue;
-    }
-    
-    // Проверка дубликатов
-    if (shopDocuments.some(doc => doc.name === file.name && doc.size === file.size)) {
-      showToast(`Файл "${file.name}" уже добавлен`, 'error');
       continue;
     }
     
@@ -112,12 +108,7 @@ function addDocuments(files) {
 
 function renderDocumentsPreview() {
   const container = document.getElementById('documentsPreview');
-  if (!container) {
-    console.error('❌ Контейнер documentsPreview не найден');
-    return;
-  }
-  
-  console.log('🖼️ Рендер превью, документов:', shopDocuments.length);
+  if (!container) return;
   
   if (shopDocuments.length === 0) {
     container.innerHTML = '';
@@ -141,7 +132,6 @@ function renderDocumentsPreview() {
 }
 
 function removeDocument(index) {
-  console.log('🗑️ Удаление документа, индекс:', index);
   shopDocuments.splice(index, 1);
   renderDocumentsPreview();
 }
@@ -207,6 +197,7 @@ function submitShopApplication() {
   localStorage.setItem('apex_shop_applications', JSON.stringify(applications));
   
   console.log('✅ Заявка сохранена:', application);
+  console.log('Всего заявок:', applications.length);
   
   // Показываем статус
   showApplicationStatus(application);
