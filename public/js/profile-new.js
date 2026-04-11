@@ -56,75 +56,44 @@
     resetProfileStats();
   }
   
-// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
-
 function setupShopWindowButton() {
-  const shopBtn = document.getElementById('connectShopBtn') || document.querySelector('.shop-window-btn');
-  
-  if (!shopBtn) {
-    console.warn('Кнопка витрины не найдена');
-    return;
-  }
-  
-  // Удаляем старый onclick если есть
-  shopBtn.removeAttribute('onclick');
-  
-  // Клонируем чтобы убрать старые обработчики
-  const newBtn = shopBtn.cloneNode(true);
-  shopBtn.parentNode.replaceChild(newBtn, shopBtn);
-  
-  newBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  const shopBtn = document.querySelector('.shop-window-btn');
+  if (shopBtn) {
+    // Удаляем старый обработчик
+    const newBtn = shopBtn.cloneNode(true);
+    shopBtn.parentNode.replaceChild(newBtn, shopBtn);
     
-    const user = localStorage.getItem('apex_user') || 'Гость';
-    
-    // Проверяем, является ли пользователь уже продавцом
-    const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-    
-    if (sellers.includes(user)) {
-      // Уже продавец - открываем управление товарами
-      if (typeof showPage === 'function') {
-        showPage('products-manage');
+    newBtn.addEventListener('click', () => {
+      const user = localStorage.getItem('apex_user') || 'Гость';
+      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+      const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+      
+      // Если уже есть одобренная заявка
+      if (sellers.includes(user)) {
+        if (typeof showPage === 'function') {
+          showPage('products-manage');
+        }
+        return;
       }
-      return;
-    }
-    
-    // Проверяем статус заявки
-    const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
-    
-    if (application && application.status === 'pending') {
-      // Заявка на рассмотрении - показываем статус
+      
+      // Если заявка на рассмотрении
+      if (application && application.status === 'pending') {
+        if (typeof showPage === 'function') {
+          showPage('shopConnectPage');
+        }
+        return;
+      }
+      
+      // Если заявка отклонена или нет заявки
       if (typeof showPage === 'function') {
         showPage('shopConnectPage');
-        setTimeout(() => {
-          if (typeof initShopConnectPage === 'function') {
-            initShopConnectPage();
-          }
-        }, 50);
-      }
-      return;
-    }
-    
-    // Нет заявки или отклонена - открываем форму подключения
-    if (typeof showPage === 'function') {
-      showPage('shopConnectPage');
-      
-      // Инициализируем страницу после перехода
-      setTimeout(() => {
         if (typeof initShopConnectPage === 'function') {
-          initShopConnectPage();
+          setTimeout(initShopConnectPage, 50);
         }
-      }, 100);
-    }
-  });
+      }
+    });
+  }
 }
-
-// Вызываем при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-  setupShopWindowButton();
-  setupReviewsClick();
-});
   // Сброс статистики профиля
   function resetProfileStats() {
     if (window.userProfile) {
@@ -453,78 +422,94 @@ function getReviewWord(count) {
       avatarSpan.innerText = window.currentUser.charAt(0).toUpperCase();
     }
   }
-  // ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+ 
 
-// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
 
-// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ (ИСПРАВЛЕННАЯ ВЕРСИЯ) ==========
 
 function setupShopWindowButton() {
-  const shopBtn = document.getElementById('connectShopBtn') || document.querySelector('.shop-window-btn');
+  console.log('🔵 setupShopWindowButton запущена');
+  
+  // Ищем кнопку разными способами
+  let shopBtn = document.getElementById('connectShopBtn');
+  if (!shopBtn) {
+    shopBtn = document.querySelector('.shop-window-btn');
+  }
   
   if (!shopBtn) {
-    console.warn('Кнопка витрины не найдена');
+    console.error('❌ Кнопка витрины не найдена!');
     return;
   }
   
-  // Удаляем старый onclick если есть
-  shopBtn.removeAttribute('onclick');
+  console.log('✅ Кнопка найдена:', shopBtn);
   
-  // Клонируем чтобы убрать старые обработчики
-  const newBtn = shopBtn.cloneNode(true);
+  // Создаем новую кнопку чтобы убрать все старые обработчики
+  const newBtn = document.createElement('button');
+  newBtn.className = shopBtn.className;
+  newBtn.id = shopBtn.id;
+  newBtn.innerHTML = shopBtn.innerHTML;
+  
+  // Заменяем старую кнопку на новую
   shopBtn.parentNode.replaceChild(newBtn, shopBtn);
   
-  newBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  // Добавляем новый обработчик
+  newBtn.addEventListener('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('🖱️ Кнопка витрины нажата!');
     
     const user = localStorage.getItem('apex_user') || 'Гость';
+    console.log('Текущий пользователь:', user);
     
-    // Проверяем, является ли пользователь уже продавцом
+    // Проверяем, есть ли функция showPage
+    if (typeof window.showPage !== 'function') {
+      console.error('❌ Функция showPage не найдена!');
+      alert('Ошибка: функция навигации не загружена. Обновите страницу.');
+      return;
+    }
+    
+    // Проверяем, одобрен ли пользователь как продавец
     const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+    console.log('Продавцы:', sellers);
     
     if (sellers.includes(user)) {
-      // Уже продавец - открываем управление товарами
-      if (typeof showPage === 'function') {
-        showPage('products-manage');
-      }
+      console.log('✅ Пользователь уже продавец, открываем товары');
+      window.showPage('products-manage');
       return;
     }
     
     // Проверяем статус заявки
     const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+    console.log('Статус заявки:', application);
     
     if (application && application.status === 'pending') {
-      // Заявка на рассмотрении - показываем статус
-      if (typeof showPage === 'function') {
-        showPage('shopConnectPage');
-        setTimeout(() => {
-          if (typeof initShopConnectPage === 'function') {
-            initShopConnectPage();
-          }
-        }, 50);
-      }
-      return;
+      console.log('⏳ Заявка на рассмотрении');
+    } else {
+      console.log('📝 Открываем форму подключения');
     }
     
-    // Нет заявки или отклонена - открываем форму подключения
-    if (typeof showPage === 'function') {
-      showPage('shopConnectPage');
-      
-      // Инициализируем страницу после перехода
-      setTimeout(() => {
-        if (typeof initShopConnectPage === 'function') {
-          initShopConnectPage();
-        }
-      }, 100);
-    }
+    // Открываем страницу подключения витрины
+    window.showPage('shopConnectPage');
+    
+    // Ждем немного и инициализируем страницу
+    setTimeout(() => {
+      if (typeof window.initShopConnectPage === 'function') {
+        console.log('🔄 Инициализация страницы витрины');
+        window.initShopConnectPage();
+      } else {
+        console.error('❌ Функция initShopConnectPage не найдена!');
+      }
+    }, 100);
   });
+  
+  console.log('✅ Обработчик кнопки витрины установлен');
 }
 
-// Вызываем при загрузке страницы
+// Запускаем при загрузке
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 DOM загружен, настраиваем кнопку витрины');
   setupShopWindowButton();
-  setupReviewsClick();
 });
 // Функция для обновления отображения рейтинга
 function updateProfileRating(rating, reviewsCount) {
