@@ -27,6 +27,89 @@
   <link rel="stylesheet" href="css/withdraw.css">
 </head>
 <style>
+    .my-carousel {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  
+  .my-carousel-track {
+    display: flex;
+    gap: 16px;
+    width: fit-content;
+    padding: 20px calc(50% - 170px);
+    animation: scrollCarousel 40s linear infinite;
+  }
+  
+  /* Убираем остановку при наведении */
+  
+  .my-carousel-slide {
+    flex: 0 0 auto;
+    width: 340px;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    opacity: 0.4;
+    transform: scale(0.85);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    pointer-events: none; /* Убираем взаимодействие */
+  }
+  
+  .my-carousel-slide.active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(96, 165, 250, 0.6) !important;
+    z-index: 10;
+  }
+  
+  .my-carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+  
+  /* Бесконечная анимация - 3 копии слайдов */
+  @keyframes scrollCarousel {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-356px * 15));
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .my-carousel-track {
+      padding: 20px calc(50% - 150px);
+    }
+    .my-carousel-slide {
+      width: 300px;
+    }
+    @keyframes scrollCarousel {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(calc(-316px * 15)); }
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .my-carousel-track {
+      padding: 20px calc(50% - 190px);
+    }
+    .my-carousel-slide {
+      width: 380px;
+    }
+    @keyframes scrollCarousel {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(calc(-396px * 15)); }
+    }
+  }
+
     /* Скрываем кнопки скролла для приложений */
     .games-header:has(+ #appsScrollContainer) .scroll-btn {
         display: none;
@@ -113,34 +196,34 @@
     <div class="hero-logo-subtitle">Цифровой маркетплейс</div>
   </div>
 
- <!-- КАРУСЕЛЬ -->
-<div class="carousel-wrapper">
-  <div class="carousel-container" id="carouselContainer">
-    <div class="carousel-track" id="carouselTrack">
-      
-      <div class="carousel-slide">
-        <img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide">
-      </div>
-      
-      <div class="carousel-slide">
-        <img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide">
-      </div>
-      
-      <div class="carousel-slide">
-        <img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide">
-      </div>
-      
-      <div class="carousel-slide">
-        <img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide">
-      </div>
-      
-      <div class="carousel-slide">
-        <img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide">
-      </div>
-      
-    </div>
+
+<div class="my-carousel">
+  <div class="my-carousel-track" id="myCarouselTrack">
+    <!-- 3 КОПИИ ДЛЯ БЕСКОНЕЧНОСТИ -->
+    
+    <!-- Копия 1 -->
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
+    
+    <!-- Копия 2 -->
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
+    
+    <!-- Копия 3 -->
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
   </div>
 </div>
+
   <!-- ПОПОЛНЕНИЕ БАЛАНСА STEAM -->
   <div class="card-modern">
     <h3>Пополнить баланс <strong>Steam</strong></h3>
@@ -912,7 +995,51 @@
 <script src="js/products-manage.js"></script>
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
-
+(function() {
+  console.log('🎯 Запуск подсветки центральной карточки...');
+  
+  const carousel = document.querySelector('.my-carousel');
+  const slides = document.querySelectorAll('.my-carousel-slide');
+  
+  if (!carousel || slides.length === 0) {
+    console.error('❌ Элементы карусели не найдены');
+    return;
+  }
+  
+  console.log(`✅ Найдено ${slides.length} слайдов`);
+  
+  function highlightCenterSlide() {
+    const carouselRect = carousel.getBoundingClientRect();
+    const centerX = carouselRect.left + carouselRect.width / 2;
+    
+    let closestSlide = null;
+    let minDistance = Infinity;
+    
+    slides.forEach(slide => {
+      const rect = slide.getBoundingClientRect();
+      const slideCenterX = rect.left + rect.width / 2;
+      const distance = Math.abs(centerX - slideCenterX);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestSlide = slide;
+      }
+    });
+    
+    if (closestSlide) {
+      slides.forEach(s => s.classList.remove('active'));
+      closestSlide.classList.add('active');
+    }
+  }
+  
+  // Запускаем подсветку каждые 50 мс для плавности
+  setInterval(highlightCenterSlide, 50);
+  
+  // Первая подсветка
+  setTimeout(highlightCenterSlide, 50);
+  
+  console.log('✅ Подсветка работает!');
+})();
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Финальная инициализация');
