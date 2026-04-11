@@ -2,9 +2,9 @@
 
 /* Базовые стили */
 .logo-block1 {
-  padding: 20px 15px;
+  padding: 20px 15px 10px;  /* Уменьшил нижний отступ */
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;       /* Приблизил к нижнему блоку */
 }
 
 .hero-logo-text {
@@ -29,19 +29,19 @@
 .top-links-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
-  margin-top: -15px;
+  margin-bottom: 10px;      /* Уменьшил отступ */
+  margin-top: 5px;
 }
 
-/* Единый блок со ссылками */
+/* Единый блок со ссылками — МЕЛКИЙ ТЕКСТ В ОДНУ СТРОКУ */
 .top-links {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 32px;
+  gap: 16px;               /* Немного уменьшил расстояние между ссылками */
   background: rgba(16, 69, 107, 0);
   backdrop-filter: blur(8px);
-  padding: 5px 40px;
+  padding: 5px 30px;       /* Сделал блок более плоским */
   border-radius: 60px;
   border: 1px solid rgba(9, 23, 56, 0);
   width: auto;
@@ -52,15 +52,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;                /* Уменьшил отступ между иконкой и текстом */
   color: #888888;
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.7rem;       /* УМЕНЬШИЛ ШРИФТ ДЛЯ КОМПАКТНОСТИ */
   font-weight: 500;
-  padding: 8px 4px;
+  padding: 6px 0;          /* Убрал лишние горизонтальные паддинги */
   white-space: nowrap;
   transition: none;
 }
+
 
 .top-link svg {
   stroke: #888888;
@@ -106,22 +107,31 @@
   }
 }
 
+/* Адаптация для мобильных — гарантирует, что строка не сломается */
 @media (max-width: 580px) {
   .top-links-wrapper {
-    margin-left: 12px;
-    margin-right: 12px;
+    margin-left: 8px;
+    margin-right: 8px;
   }
   
   .top-links {
-    gap: 16px;
-    padding: 8px 16px;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 8px;              /* Ещё компактнее */
+    padding: 5px 12px;
+    flex-wrap: nowrap;     /* ЗАПРЕЩАЕМ ПЕРЕНОС СТРОКИ */
+    justify-content: space-around;
     border-radius: 40px;
+    min-width: 100%;       /* Растягиваем на всю ширину экрана */
   }
   
   .top-link {
-    font-size: 0.65rem;
+    font-size: 0.55rem;    /* Максимально мелкий шрифт для телефонов */
+    gap: 4px;
+  }
+
+  /* Скрываем иконки на очень маленьких экранах, чтобы текст влез */
+  .top-link svg {
+    width: 12px;
+    height: 12px;
   }
 }
 
