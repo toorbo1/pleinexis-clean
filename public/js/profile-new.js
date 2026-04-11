@@ -118,9 +118,15 @@ function showAdminButtonInProfile() {
     const currentUser = getCurrentUser();
     
     // Проверяем, является ли пользователь админом
-    const isAdmin = typeof isUserAdmin === 'function' ? isUserAdmin(currentUser) : false;
+    let admins = [];
+    try {
+        admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+    } catch(e) {
+        admins = [];
+    }
+    const isAdmin = admins.some(a => a.username === currentUser);
     
-    // ВСЕГДА показываем кнопку, но с разным текстом
+    // ВСЕГДА показываем кнопку
     adminBtn.style.display = 'flex';
     
     if (isAdmin) {
@@ -131,63 +137,106 @@ function showAdminButtonInProfile() {
         adminBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
     }
     
-    // Удаляем старый обработчик и вешаем новый
-    const newBtn = adminBtn.cloneNode(true);
+    // ВАЖНО: Полностью удаляем и пересоздаем кнопку, чтобы убрать все старые обработчики
+    const newBtn = document.createElement('button');
+    newBtn.id = 'adminProfileBtn';
+    newBtn.className = 'shop-window-btn';
+    newBtn.innerHTML = adminBtn.innerHTML;
+    newBtn.style.cssText = adminBtn.style.cssText;
+    
+    // Заменяем старую кнопку на новую
     adminBtn.parentNode.replaceChild(newBtn, adminBtn);
     
+    // Вешаем НОВЫЙ обработчик
     newBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🖱️ Клик по кнопке админ-панели');
+        e.stopImmediatePropagation(); // Останавливаем все другие обработчики
         
-        // Используем функцию из auth-fix.js
-        if (typeof window.enterAdminPanel === 'function') {
-            window.enterAdminPanel();
+        console.log('🖱️ АДМИН-КНОПКА: Клик обработан');
+        
+        const currentUser = getCurrentUser();
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            // Уже админ - сразу открываем панель
+            console.log('✅ Открываем админ-панель');
+            if (typeof window.showPage === 'function') {
+                window.showPage('admin');
+            }
+            setTimeout(() => {
+                if (typeof window.initAdmin === 'function') {
+                    window.initAdmin();
+                }
+            }, 100);
         } else {
-            // Запасной вариант
-            const password = prompt("Введите пароль администратора:");
+            // Не админ - запрашиваем пароль
+            const password = prompt("🔐 Введите пароль администратора:");
             if (password === "admin123") {
+                // Добавляем в админы
+                if (!admins.some(a => a.username === currentUser)) {
+                    admins.push({
+                        id: 'admin_' + Date.now(),
+                        username: currentUser,
+                        isOwner: false,
+                        hiredBy: 'system',
+                        hiredAt: new Date().toISOString()
+                    });
+                    localStorage.setItem('apex_admins', JSON.stringify(admins));
+                }
+                
+                // Открываем админку
                 if (typeof window.showPage === 'function') {
                     window.showPage('admin');
                 }
+                setTimeout(() => {
+                    if (typeof window.initAdmin === 'function') {
+                        window.initAdmin();
+                    }
+                }, 100);
+                
+                showToast('✅ Доступ к админ-панели получен!', 'success');
             } else {
-                alert('Неверный пароль!');
+                showToast('❌ Неверный пароль!', 'error');
             }
         }
     });
     
-    console.log('✅ Кнопка админ-панели настроена');
+    console.log('✅ Кнопка админ-панели настроена, isAdmin:', isAdmin);
 }
 
-
-  function setupShopWindowButton() {
+function setupShopWindowButton() {
     const shopBtn = document.querySelector('#connectShopBtn');
     if (!shopBtn) return;
     
     const newBtn = shopBtn.cloneNode(true);
     shopBtn.parentNode.replaceChild(newBtn, shopBtn);
     
-    newBtn.addEventListener('click', () => {
-      const user = getCurrentUser();
-      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-      const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
-      
-      if (sellers.includes(user)) {
-        if (typeof showPage === 'function') showPage('products-manage');
-        return;
-      }
-      
-      if (application && application.status === 'pending') {
-        if (typeof showPage === 'function') showPage('shopConnectPage');
-        return;
-      }
-      
-      if (typeof showPage === 'function') {
-        showPage('shopConnectPage');
-        if (typeof initShopConnectPage === 'function') setTimeout(initShopConnectPage, 50);
-      }
+    newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const user = getCurrentUser();
+        const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+        const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+        
+        if (sellers.includes(user)) {
+            if (typeof showPage === 'function') showPage('products-manage');
+            return;
+        }
+        
+        if (application && application.status === 'pending') {
+            if (typeof showPage === 'function') showPage('shopConnectPage');
+            return;
+        }
+        
+        if (typeof showPage === 'function') {
+            showPage('shopConnectPage');
+            if (typeof initShopConnectPage === 'function') setTimeout(initShopConnectPage, 50);
+        }
     });
-  }
+}
   
   function resetProfileStats() {
     if (window.userProfile) {

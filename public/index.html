@@ -1405,15 +1405,11 @@
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
-
-
- <!-- <script src="js/bottom-nav.js"></script> -->
-<script src="js/shop-connect.js"></script>
-<script src="js/reviews-shop.js"></script>
+<!-- ==================== СКРИПТЫ ==================== -->
 <script src="js/api.js"></script>
 <script src="js/global-fix.js"></script>
 <script src="js/auth-fix.js"></script>
-<script src="js/detail-page.js"></script>  <!-- ДОБАВИТЬ СЮДА, ПЕРЕД ОСТАЛЬНЫМИ -->
+<script src="js/detail-page.js"></script>
 <script src="js/chats.js"></script>
 <script src="js/typewriter.js"></script>
 <script src="js/blob-new.js"></script>
@@ -1423,270 +1419,496 @@
 <script src="js/app.js"></script>
 <script src="js/profile-new.js"></script>
 <script src="js/products-manage.js"></script>
+<script src="js/shop-connect.js"></script>
+<script src="js/reviews-shop.js"></script>
 <script src="js/reviews.js"></script>
-<!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
-<script>
 
-  // Фикс для кнопки админки в хедере (если есть)
-document.addEventListener('DOMContentLoaded', function() {
-    // Находим кнопку админки в хедере
-    const adminToggleBtn = document.querySelector('.admin-toggle-btn');
-    if (adminToggleBtn) {
-        adminToggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (typeof window.enterAdminPanel === 'function') {
-                window.enterAdminPanel();
-            }
-        });
-    }
+<script>
+// ========== ГЛОБАЛЬНЫЕ ФИКСЫ И ИНИЦИАЛИЗАЦИЯ ==========
+(function() {
+    console.log('🔥 ГЛОБАЛЬНЫЕ ФИКСЫ ЗАПУЩЕНЫ');
     
-    // Фикс для кнопки в профиле - дополнительная проверка
-    setTimeout(() => {
-        const adminProfileBtn = document.getElementById('adminProfileBtn');
-        if (adminProfileBtn && !adminProfileBtn._hasListener) {
-            adminProfileBtn._hasListener = true;
-            adminProfileBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🖱️ Клик по кнопке админки (запасной обработчик)');
-                if (typeof window.enterAdminPanel === 'function') {
-                    window.enterAdminPanel();
-                }
-            });
-        }
-    }, 500);
-});
-    // Принудительное обновление версии (очистка кэша)
-  (function() {
-    const APP_VERSION = '2.1.0';
+    // ========== ФИКС: ОЧИСТКА КЭША ПРИ НОВОЙ ВЕРСИИ ==========
+    const APP_VERSION = '2.2.0';
     const savedVersion = localStorage.getItem('app_version');
     
     if (savedVersion !== APP_VERSION) {
-      console.log('🔄 Обнаружена новая версия, очищаем кэш...');
-      localStorage.setItem('app_version', APP_VERSION);
-      
-      // Очищаем только старые данные профиля
-      const oldProfile = localStorage.getItem('apex_profile');
-      if (oldProfile) {
-        try {
-          const profile = JSON.parse(oldProfile);
-          // Сохраняем только базовые данные, сбрасываем кэшированные стили
-          const newProfile = {
-            ...profile,
-            balance: profile.balance || 0,
-            rating: 5.0,
-            reviewsCount: 0
-          };
-          localStorage.setItem('apex_profile', JSON.stringify(newProfile));
-        } catch(e) {}
-      }
-      
-      // Обновляем список админов
-      let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
-      const currentUser = localStorage.getItem('apex_user') || 'Гость';
-      
-      if (currentUser === 'Admin' && !admins.some(a => a.username === 'Admin')) {
-        admins.push({
-          id: 'admin_' + Date.now(),
-          username: 'Admin',
-          isOwner: true,
-          hiredBy: 'system',
-          hiredAt: new Date().toISOString()
-        });
+        console.log('🔄 Обнаружена новая версия, очищаем кэш...');
+        localStorage.setItem('app_version', APP_VERSION);
+        
+        // Сохраняем важные данные
+        const currentUser = localStorage.getItem('apex_user');
+        const profile = localStorage.getItem('apex_profile');
+        
+        // Очищаем всё
+        localStorage.clear();
+        
+        // Восстанавливаем важное
+        if (currentUser) localStorage.setItem('apex_user', currentUser);
+        if (profile) localStorage.setItem('apex_profile', profile);
+        
+        // Создаем админа по умолчанию
+        let admins = [{
+            id: 'admin_1',
+            username: 'Admin',
+            isOwner: true,
+            hiredBy: 'system',
+            hiredAt: new Date().toISOString()
+        }];
         localStorage.setItem('apex_admins', JSON.stringify(admins));
-      }
-      
-      // Перезагружаем страницу
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
-    }
-  })();
-
-
-  function addCacheResetButton() {
-  const paymentMethods = document.querySelector('.profile-payment-methods');
-  if (!paymentMethods) return;
-  
-  // Проверяем, есть ли уже
-  if (document.getElementById('cacheResetBtn')) return;
-  
-  const resetBtn = document.createElement('button');
-  resetBtn.id = 'cacheResetBtn';
-  resetBtn.className = 'shop-window-btn';
-  resetBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Обновить интерфейс (сброс кэша)';
-  resetBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
-  resetBtn.style.marginTop = '12px';
-  
-  resetBtn.addEventListener('click', function() {
-    if (confirm('Сбросить кэш и обновить интерфейс? Это может помочь решить проблемы с отображением.')) {
-      localStorage.setItem('app_version', '2.1.0');
-      window.location.reload();
-    }
-  });
-  
-  paymentMethods.insertAdjacentElement('afterend', resetBtn);
-}
-
-// Вызовите в initNewProfile
-addCacheResetButton();
-  (function() {
-    console.log('🔥 Карусель запущена');
-    
-    const track = document.getElementById('myCarouselTrack');
-    if (!track) return;
-    
-    const slides = document.querySelectorAll('.my-carousel-slide');
-    if (slides.length === 0) return;
-    
-    let slideWidth = 0;
-    let slideFull = 0;
-    let setWidth = 0;
-    let position = 0;
-    let animFrame = null;
-    let isVisible = true;
-    
-    const gap = 16;
-    const slidesPerSet = 5;
-    const speed = 0.5;
-    
-    function waitForImages() {
-      return new Promise((resolve) => {
-        const images = document.querySelectorAll('.my-carousel-slide img');
-        let loaded = 0;
-        if (images.length === 0) { resolve(); return; }
         
-        images.forEach(img => {
-          if (img.complete) {
-            loaded++;
-            if (loaded === images.length) resolve();
-          } else {
-            img.addEventListener('load', () => {
-              loaded++;
-              if (loaded === images.length) resolve();
-            });
-            img.addEventListener('error', () => {
-              loaded++;
-              if (loaded === images.length) resolve();
-            });
-          }
-        });
-      });
+        console.log('✅ Кэш очищен, админ создан');
     }
     
-    async function recalculateDimensions() {
-      await waitForImages();
-      
-      const firstSlide = slides[0];
-      slideWidth = firstSlide.offsetWidth;
-      slideFull = slideWidth + gap;
-      setWidth = slidesPerSet * slideFull;
-      
-      position = setWidth;
-      track.style.transform = `translateX(${-position}px)`;
-      
-      console.log(`📐 Карусель: ширина=${slideWidth}px`);
-    }
-    
-    function highlightCenterSlide() {
-      const carousel = document.querySelector('.my-carousel');
-      if (!carousel) return;
-      
-      const carouselRect = carousel.getBoundingClientRect();
-      const centerX = carouselRect.left + carouselRect.width / 2;
-      
-      let closestSlide = null;
-      let minDistance = Infinity;
-      
-      slides.forEach(slide => {
-        const rect = slide.getBoundingClientRect();
-        const slideCenterX = rect.left + rect.width / 2;
-        const distance = Math.abs(centerX - slideCenterX);
+    // ========== ФИКС: СОЗДАНИЕ АДМИНА ЕСЛИ НЕТ ==========
+    function ensureAdminExists() {
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
         
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestSlide = slide;
+        if (admins.length === 0) {
+            admins.push({
+                id: 'admin_1',
+                username: 'Admin',
+                isOwner: true,
+                hiredBy: 'system',
+                hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Создан админ по умолчанию: Admin');
         }
-      });
-      
-      if (closestSlide) {
-        slides.forEach(s => s.classList.remove('active'));
-        closestSlide.classList.add('active');
-      }
+        
+        if (currentUser === 'Admin' && !admins.some(a => a.username === 'Admin')) {
+            admins.push({
+                id: 'admin_' + Date.now(),
+                username: 'Admin',
+                isOwner: true,
+                hiredBy: 'system',
+                hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Admin добавлен в список админов');
+        }
+    }
+    ensureAdminExists();
+    
+    // ========== ФИКС: ФУНКЦИЯ ВХОДА В АДМИНКУ ==========
+    window.enterAdminPanel = function() {
+        console.log('🔐 enterAdminPanel вызвана');
+        
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        
+        // Проверяем, админ ли пользователь
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            // Уже админ - открываем панель
+            console.log('✅ Пользователь админ, открываем панель');
+            openAdminPage();
+            return true;
+        }
+        
+        // Не админ - запрашиваем пароль
+        const password = prompt('🔐 Введите пароль администратора:');
+        const ADMIN_PASSWORD = 'admin123';
+        
+        if (password === ADMIN_PASSWORD) {
+            // Добавляем в админы
+            if (!admins.some(a => a.username === currentUser)) {
+                admins.push({
+                    id: 'admin_' + Date.now(),
+                    username: currentUser,
+                    isOwner: false,
+                    hiredBy: 'system',
+                    hiredAt: new Date().toISOString()
+                });
+                localStorage.setItem('apex_admins', JSON.stringify(admins));
+                console.log('✅ Пользователь добавлен в админы:', currentUser);
+            }
+            
+            openAdminPage();
+            showToast('✅ Доступ к админ-панели получен!', 'success');
+            return true;
+        } else {
+            showToast('❌ Неверный пароль!', 'error');
+            return false;
+        }
+    };
+    
+    // Функция открытия админ-страницы
+    function openAdminPage() {
+        // Скрываем все страницы
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        
+        // Показываем админку
+        const adminPage = document.getElementById('admin');
+        if (adminPage) {
+            adminPage.style.display = 'block';
+            adminPage.classList.add('active');
+        }
+        
+        // Инициализируем админку
+        setTimeout(() => {
+            if (typeof window.initAdmin === 'function') {
+                window.initAdmin();
+                console.log('✅ initAdmin вызвана');
+            }
+            
+            // Показываем главную секцию админки
+            if (typeof window.showAdminSection === 'function') {
+                window.showAdminSection('adminMainSection');
+            }
+        }, 100);
+        
+        // Обновляем активные кнопки навигации
+        document.querySelectorAll('.nav-item, .nav-link').forEach(btn => {
+            btn.classList.remove('active');
+        });
     }
     
-    function animate() {
-      if (!isVisible) {
-        animFrame = null;
-        return;
-      }
-      
-      position += speed;
-      
-      if (position >= setWidth * 2) {
-        position -= setWidth;
-      }
-      
-      track.style.transform = `translateX(${-position}px)`;
-      highlightCenterSlide();
-      
-      animFrame = requestAnimationFrame(animate);
+    // ========== ФИКС: ФУНКЦИЯ ПОКАЗА УВЕДОМЛЕНИЙ ==========
+    window.showToast = function(message, type = 'success') {
+        let toast = document.querySelector('.toast-notification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        toast.className = `toast-notification ${type} show`;
+        
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    };
+    
+    // ========== ФИКС: КНОПКА АДМИНКИ В ПРОФИЛЕ ==========
+    function fixAdminButton() {
+        const adminBtn = document.getElementById('adminProfileBtn');
+        if (!adminBtn) {
+            console.log('⏳ Кнопка админки не найдена, ждем...');
+            setTimeout(fixAdminButton, 200);
+            return;
+        }
+        
+        console.log('✅ Кнопка админки найдена, применяем фикс');
+        
+        // Полностью пересоздаем кнопку
+        const newBtn = document.createElement('button');
+        newBtn.id = 'adminProfileBtn';
+        newBtn.className = 'shop-window-btn';
+        newBtn.style.cssText = adminBtn.style.cssText;
+        newBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
+        newBtn.style.marginBottom = '16px';
+        
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            newBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+        } else {
+            newBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
+            newBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
+        }
+        
+        // Заменяем старую кнопку
+        adminBtn.parentNode.replaceChild(newBtn, adminBtn);
+        
+        // Вешаем обработчик
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🖱️ КЛИК ПО КНОПКЕ АДМИНКИ');
+            window.enterAdminPanel();
+        });
+        
+        console.log('✅ Фикс для кнопки админки применен, isAdmin:', isAdmin);
     }
     
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
-      
-      if (isVisible && !animFrame) {
-        animFrame = requestAnimationFrame(animate);
-      } else if (!isVisible && animFrame) {
-        cancelAnimationFrame(animFrame);
-        animFrame = null;
-      }
-    }, { threshold: 0.1 });
-    
-    observer.observe(track);
-    
-    (async function init() {
-      await recalculateDimensions();
-      
-      if (animFrame) cancelAnimationFrame(animFrame);
-      animFrame = requestAnimationFrame(animate);
-      
-      let resizeTimer;
-      window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(async () => {
-          await recalculateDimensions();
-          highlightCenterSlide();
-        }, 150);
-      });
-      
-      console.log('✅ Карусель готова');
-    })();
-    
-  })();
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🚀 Финальная инициализация');
-    
-    // Принудительно загружаем блоки игр, приложений и товары
-    if (typeof window.loadGameBlocks === 'function') {
-      await window.loadGameBlocks();
+    // ========== ФИКС: КНОПКА ВИТРИНЫ ==========
+    function fixShopButton() {
+        const shopBtn = document.querySelector('#connectShopBtn');
+        if (!shopBtn) return;
+        
+        console.log('✅ Кнопка витрины найдена, применяем фикс');
+        
+        const newBtn = shopBtn.cloneNode(true);
+        shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🛒 КЛИК ПО КНОПКЕ ВИТРИНЫ');
+            
+            const user = localStorage.getItem('apex_user') || 'Гость';
+            const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+            const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+            
+            if (sellers.includes(user)) {
+                if (typeof window.showPage === 'function') window.showPage('products-manage');
+                return;
+            }
+            
+            if (application && application.status === 'pending') {
+                if (typeof window.showPage === 'function') {
+                    window.showPage('shopConnectPage');
+                    setTimeout(() => {
+                        if (typeof window.initShopConnectPage === 'function') {
+                            window.initShopConnectPage();
+                        }
+                    }, 50);
+                }
+                return;
+            }
+            
+            if (typeof window.showPage === 'function') {
+                window.showPage('shopConnectPage');
+                setTimeout(() => {
+                    if (typeof window.initShopConnectPage === 'function') {
+                        window.initShopConnectPage();
+                    }
+                }, 50);
+            }
+        });
+        
+        console.log('✅ Фикс для кнопки витрины применен');
     }
-    if (typeof window.loadAppBlocks === 'function') {
-      await window.loadAppBlocks();
-    }
-    if (typeof window.loadProducts === 'function') {
-      await window.loadProducts();
+    
+    // ========== ФИКС: КНОПКА АДМИНКИ В ХЕДЕРЕ ==========
+    function fixHeaderAdminButton() {
+        const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+        if (!adminToggleBtn) return;
+        
+        console.log('✅ Кнопка админки в хедере найдена');
+        
+        const newBtn = adminToggleBtn.cloneNode(true);
+        adminToggleBtn.parentNode.replaceChild(newBtn, adminToggleBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ КЛИК ПО АДМИН-КНОПКЕ В ХЕДЕРЕ');
+            window.enterAdminPanel();
+        });
     }
     
-    // Показываем главную страницу
-    if (typeof window.showPage === 'function') {
-      window.showPage('home');
+    // ========== ФИКС: КНОПКА СБРОСА КЭША ==========
+    function addCacheResetButton() {
+        const container = document.querySelector('.profile-new-container');
+        if (!container) return;
+        
+        if (document.getElementById('cacheResetBtn')) return;
+        
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'cacheResetBtn';
+        resetBtn.className = 'shop-window-btn';
+        resetBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Сбросить кэш';
+        resetBtn.style.background = 'linear-gradient(105deg, #6b7280, #4b5563)';
+        resetBtn.style.marginTop = '12px';
+        resetBtn.style.fontSize = '0.8rem';
+        
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Сбросить кэш и обновить интерфейс?')) {
+                localStorage.setItem('app_version', APP_VERSION);
+                window.location.reload();
+            }
+        });
+        
+        const paymentMethods = document.querySelector('.profile-payment-methods');
+        if (paymentMethods) {
+            paymentMethods.insertAdjacentElement('afterend', resetBtn);
+        }
     }
-  });
+    
+    // ========== КАРУСЕЛЬ ==========
+    function initCarousel() {
+        console.log('🔥 Инициализация карусели');
+        
+        const track = document.getElementById('myCarouselTrack');
+        if (!track) return;
+        
+        const slides = document.querySelectorAll('.my-carousel-slide');
+        if (slides.length === 0) return;
+        
+        let slideWidth = 0;
+        let slideFull = 0;
+        let setWidth = 0;
+        let position = 0;
+        let animFrame = null;
+        let isVisible = true;
+        
+        const gap = 16;
+        const slidesPerSet = 5;
+        const speed = 0.5;
+        
+        function waitForImages() {
+            return new Promise((resolve) => {
+                const images = document.querySelectorAll('.my-carousel-slide img');
+                let loaded = 0;
+                if (images.length === 0) { resolve(); return; }
+                
+                images.forEach(img => {
+                    if (img.complete) {
+                        loaded++;
+                        if (loaded === images.length) resolve();
+                    } else {
+                        img.addEventListener('load', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                        img.addEventListener('error', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                    }
+                });
+            });
+        }
+        
+        async function recalculateDimensions() {
+            await waitForImages();
+            
+            const firstSlide = slides[0];
+            slideWidth = firstSlide.offsetWidth;
+            slideFull = slideWidth + gap;
+            setWidth = slidesPerSet * slideFull;
+            
+            position = setWidth;
+            track.style.transform = `translateX(${-position}px)`;
+        }
+        
+        function highlightCenterSlide() {
+            const carousel = document.querySelector('.my-carousel');
+            if (!carousel) return;
+            
+            const carouselRect = carousel.getBoundingClientRect();
+            const centerX = carouselRect.left + carouselRect.width / 2;
+            
+            let closestSlide = null;
+            let minDistance = Infinity;
+            
+            slides.forEach(slide => {
+                const rect = slide.getBoundingClientRect();
+                const slideCenterX = rect.left + rect.width / 2;
+                const distance = Math.abs(centerX - slideCenterX);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestSlide = slide;
+                }
+            });
+            
+            if (closestSlide) {
+                slides.forEach(s => s.classList.remove('active'));
+                closestSlide.classList.add('active');
+            }
+        }
+        
+        function animate() {
+            if (!isVisible) {
+                animFrame = null;
+                return;
+            }
+            
+            position += speed;
+            
+            if (position >= setWidth * 2) {
+                position -= setWidth;
+            }
+            
+            track.style.transform = `translateX(${-position}px)`;
+            highlightCenterSlide();
+            
+            animFrame = requestAnimationFrame(animate);
+        }
+        
+        const observer = new IntersectionObserver((entries) => {
+            isVisible = entries[0].isIntersecting;
+            
+            if (isVisible && !animFrame) {
+                animFrame = requestAnimationFrame(animate);
+            } else if (!isVisible && animFrame) {
+                cancelAnimationFrame(animFrame);
+                animFrame = null;
+            }
+        }, { threshold: 0.1 });
+        
+        observer.observe(track);
+        
+        (async function init() {
+            await recalculateDimensions();
+            
+            if (animFrame) cancelAnimationFrame(animFrame);
+            animFrame = requestAnimationFrame(animate);
+            
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(async () => {
+                    await recalculateDimensions();
+                    highlightCenterSlide();
+                }, 150);
+            });
+            
+            console.log('✅ Карусель готова');
+        })();
+    }
+    
+    // ========== ЗАПУСК ВСЕХ ФИКСОВ ПОСЛЕ ЗАГРУЗКИ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM ЗАГРУЖЕН, ЗАПУСКАЕМ ФИКСЫ');
+        
+        // Загружаем данные
+        if (typeof window.loadGameBlocks === 'function') window.loadGameBlocks();
+        if (typeof window.loadAppBlocks === 'function') window.loadAppBlocks();
+        if (typeof window.loadProducts === 'function') window.loadProducts();
+        
+        // Показываем главную страницу
+        if (typeof window.showPage === 'function') {
+            window.showPage('home');
+        }
+        
+        // Применяем фиксы с задержкой
+        setTimeout(() => {
+            fixAdminButton();
+            fixShopButton();
+            fixHeaderAdminButton();
+            addCacheResetButton();
+            initCarousel();
+            
+            // Дополнительная проверка кнопки админки
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                console.log('✅ Кнопка админки присутствует в DOM');
+            } else {
+                console.warn('⚠️ Кнопка админки НЕ НАЙДЕНА в DOM');
+                // Пробуем найти позже
+                setTimeout(fixAdminButton, 500);
+            }
+        }, 300);
+        
+        // Еще одна проверка через секунду
+        setTimeout(() => {
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                // Проверяем, есть ли обработчик
+                const hasClick = adminBtn.onclick !== null || adminBtn._listeners;
+                console.log('🔍 Кнопка админки, есть обработчик:', hasClick);
+            }
+        }, 1000);
+    });
+    
+    // Экспорт функций
+    window.fixAdminButton = fixAdminButton;
+    window.fixShopButton = fixShopButton;
+    
+    console.log('✅ ВСЕ ГЛОБАЛЬНЫЕ ФИКСЫ ЗАГРУЖЕНЫ');
+})();
 </script>
 
 </body>
