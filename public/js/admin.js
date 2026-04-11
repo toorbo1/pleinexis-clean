@@ -27,6 +27,7 @@ async function initAdmin() {
     setupAdminChatListeners();
     renderAdminNavButtons();
     updateAdminStats();
+    renderShopApplicationsInAdmin();
 }
 function updateAdminStats() {
   const products = JSON.parse(localStorage.getItem("apex_products") || "[]");
@@ -640,7 +641,8 @@ function renderAdminNavButtons() {
     { id: "adminChatSection", name: "💬 Чат поддержки", icon: "fa-headset" },
     { id: "adminProductsSection", name: "📦 Товары", icon: "fa-box" },
     { id: "adminGamesSection", name: "🎮 Игры", icon: "fa-gamepad" },
-    { id: "adminAppsSection", name: "📱 Приложения", icon: "fa-mobile-alt" }
+    { id: "adminAppsSection", name: "📱 Приложения", icon: "fa-mobile-alt" },
+    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" }
   ];
   
   container.innerHTML = sections.map(section => `

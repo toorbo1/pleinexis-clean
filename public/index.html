@@ -10,6 +10,7 @@
    <link rel="stylesheet" href="premium-bg.css">
 <link rel="stylesheet" href="css/premium-mobile.css">
   <!-- CSS файлы -->
+   <link rel="stylesheet" href="css/reviews-shop.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/header.css">
   <link rel="stylesheet" href="css/footer.css">
@@ -612,7 +613,13 @@
           <div class="admin-stat-label">Чатов поддержки</div>
         </div>
       </div>
-      
+      <!-- ===== 9. ЗАЯВКИ НА ВИТРИНУ ===== -->
+<div id="adminShopSection" class="admin-section" style="display: none;">
+  <div class="admin-card">
+    <h3><i class="fas fa-store"></i> Заявки на подключение витрины</h3>
+    <div id="shopApplicationsList" class="shop-applications-list"></div>
+  </div>
+</div>
       <div class="admin-quick-actions">
         <h3>Быстрые действия</h3>
         <div class="quick-buttons">
@@ -913,6 +920,226 @@
     </filter>
   </defs>
 </svg>
+
+<!-- ==================== СТРАНИЦА ОТЗЫВОВ ==================== -->
+<div class="page" id="reviewsPage">
+  <div class="reviews-page-container">
+    <!-- Хедер -->
+    <div class="reviews-header">
+      <button class="back-btn" onclick="showPage('home')">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-star"></i> Отзывы</h1>
+    </div>
+    
+    <!-- Статистика -->
+    <div class="reviews-stats-card">
+      <div class="reviews-overall">
+        <div class="reviews-rating-large">4.8</div>
+        <div class="reviews-stars-large">★★★★★</div>
+        <div class="reviews-total">на основе 156 отзывов</div>
+      </div>
+      <div class="reviews-bars">
+        <div class="rating-bar">
+          <span>5 ★</span>
+          <div class="bar-fill"><div class="bar-progress" style="width: 75%"></div></div>
+          <span>75%</span>
+        </div>
+        <div class="rating-bar">
+          <span>4 ★</span>
+          <div class="bar-fill"><div class="bar-progress" style="width: 15%"></div></div>
+          <span>15%</span>
+        </div>
+        <div class="rating-bar">
+          <span>3 ★</span>
+          <div class="bar-fill"><div class="bar-progress" style="width: 5%"></div></div>
+          <span>5%</span>
+        </div>
+        <div class="rating-bar">
+          <span>2 ★</span>
+          <div class="bar-fill"><div class="bar-progress" style="width: 3%"></div></div>
+          <span>3%</span>
+        </div>
+        <div class="rating-bar">
+          <span>1 ★</span>
+          <div class="bar-fill"><div class="bar-progress" style="width: 2%"></div></div>
+          <span>2%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Кнопка написать отзыв -->
+    <button class="write-review-btn" onclick="openWriteReviewModal()">
+      <i class="fas fa-pen"></i> Написать отзыв
+    </button>
+    
+    <!-- Список отзывов -->
+    <div class="reviews-list-container" id="reviewsList">
+      <!-- Отзывы будут загружаться через JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ==================== СТРАНИЦА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==================== -->
+<div class="page" id="shopConnectPage">
+  <div class="shop-connect-container">
+    <!-- Хедер -->
+    <div class="shop-connect-header">
+      <button class="back-btn" onclick="showPage('profile')">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-store"></i> Подключение витрины</h1>
+    </div>
+    
+    <!-- Информация -->
+    <div class="shop-info-card">
+      <i class="fas fa-store-alt"></i>
+      <h2>Станьте продавцом</h2>
+      <p>Подключите витрину магазина и начните продавать свои товары тысячам покупателей. После проверки документов вы сможете:</p>
+      <ul>
+        <li><i class="fas fa-check-circle"></i> Выставлять неограниченное количество товаров</li>
+        <li><i class="fas fa-check-circle"></i> Создавать посты как в соцсетях</li>
+        <li><i class="fas fa-check-circle"></i> Получать выплаты на карту</li>
+        <li><i class="fas fa-check-circle"></i> Доступ к расширенной статистике</li>
+      </ul>
+    </div>
+    
+    <!-- Форма -->
+    <div class="shop-form-card">
+      <h3><i class="fas fa-file-alt"></i> Данные о бизнесе</h3>
+      
+      <div class="form-group">
+        <label>Название магазина <span class="required">*</span></label>
+        <input type="text" id="shopName" class="input-modern" placeholder="Например: GameStore">
+      </div>
+      
+      <div class="form-group">
+        <label>Тип бизнеса <span class="required">*</span></label>
+        <select id="shopType" class="input-modern">
+          <option value="">Выберите тип</option>
+          <option value="individual">Самозанятый / ИП</option>
+          <option value="company">Юридическое лицо (ООО)</option>
+          <option value="private">Частное лицо (без документов)</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Контактный телефон <span class="required">*</span></label>
+        <input type="tel" id="shopPhone" class="input-modern" placeholder="+7 (999) 123-45-67">
+      </div>
+      
+      <div class="form-group">
+        <label>Email для связи</label>
+        <input type="email" id="shopEmail" class="input-modern" placeholder="shop@example.com">
+      </div>
+      
+      <div class="form-group">
+        <label>Описание магазина</label>
+        <textarea id="shopDescription" class="input-modern" rows="3" placeholder="Расскажите о вашем магазине..."></textarea>
+      </div>
+      
+      <!-- Загрузка документов -->
+      <div class="form-group">
+        <label>Документы, подтверждающие бизнес <span class="required">*</span></label>
+        <p class="hint-text">Загрузите фото или скан документов (свидетельство ИП, ОГРН, паспорт или другие)</p>
+        
+        <div class="documents-upload-area" id="documentsUploadArea">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Нажмите или перетащите файлы</p>
+          <span>JPG, PNG, PDF до 10 МБ</span>
+          <input type="file" id="documentsInput" multiple accept="image/jpeg,image/png,image/gif,application/pdf" style="display: none;">
+        </div>
+        
+        <div class="documents-preview" id="documentsPreview"></div>
+      </div>
+      
+      <!-- Согласие -->
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="shopAgreement" checked>
+          <span>Я подтверждаю, что предоставленные данные и документы являются подлинными</span>
+        </label>
+      </div>
+      
+      <!-- Кнопки -->
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="showPage('profile')">Отмена</button>
+        <button class="btn-primary" onclick="submitShopApplication()">
+          <i class="fas fa-paper-plane"></i> Отправить заявку
+        </button>
+      </div>
+    </div>
+    
+    <!-- Статус заявки (показывается после отправки) -->
+    <div class="shop-status-card" id="shopStatusCard" style="display: none;">
+      <div class="status-icon pending">
+        <i class="fas fa-clock"></i>
+      </div>
+      <h3>Заявка на рассмотрении</h3>
+      <p>Ваша заявка отправлена и ожидает проверки администратором. Обычно это занимает до 24 часов.</p>
+      <div class="status-timeline">
+        <div class="timeline-step completed">
+          <div class="step-icon"><i class="fas fa-check"></i></div>
+          <span>Отправка</span>
+        </div>
+        <div class="timeline-step active">
+          <div class="step-icon"><i class="fas fa-spinner fa-spin"></i></div>
+          <span>Проверка</span>
+        </div>
+        <div class="timeline-step">
+          <div class="step-icon"><i class="fas fa-store"></i></div>
+          <span>Готово</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== МОДАЛКА НАПИСАНИЯ ОТЗЫВА ==================== -->
+<div class="modal-glass" id="writeReviewModal">
+  <div class="modal-content review-modal">
+    <h3><i class="fas fa-star"></i> Написать отзыв</h3>
+    
+    <div class="rating-select">
+      <label>Ваша оценка</label>
+      <div class="stars-select" id="reviewStarsSelect">
+        <i class="far fa-star" data-rating="1"></i>
+        <i class="far fa-star" data-rating="2"></i>
+        <i class="far fa-star" data-rating="3"></i>
+        <i class="far fa-star" data-rating="4"></i>
+        <i class="far fa-star" data-rating="5"></i>
+      </div>
+      <input type="hidden" id="reviewRating" value="0">
+    </div>
+    
+    <div class="form-group">
+      <label>Ваше имя</label>
+      <input type="text" id="reviewAuthor" class="input-modern" placeholder="Как вас зовут?">
+    </div>
+    
+    <div class="form-group">
+      <label>Текст отзыва</label>
+      <textarea id="reviewText" class="input-modern" rows="4" placeholder="Поделитесь вашим опытом использования..."></textarea>
+      <div class="char-counter" id="reviewCharCounter">0/500</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Фото (опционально)</label>
+      <div class="review-photo-upload" id="reviewPhotoUpload">
+        <i class="fas fa-camera"></i>
+        <span>Добавить фото</span>
+        <input type="file" id="reviewPhotoInput" accept="image/jpeg,image/png,image/gif" style="display: none;">
+      </div>
+      <div id="reviewPhotoPreview" class="review-photo-preview"></div>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
+      <button class="btn-primary" onclick="submitReview()">Опубликовать</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
@@ -1024,6 +1251,7 @@
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
+<script src="js/reviews-shop.js"></script>
 <script src="js/api.js"></script>
 <script src="js/global-fix.js"></script>
 <script src="js/auth-fix.js"></script>
