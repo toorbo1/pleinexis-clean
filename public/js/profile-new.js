@@ -111,37 +111,55 @@
     paymentMethods.insertAdjacentElement('afterend', logoutBtn);
   }
   
-  function showAdminButtonInProfile() {
+function showAdminButtonInProfile() {
     const adminBtn = document.getElementById('adminProfileBtn');
     if (!adminBtn) return;
     
     const currentUser = getCurrentUser();
-    let admins = [];
-    const storedAdmins = localStorage.getItem('apex_admins');
-    if (storedAdmins) {
-      admins = JSON.parse(storedAdmins);
-    } else {
-      admins = [{ username: 'Admin', isOwner: true }];
-      localStorage.setItem('apex_admins', JSON.stringify(admins));
-    }
     
-    const isAdmin = admins.some(a => a.username === currentUser);
+    // Проверяем, является ли пользователь админом
+    const isAdmin = typeof isUserAdmin === 'function' ? isUserAdmin(currentUser) : false;
+    
+    // ВСЕГДА показываем кнопку, но с разным текстом
+    adminBtn.style.display = 'flex';
     
     if (isAdmin) {
-      adminBtn.style.display = 'flex';
-      const newBtn = adminBtn.cloneNode(true);
-      adminBtn.parentNode.replaceChild(newBtn, adminBtn);
-      newBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (typeof window.showPage === 'function') {
-          window.showPage('admin');
-        }
-      });
+        adminBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+        adminBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
     } else {
-      adminBtn.style.display = 'none';
+        adminBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
+        adminBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
     }
-  }
-  
+    
+    // Удаляем старый обработчик и вешаем новый
+    const newBtn = adminBtn.cloneNode(true);
+    adminBtn.parentNode.replaceChild(newBtn, adminBtn);
+    
+    newBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🖱️ Клик по кнопке админ-панели');
+        
+        // Используем функцию из auth-fix.js
+        if (typeof window.enterAdminPanel === 'function') {
+            window.enterAdminPanel();
+        } else {
+            // Запасной вариант
+            const password = prompt("Введите пароль администратора:");
+            if (password === "admin123") {
+                if (typeof window.showPage === 'function') {
+                    window.showPage('admin');
+                }
+            } else {
+                alert('Неверный пароль!');
+            }
+        }
+    });
+    
+    console.log('✅ Кнопка админ-панели настроена');
+}
+
+
   function setupShopWindowButton() {
     const shopBtn = document.querySelector('#connectShopBtn');
     if (!shopBtn) return;

@@ -1426,6 +1426,36 @@
 <script src="js/reviews.js"></script>
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
+
+  // Фикс для кнопки админки в хедере (если есть)
+document.addEventListener('DOMContentLoaded', function() {
+    // Находим кнопку админки в хедере
+    const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+    if (adminToggleBtn) {
+        adminToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof window.enterAdminPanel === 'function') {
+                window.enterAdminPanel();
+            }
+        });
+    }
+    
+    // Фикс для кнопки в профиле - дополнительная проверка
+    setTimeout(() => {
+        const adminProfileBtn = document.getElementById('adminProfileBtn');
+        if (adminProfileBtn && !adminProfileBtn._hasListener) {
+            adminProfileBtn._hasListener = true;
+            adminProfileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Клик по кнопке админки (запасной обработчик)');
+                if (typeof window.enterAdminPanel === 'function') {
+                    window.enterAdminPanel();
+                }
+            });
+        }
+    }, 500);
+});
     // Принудительное обновление версии (очистка кэша)
   (function() {
     const APP_VERSION = '2.1.0';
