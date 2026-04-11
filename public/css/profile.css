@@ -1093,3 +1093,28 @@
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
 }
+
+/* Кнопка выхода из аккаунта */
+#logoutProfileBtn {
+  background: linear-gradient(105deg, #ef4444, #dc2626) !important;
+  border: none;
+  border-radius: 60px;
+  padding: 14px 20px;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+  margin-top: 16px;
+  width: 100%;
+}
+
+#logoutProfileBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
+}
