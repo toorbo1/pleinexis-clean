@@ -162,29 +162,38 @@
 </style>
 <body>
 
-<!-- ХЕДЕР -->
+<!-- ==================== ХЕДЕР ==================== -->
 <div class="header">
+  <!-- Логотип и название -->
   <div class="header-left">
     <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
   </div>
-<div class="header-right">
-    <div class="header-search">
+  
+  <!-- Поиск во всю ширину + кнопка админа -->
+  <div class="header-center">
+    <div class="header-search" id="headerSearchWrapper">
       <i class="fas fa-search"></i>
-      <input id="globalSearchInput" placeholder="Поиск товаров..." class="global-search-input">
-      <i class="fas fa-times" id="clearSearchBtn" style="display: none; cursor: pointer;"></i>
+      <input id="globalSearchInput" placeholder="Поиск товаров, игр, приложений..." class="global-search-input" autocomplete="off">
+      <i class="fas fa-times clear-search-icon" id="clearSearchBtn" style="display: none;"></i>
+  
+      
+      <!-- Выпадающий список результатов -->
+      <div class="search-results-dropdown" id="searchResultsDropdown"></div>
     </div>
-    <button class="admin-toggle-btn" onclick="toggleAdminPanel()" id="adminToggleBtn">
+    
+    <button class="admin-toggle-btn" onclick="toggleAdminPanel()" id="adminToggleBtn" title="Админ-панель">
       <i class="fas fa-user-shield"></i>
     </button>
-</div>
+  </div>
+  
+  <!-- Десктопная навигация -->
   <div class="nav-links" id="desktopNav">
     <button class="nav-link active" data-nav="home"><i class="fas fa-home"></i><span>Главная</span></button>
-    <button class="nav-link" data-nav="chat"><i class="fab fa-telegram"></i><span>Чаты</span></button>
+    <button class="nav-link" data-nav="chat"><i class="fas fa-comments"></i><span>Чаты</span></button>
     <button class="nav-link" data-nav="products-manage"><i class="fas fa-tag"></i><span>Товары</span></button>
     <button class="nav-link" data-nav="profile"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
   </div>
 </div>
-
 <!-- ==================== ГЛАВНАЯ ==================== -->
 <div class="page active" id="home">
 <div class="top-links-wrapper">
