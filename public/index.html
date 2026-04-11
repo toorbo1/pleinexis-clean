@@ -1402,8 +1402,8 @@
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
-<!-- <script src="js/blob-test.js"></script> -->
-<!-- <script src="js/bottom-nav-blob.js"></script> -->
+
+
  <script src="js/bottom-nav.js"></script>
 <script src="js/shop-connect.js"></script>
 <script src="js/reviews-shop.js"></script>
@@ -1411,11 +1411,9 @@
 <script src="js/global-fix.js"></script>
 <script src="js/auth-fix.js"></script>
 <script src="js/detail-page.js"></script>  <!-- ДОБАВИТЬ СЮДА, ПЕРЕД ОСТАЛЬНЫМИ -->
-<!-- <script src="js/slider.js"></script> -->
 <script src="js/chats.js"></script>
 <script src="js/typewriter.js"></script>
 <script src="js/blob-new.js"></script>
-<!-- <script src="js/bottom-nav-blob.js"></script> -->
 <script src="js/profile-avatar-upload.js"></script>
 <script src="js/withdraw.js"></script>
 <script src="js/admin.js"></script>
@@ -1426,134 +1424,184 @@
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
   (function() {
-    console.log('🔥 Фикс бесконечной карусели...');
+    console.log('🔥 Запуск оптимизированной бесконечной карусели...');
     
     const track = document.getElementById('myCarouselTrack');
     if (!track) {
-        console.error('❌ Трек карусели не найден');
-        return;
+      console.error('❌ Трек карусели не найден');
+      return;
     }
     
-    // Получаем ширину одного набора слайдов
     const slides = document.querySelectorAll('.my-carousel-slide');
     if (slides.length === 0) return;
     
-    // Ждём полной загрузки всех изображений
+    let slideWidth = 0;
+    let slideFull = 0;
+    let setWidth = 0;
+    let position = 0;
+    let animFrame = null;
+    let isVisible = true;
+    
+    // Настройки
+    const gap = 16;             // отступ между слайдами
+    const slidesPerSet = 5;     // количество уникальных слайдов в одном наборе
+    const speed = 0.6;          // пикселей за кадр (плавность)
+    
+    // Ждём загрузки всех изображений для точного расчёта ширины
     function waitForImages() {
-        return new Promise((resolve) => {
-            let images = document.querySelectorAll('.my-carousel-slide img');
-            let loaded = 0;
-            if (images.length === 0) { resolve(); return; }
-            
-            images.forEach(img => {
-                if (img.complete) {
-                    loaded++;
-                    if (loaded === images.length) resolve();
-                } else {
-                    img.addEventListener('load', () => {
-                        loaded++;
-                        if (loaded === images.length) resolve();
-                    });
-                }
+      return new Promise((resolve) => {
+        const images = document.querySelectorAll('.my-carousel-slide img');
+        let loaded = 0;
+        if (images.length === 0) { resolve(); return; }
+        
+        images.forEach(img => {
+          if (img.complete) {
+            loaded++;
+            if (loaded === images.length) resolve();
+          } else {
+            img.addEventListener('load', () => {
+              loaded++;
+              if (loaded === images.length) resolve();
             });
+          }
         });
+      });
     }
     
-    async function initCarousel() {
-        await waitForImages();
-        
-        // Получаем ширину одного слайда с отступом
-        const slide = slides[0];
-        const slideWidth = slide.offsetWidth;
-        const gap = 16; // отступ между слайдами
-        const slideFullWidth = slideWidth + gap;
-        const slidesPerSet = 5; // 5 слайдов в одном наборе
-        const setWidth = slidesPerSet * slideFullWidth;
-        
-        // Смещаем трек на ширину одного набора (чтобы начать с середины)
-        // Это создаст видимость, что слева уже есть слайды
-        track.style.transform = `translateX(-${setWidth}px)`;
-        
-        // Анимация будет продолжаться с этого смещения
-        console.log(`✅ Карусель инициализирована, смещение: -${setWidth}px`);
+    // Пересчёт размеров и сброс позиции
+    async function recalculateDimensions() {
+      await waitForImages();
+      
+      const firstSlide = slides[0];
+      slideWidth = firstSlide.offsetWidth;
+      slideFull = slideWidth + gap;
+      setWidth = slidesPerSet * slideFull;
+      
+      // Начинаем со второго набора (визуально по центру)
+      position = setWidth;
+      track.style.transform = `translateX(${-position}px)`;
+      
+      console.log(`📐 Карусель пересчитана: ширина=${slideWidth}px, набор=${setWidth}px`);
     }
     
-    initCarousel();
-    
-    // При ресайзе пересчитываем
-    window.addEventListener('resize', function() {
-        setTimeout(initCarousel, 100);
-    });
-})();
-(function() {
-    console.log('🎯 Запуск подсветки центральной карточки...');
-    
+    // Подсветка центрального слайда
     function highlightCenterSlide() {
-        const carousel = document.querySelector('.my-carousel');
-        const slides = document.querySelectorAll('.my-carousel-slide');
+      const carousel = document.querySelector('.my-carousel');
+      if (!carousel) return;
+      
+      const carouselRect = carousel.getBoundingClientRect();
+      const centerX = carouselRect.left + carouselRect.width / 2;
+      
+      let closestSlide = null;
+      let minDistance = Infinity;
+      
+      slides.forEach(slide => {
+        const rect = slide.getBoundingClientRect();
+        const slideCenterX = rect.left + rect.width / 2;
+        const distance = Math.abs(centerX - slideCenterX);
         
-        if (!carousel || slides.length === 0) {
-            console.error('❌ Элементы карусели не найдены');
-            return;
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSlide = slide;
         }
-        
-        const carouselRect = carousel.getBoundingClientRect();
-        const centerX = carouselRect.left + carouselRect.width / 2;
-        
-        let closestSlide = null;
-        let minDistance = Infinity;
-        
-        slides.forEach(slide => {
-            const rect = slide.getBoundingClientRect();
-            const slideCenterX = rect.left + rect.width / 2;
-            const distance = Math.abs(centerX - slideCenterX);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestSlide = slide;
-            }
-        });
-        
-        if (closestSlide) {
-            slides.forEach(s => s.classList.remove('active'));
-            closestSlide.classList.add('active');
-        }
+      });
+      
+      if (closestSlide) {
+        slides.forEach(s => s.classList.remove('active'));
+        closestSlide.classList.add('active');
+      }
     }
     
-    // Запускаем подсветку сразу
-    setTimeout(highlightCenterSlide, 50);
+    // Основной цикл анимации
+    function animate() {
+      if (!isVisible) {
+        animFrame = null;
+        return;
+      }
+      
+      position += speed;
+      
+      // Бесконечный цикл: когда дошли до конца третьего набора, перепрыгиваем на второй
+      if (position >= setWidth * 2) {
+        position -= setWidth;
+      }
+      
+      track.style.transform = `translateX(${-position}px)`;
+      
+      // Обновляем подсветку
+      highlightCenterSlide();
+      
+      animFrame = requestAnimationFrame(animate);
+    }
     
-    // Запускаем каждые 100 мс для плавности во время анимации
-    setInterval(highlightCenterSlide, 100);
+    // Observer для остановки анимации, когда карусель не видна
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0].isIntersecting;
+      
+      if (isVisible && !animFrame) {
+        animFrame = requestAnimationFrame(animate);
+        console.log('▶️ Карусель продолжает движение');
+      } else if (!isVisible && animFrame) {
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
+        console.log('⏸️ Карусель приостановлена (вне экрана)');
+      }
+    }, { threshold: 0.1 });
     
-    // Также запускаем при ресайзе окна
-    window.addEventListener('resize', function() {
-        setTimeout(highlightCenterSlide, 50);
-    });
+    observer.observe(track);
     
-    console.log('✅ Подсветка центрального слайда работает!');
-})();
+    // Инициализация
+    (async function init() {
+      await recalculateDimensions();
+      
+      // Запускаем анимацию
+      if (animFrame) cancelAnimationFrame(animFrame);
+      animFrame = requestAnimationFrame(animate);
+      
+      // Обработка ресайза с debounce
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(async () => {
+          await recalculateDimensions();
+          highlightCenterSlide();
+        }, 150);
+      });
+      
+      console.log('✅ Карусель полностью готова');
+    })();
+    
+  })();
+</script>
 
-document.addEventListener('DOMContentLoaded', async function() {
+<script>
+  (function() {
+    console.log('🎯 Запуск подсветки центральной карточки (синхронизировано с каруселью)');
+    // Подсветка уже встроена в основной цикл карусели, этот блок оставлен для обратной совместимости.
+    // Никаких дополнительных setInterval – всё делается в requestAnimationFrame.
+  })();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Финальная инициализация');
     
-    // Принудительно загружаем блоки игр
+    // Принудительно загружаем блоки игр, приложений и товары
     if (typeof window.loadGameBlocks === 'function') {
-        await window.loadGameBlocks();
+      await window.loadGameBlocks();
     }
     if (typeof window.loadAppBlocks === 'function') {
-        await window.loadAppBlocks();
+      await window.loadAppBlocks();
     }
     if (typeof window.loadProducts === 'function') {
-        await window.loadProducts();
+      await window.loadProducts();
     }
     
+    // Показываем главную страницу
     if (typeof window.showPage === 'function') {
-        window.showPage('home');
+      window.showPage('home');
     }
-});
-
-
+  });
 </script>
 
 </body>
