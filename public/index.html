@@ -7,6 +7,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Anonymous+Pro:wght@400;700&display=swap" rel="stylesheet">
   <!-- В конец секции head в index.html -->
+   <link rel="stylesheet" href="premium-bg.css">
 <link rel="stylesheet" href="css/premium-mobile.css">
   <!-- CSS файлы -->
   <link rel="stylesheet" href="css/base.css">
@@ -27,6 +28,41 @@
   <link rel="stylesheet" href="css/withdraw.css">
 </head>
 <style>
+  /* дополнительные стили именно для страницы (демо) */
+    .demo-content {
+      text-align: center;
+    }
+    
+    .btn {
+      margin-top: 24px;
+      display: inline-block;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1.5px solid rgba(0, 212, 255, 0.6);
+      color: white;
+      padding: 14px 34px;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 1rem;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+      transition: all 0.25s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    .btn:hover {
+      background: rgba(0, 212, 255, 0.25);
+      border-color: #aad4ff;
+      box-shadow: 0 0 35px rgba(106, 92, 255, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    /* десктоп — немного увеличим отступы */
+    @media (min-width: 768px) {
+      h1 { font-size: 3.5rem; }
+      .glass-panel { padding: 32px 48px; }
+    }
     .my-carousel {
     width: 100%;
     overflow: hidden;
