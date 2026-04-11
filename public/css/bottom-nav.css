@@ -1,5 +1,3 @@
-/* ========== НИЖНЯЯ ПАНЕЛЬ С LIQUID BLOB ЭФФЕКТОМ ========== */
-
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -7,22 +5,20 @@
   right: 0;
   background: rgba(10, 14, 23, 0.95);
   backdrop-filter: blur(25px);
-
-
+  -webkit-backdrop-filter: blur(25px);
   z-index: 1000;
-  will-change: transform;
+  border-top: 1px solid rgba(59, 130, 246, 0.15);
 }
 
 .nav-container {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-around;
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  padding: 12px 12px 14px;  /* было 24px, стало 14px */
-  min-height: 70px;  /* было 80px, стало 70px */
+  padding: 12px 12px 14px;
+  min-height: 70px;
 }
 
 .nav-item {
@@ -36,17 +32,18 @@
   z-index: 10;
   background: transparent;
   border: none;
-  font-family: inherit;
-  transition: none; /* Убираем анимацию */
-  -webkit-tap-highlight-color: transparent;
-  position: relative;
+  color: #888;
 }
 
-/* Убираем эффект нажатия */
-.nav-item:active {
-  transform: none;
+.nav-item.active {
+  color: #fff;
 }
 
+.nav-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
 /* Минималистичные черно-белые иконки (SVG) */
 .nav-icon {
   width: 24px;
