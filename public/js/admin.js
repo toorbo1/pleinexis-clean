@@ -10,14 +10,13 @@ let adminDialogs = [];
 
 const ADMIN_PASSWORD = "admin123";
 
-// Обновляем функцию initAdmin, чтобы она загружала данные с сервера
 async function initAdmin() {
     console.log("initAdmin started");
     await loadKeywords();
     await loadPendingProducts();
     await loadAdminProducts();
-    await loadGameBlocks();   // <-- добавить await
-    await loadAppBlocks();    // <-- добавить await
+    await loadGameBlocks();
+    await loadAppBlocks();
     await loadAdmins();
     await loadAdminDialogs();
     renderGamesBlocks();
@@ -27,8 +26,7 @@ async function initAdmin() {
     setupAdminChatListeners();
     renderAdminNavButtons();
     updateAdminStats();
-    renderShopApplicationsInAdmin();
-
+    renderShopApplicationsInAdmin(); // 🔥 ЭТА СТРОКА ДОЛЖНА БЫТЬ
 }
 function updateAdminStats() {
   const products = JSON.parse(localStorage.getItem("apex_products") || "[]");
@@ -668,6 +666,12 @@ function showAdminSection(sectionId) {
   const target = document.getElementById(sectionId);
   if (target) target.style.display = "block";
   
+  // 🔥 ДОБАВЛЯЕМ ЭТУ СТРОКУ:
+  if (sectionId === 'adminShopSection') {
+    renderShopApplicationsInAdmin();
+  }
+  // 🔥 КОНЕЦ ДОБАВЛЕНИЯ
+  
   document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     btn.classList.remove('active');
   });
@@ -677,7 +681,6 @@ function showAdminSection(sectionId) {
   );
   if (activeBtn) activeBtn.classList.add('active');
 }
-
 // ==================== 6. БЛОКИ ИГР И ПРИЛОЖЕНИЙ ====================
 // ==================== БЛОКИ ИГР И ПРИЛОЖЕНИЙ (ИСПРАВЛЕННЫЕ) ====================
 

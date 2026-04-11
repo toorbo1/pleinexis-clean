@@ -435,63 +435,88 @@ function loadShopApplications() {
 }
 
 function renderShopApplicationsInAdmin() {
+  console.log('🔄 Рендеринг заявок на витрину...');
+  
   const container = document.getElementById('shopApplicationsList');
-  if (!container) return;
-  
-  const applications = loadShopApplications();
-  
-  if (applications.length === 0) {
-    container.innerHTML = '<div class="empty-state">Нет заявок на подключение витрины</div>';
+  if (!container) {
+    console.error('❌ Контейнер shopApplicationsList не найден!');
     return;
   }
   
-  container.innerHTML = applications.map(app => `
-    <div class="shop-application-item">
-      <div class="app-header">
-        <span class="app-user">${escapeHtml(app.userId)}</span>
-        <span class="app-status ${app.status}">${getStatusText(app.status)}</span>
+  console.log('✅ Контейнер найден');
+  
+  const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
+  console.log(`📋 Загружено заявок: ${applications.length}`, applications);
+  
+  if (applications.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="text-align: center; padding: 40px; color: #6b7a9e;">
+        <i class="fas fa-store" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.4;"></i>
+        <p>Нет заявок на подключение витрины</p>
       </div>
-      <div class="app-info">
-        <div><strong>Магазин:</strong> ${escapeHtml(app.shopName)}</div>
-        <div><strong>Тип:</strong> ${getShopTypeText(app.shopType)}</div>
-        <div><strong>Телефон:</strong> ${escapeHtml(app.phone)}</div>
-        <div><strong>Email:</strong> ${escapeHtml(app.email || '—')}</div>
-        <div><strong>Описание:</strong> ${escapeHtml(app.description || '—')}</div>
-        <div><strong>Дата:</strong> ${new Date(app.createdAt).toLocaleString()}</div>
-      </div>
-      ${app.documents && app.documents.length > 0 ? `
-        <div class="app-documents">
-          <strong>Документы (${app.documents.length}):</strong>
-          <div class="documents-grid">
-            ${app.documents.map((doc, i) => `
-              <div class="doc-item" onclick="window.open('${doc.data}', '_blank')">
-                ${doc.type.startsWith('image/') ? 
-                  `<img src="${doc.data}" alt="${doc.name}">` : 
-                  `<div class="file-icon"><i class="fas fa-file-pdf"></i><span>PDF</span></div>`
-                }
-                <span>${doc.name.substring(0, 20)}</span>
-              </div>
-            `).join('')}
+    `;
+    return;
+  }
+  
+  let html = '';
+  applications.forEach(app => {
+    html += `
+      <div class="shop-application-item" style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,0.1);">
+        <div class="app-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span class="app-user" style="font-weight: 600; font-size: 1.1rem;">${escapeHtml(app.userId)}</span>
+          <span class="app-status ${app.status}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; ${
+            app.status === 'pending' ? 'background: rgba(245,158,11,0.2); color: #f59e0b;' :
+            app.status === 'approved' ? 'background: rgba(34,197,94,0.2); color: #22c55e;' :
+            'background: rgba(239,68,68,0.2); color: #ef4444;'
+          }">${getStatusText(app.status)}</span>
+        </div>
+        <div class="app-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; color: #cbd5e1; font-size: 0.9rem;">
+          <div><strong>Магазин:</strong> ${escapeHtml(app.shopName)}</div>
+          <div><strong>Тип:</strong> ${getShopTypeText(app.shopType)}</div>
+          <div><strong>Телефон:</strong> ${escapeHtml(app.phone)}</div>
+          <div><strong>Email:</strong> ${escapeHtml(app.email || '—')}</div>
+          <div><strong>Описание:</strong> ${escapeHtml(app.description || '—')}</div>
+          <div><strong>Дата:</strong> ${new Date(app.createdAt).toLocaleString()}</div>
+        </div>
+        ${app.documents && app.documents.length > 0 ? `
+          <div class="app-documents" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <strong>Документы (${app.documents.length}):</strong>
+            <div class="documents-grid" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
+              ${app.documents.map((doc, i) => `
+                <div class="doc-item" onclick="window.open('${doc.data}', '_blank')" style="width: 80px; text-align: center; cursor: pointer;">
+                  ${doc.type.startsWith('image/') ? 
+                    `<img src="${doc.data}" alt="${doc.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(59,130,246,0.2);">` : 
+                    `<div class="file-icon" style="width: 80px; height: 80px; background: rgba(59,130,246,0.1); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #3b82f6;">
+                      <i class="fas fa-file-pdf"></i><span>PDF</span>
+                    </div>`
+                  }
+                  <span style="display: block; font-size: 0.7rem; color: #8f8f9e; margin-top: 4px;">${escapeHtml(doc.name.substring(0, 15))}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
-        </div>
-      ` : ''}
-      ${app.status === 'pending' ? `
-        <div class="app-actions">
-          <button class="approve-btn" onclick="approveShopApplication('${app.id}')">
-            <i class="fas fa-check"></i> Одобрить
-          </button>
-          <button class="reject-btn" onclick="rejectShopApplication('${app.id}')">
-            <i class="fas fa-times"></i> Отклонить
-          </button>
-        </div>
-      ` : ''}
-      ${app.status === 'rejected' && app.rejectReason ? `
-        <div class="reject-reason">
-          <strong>Причина отказа:</strong> ${escapeHtml(app.rejectReason)}
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
+        ` : ''}
+        ${app.status === 'pending' ? `
+          <div class="app-actions" style="display: flex; gap: 12px; margin-top: 20px;">
+            <button class="approve-btn" onclick="approveShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.3);">
+              <i class="fas fa-check"></i> Одобрить
+            </button>
+            <button class="reject-btn" onclick="rejectShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);">
+              <i class="fas fa-times"></i> Отклонить
+            </button>
+          </div>
+        ` : ''}
+        ${app.status === 'rejected' && app.rejectReason ? `
+          <div class="reject-reason" style="margin-top: 16px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 12px; color: #f87171; font-size: 0.85rem;">
+            <strong>Причина отказа:</strong> ${escapeHtml(app.rejectReason)}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  console.log('✅ Заявки отрендерены');
 }
 
 function getStatusText(status) {
