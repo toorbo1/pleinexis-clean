@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/tasks-create.css">
   <link rel="stylesheet" href="css/withdraw.css">
+  <link rel="stylesheet" href="css/reviews.css">
 </head>
 <style>
   /* дополнительные стили именно для страницы (демо) */
@@ -160,6 +161,54 @@
     #appsScrollWrapper {
         overflow: visible !important;
     }
+    .infinite-carousel-viewport {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.infinite-carousel-track {
+    display: flex;
+    gap: 16px;
+    width: fit-content;
+    will-change: transform;
+}
+
+.carousel-slide {
+    flex: 0 0 auto;
+    width: 340px;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0.4;
+    transform: scale(0.88);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    cursor: pointer;
+}
+
+.carousel-slide.active {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(96, 165, 250, 0.6) !important;
+    z-index: 10;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 480px) {
+    .carousel-slide { width: 300px; }
+}
+@media (min-width: 769px) {
+    .carousel-slide { width: 380px; }
+}
 </style>
 <body>
 
@@ -244,32 +293,29 @@
 
 
 <div class="my-carousel">
-  <div class="my-carousel-track" id="myCarouselTrack">
-    <!-- 3 КОПИИ ДЛЯ БЕСКОНЕЧНОСТИ -->
-    
-    <!-- Копия 1 -->
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
-    
-    <!-- Копия 2 -->
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
-    
-    <!-- Копия 3 -->
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-    <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
-  </div>
-</div>
+    <div class="my-carousel-track" id="myCarouselTrack">
+        <!-- ХВОСТ (копия 3) -->
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
 
+        <!-- НАЧАЛО (копия 1) -->
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
+
+        <!-- ПРОДОЛЖЕНИЕ (копия 2) -->
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
+        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
+    </div>
+</div>
   <!-- ПОПОЛНЕНИЕ БАЛАНСА STEAM -->
   <div class="card-modern">
     <h3>Пополнить баланс <strong>Steam</strong></h3>
@@ -521,14 +567,13 @@
 <!-- Блок баланса -->
 <div class="profile-balance-card">
   <div class="balance-left">
-    <div class="wallet-icon">💼</div>
     <span class="balance-amount" id="profileBalance">0 ₽</span>
   </div>
   <div class="balance-chevron">›</div>
 </div>
 
 <!-- Новая кнопка витрины -->
-<button class="shop-window-btn" onclick="alert('🏪 Витрина магазина\n\nЗдесь будут отображаться ваши товары для покупателей.\nСкоро появится возможность настроить витрину!')">
+<button class="shop-window-btn" id="connectShopBtn">
   🏪 Вы магазин? Подключить витрину
 </button>
     
@@ -935,36 +980,12 @@
     <!-- Статистика -->
     <div class="reviews-stats-card">
       <div class="reviews-overall">
-        <div class="reviews-rating-large">4.8</div>
-        <div class="reviews-stars-large">★★★★★</div>
-        <div class="reviews-total">на основе 156 отзывов</div>
+        <div class="reviews-rating-large" id="avgRatingDisplay">4.8</div>
+        <div class="reviews-stars-large" id="avgStarsDisplay">★★★★★</div>
+        <div class="reviews-total" id="totalReviewsDisplay">на основе 0 отзывов</div>
       </div>
-      <div class="reviews-bars">
-        <div class="rating-bar">
-          <span>5 ★</span>
-          <div class="bar-fill"><div class="bar-progress" style="width: 75%"></div></div>
-          <span>75%</span>
-        </div>
-        <div class="rating-bar">
-          <span>4 ★</span>
-          <div class="bar-fill"><div class="bar-progress" style="width: 15%"></div></div>
-          <span>15%</span>
-        </div>
-        <div class="rating-bar">
-          <span>3 ★</span>
-          <div class="bar-fill"><div class="bar-progress" style="width: 5%"></div></div>
-          <span>5%</span>
-        </div>
-        <div class="rating-bar">
-          <span>2 ★</span>
-          <div class="bar-fill"><div class="bar-progress" style="width: 3%"></div></div>
-          <span>3%</span>
-        </div>
-        <div class="rating-bar">
-          <span>1 ★</span>
-          <div class="bar-fill"><div class="bar-progress" style="width: 2%"></div></div>
-          <span>2%</span>
-        </div>
+      <div class="reviews-bars" id="ratingBarsContainer">
+        <!-- Бары будут заполняться через JS -->
       </div>
     </div>
     
@@ -973,10 +994,135 @@
       <i class="fas fa-pen"></i> Написать отзыв
     </button>
     
+    <!-- Фильтры -->
+    <div class="reviews-filters">
+      <button class="filter-btn active" data-filter="all">Все</button>
+      <button class="filter-btn" data-filter="5">5 ★</button>
+      <button class="filter-btn" data-filter="4">4 ★</button>
+      <button class="filter-btn" data-filter="3">3 ★</button>
+      <button class="filter-btn" data-filter="2">2 ★</button>
+      <button class="filter-btn" data-filter="1">1 ★</button>
+      <button class="filter-btn" data-filter="with-photo"><i class="fas fa-camera"></i> С фото</button>
+    </div>
+    
+    <!-- Сортировка -->
+    <div class="reviews-sort">
+      <select id="reviewsSortSelect" class="sort-select">
+        <option value="newest">Сначала новые</option>
+        <option value="oldest">Сначала старые</option>
+        <option value="highest">Высокий рейтинг</option>
+        <option value="lowest">Низкий рейтинг</option>
+        <option value="popular">Популярные</option>
+      </select>
+    </div>
+    
     <!-- Список отзывов -->
     <div class="reviews-list-container" id="reviewsList">
-      <!-- Отзывы будут загружаться через JS -->
+      <div class="loading-reviews">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Загрузка отзывов...</p>
+      </div>
     </div>
+    
+    <!-- Кнопка "Показать ещё" -->
+    <button class="load-more-btn" id="loadMoreReviewsBtn" style="display: none;">
+      <i class="fas fa-chevron-down"></i> Показать ещё
+    </button>
+  </div>
+</div>
+
+<!-- ==================== МОДАЛКА НАПИСАНИЯ ОТЗЫВА ==================== -->
+<div class="modal-glass" id="writeReviewModal">
+  <div class="modal-content review-modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-star"></i> Написать отзыв</h3>
+      <button class="close-modal" onclick="closeWriteReviewModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Выбор товара (опционально) -->
+      <div class="form-group">
+        <label>О каком товаре отзыв?</label>
+        <select id="reviewProduct" class="input-modern">
+          <option value="">Общий отзыв о маркетплейсе</option>
+        </select>
+      </div>
+      
+      <!-- Оценка -->
+      <div class="rating-select">
+        <label>Ваша оценка <span class="required">*</span></label>
+        <div class="stars-select" id="reviewStarsSelect">
+          <i class="far fa-star" data-rating="1"></i>
+          <i class="far fa-star" data-rating="2"></i>
+          <i class="far fa-star" data-rating="3"></i>
+          <i class="far fa-star" data-rating="4"></i>
+          <i class="far fa-star" data-rating="5"></i>
+        </div>
+        <input type="hidden" id="reviewRating" value="0">
+      </div>
+      
+      <!-- Имя -->
+      <div class="form-group">
+        <label>Ваше имя <span class="required">*</span></label>
+        <input type="text" id="reviewAuthor" class="input-modern" placeholder="Как вас зовут?">
+      </div>
+      
+      <!-- Текст отзыва -->
+      <div class="form-group">
+        <label>Текст отзыва <span class="required">*</span></label>
+        <textarea id="reviewText" class="input-modern" rows="4" placeholder="Поделитесь вашим опытом использования..."></textarea>
+        <div class="char-counter" id="reviewCharCounter">0/500</div>
+      </div>
+      
+      <!-- Фото -->
+      <div class="form-group">
+        <label>Фото (до 5 шт.)</label>
+        <div class="review-photo-upload" id="reviewPhotoUpload">
+          <i class="fas fa-camera"></i>
+          <span>Добавить фото</span>
+          <input type="file" id="reviewPhotoInput" accept="image/jpeg,image/png,image/gif,image/webp" multiple style="display: none;">
+        </div>
+        <div id="reviewPhotoPreview" class="review-photo-preview"></div>
+      </div>
+      
+      <!-- Плюсы и минусы -->
+      <div class="form-row-2">
+        <div class="form-group">
+          <label><i class="fas fa-plus-circle" style="color: #22c55e;"></i> Достоинства</label>
+          <textarea id="reviewPros" class="input-modern" rows="2" placeholder="Что понравилось?"></textarea>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-minus-circle" style="color: #ef4444;"></i> Недостатки</label>
+          <textarea id="reviewCons" class="input-modern" rows="2" placeholder="Что можно улучшить?"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
+      <button class="btn-primary" onclick="submitReview()">
+        <i class="fas fa-paper-plane"></i> Опубликовать
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== МОДАЛКА ПРОСМОТРА ФОТО ==================== -->
+<div class="modal-glass" id="photoViewerModal">
+  <div class="photo-viewer-content">
+    <button class="close-photo-viewer" onclick="closePhotoViewer()">
+      <i class="fas fa-times"></i>
+    </button>
+    <button class="photo-nav prev" onclick="prevPhoto()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <img id="viewerImage" src="" alt="Фото отзыва">
+    <button class="photo-nav next" onclick="nextPhoto()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="photo-counter" id="photoCounter">1 / 5</div>
   </div>
 </div>
 
@@ -995,18 +1141,17 @@
     <div class="shop-info-card">
       <i class="fas fa-store-alt"></i>
       <h2>Станьте продавцом</h2>
-      <p>Подключите витрину магазина и начните продавать свои товары тысячам покупателей. После проверки документов вы сможете:</p>
+      <p>Подключите витрину магазина и начните продавать свои товары. После проверки документов вы сможете:</p>
       <ul>
-        <li><i class="fas fa-check-circle"></i> Выставлять неограниченное количество товаров</li>
-        <li><i class="fas fa-check-circle"></i> Создавать посты как в соцсетях</li>
+        <li><i class="fas fa-check-circle"></i> Выставлять товары без ограничений</li>
         <li><i class="fas fa-check-circle"></i> Получать выплаты на карту</li>
-        <li><i class="fas fa-check-circle"></i> Доступ к расширенной статистике</li>
+        <li><i class="fas fa-check-circle"></i> Доступ к статистике продаж</li>
       </ul>
     </div>
     
-    <!-- Форма -->
-    <div class="shop-form-card">
-      <h3><i class="fas fa-file-alt"></i> Данные о бизнесе</h3>
+    <!-- Форма заявки -->
+    <div class="shop-form-card" id="shopFormCard">
+      <h3><i class="fas fa-file-alt"></i> Данные для заявки</h3>
       
       <div class="form-group">
         <label>Название магазина <span class="required">*</span></label>
@@ -1014,12 +1159,12 @@
       </div>
       
       <div class="form-group">
-        <label>Тип бизнеса <span class="required">*</span></label>
+        <label>Тип деятельности <span class="required">*</span></label>
         <select id="shopType" class="input-modern">
           <option value="">Выберите тип</option>
           <option value="individual">Самозанятый / ИП</option>
           <option value="company">Юридическое лицо (ООО)</option>
-          <option value="private">Частное лицо (без документов)</option>
+          <option value="private">Частное лицо</option>
         </select>
       </div>
       
@@ -1040,8 +1185,8 @@
       
       <!-- Загрузка документов -->
       <div class="form-group">
-        <label>Документы, подтверждающие бизнес <span class="required">*</span></label>
-        <p class="hint-text">Загрузите фото или скан документов (свидетельство ИП, ОГРН, паспорт или другие)</p>
+        <label>Документы <span class="required">*</span></label>
+        <p class="hint-text">Загрузите фото или скан документов (ИП, ОГРН, паспорт)</p>
         
         <div class="documents-upload-area" id="documentsUploadArea">
           <i class="fas fa-cloud-upload-alt"></i>
@@ -1057,7 +1202,7 @@
       <div class="form-group">
         <label class="checkbox-label">
           <input type="checkbox" id="shopAgreement" checked>
-          <span>Я подтверждаю, что предоставленные данные и документы являются подлинными</span>
+          <span>Подтверждаю подлинность предоставленных данных</span>
         </label>
       </div>
       
@@ -1070,13 +1215,13 @@
       </div>
     </div>
     
-    <!-- Статус заявки (показывается после отправки) -->
+    <!-- Статус заявки -->
     <div class="shop-status-card" id="shopStatusCard" style="display: none;">
       <div class="status-icon pending">
         <i class="fas fa-clock"></i>
       </div>
-      <h3>Заявка на рассмотрении</h3>
-      <p>Ваша заявка отправлена и ожидает проверки администратором. Обычно это занимает до 24 часов.</p>
+      <h3 id="statusTitle">Заявка на рассмотрении</h3>
+      <p id="statusText">Ваша заявка отправлена и ожидает проверки администратором.</p>
       <div class="status-timeline">
         <div class="timeline-step completed">
           <div class="step-icon"><i class="fas fa-check"></i></div>
@@ -1251,6 +1396,7 @@
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
+<script src="js/shop-connect.js"></script>
 <script src="js/reviews-shop.js"></script>
 <script src="js/api.js"></script>
 <script src="js/global-fix.js"></script>
@@ -1266,52 +1412,116 @@
 <script src="js/app.js"></script>
 <script src="js/profile-new.js"></script>
 <script src="js/products-manage.js"></script>
+<script src="js/reviews.js"></script>
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
+  (function() {
+    console.log('🔥 Фикс бесконечной карусели...');
+    
+    const track = document.getElementById('myCarouselTrack');
+    if (!track) {
+        console.error('❌ Трек карусели не найден');
+        return;
+    }
+    
+    // Получаем ширину одного набора слайдов
+    const slides = document.querySelectorAll('.my-carousel-slide');
+    if (slides.length === 0) return;
+    
+    // Ждём полной загрузки всех изображений
+    function waitForImages() {
+        return new Promise((resolve) => {
+            let images = document.querySelectorAll('.my-carousel-slide img');
+            let loaded = 0;
+            if (images.length === 0) { resolve(); return; }
+            
+            images.forEach(img => {
+                if (img.complete) {
+                    loaded++;
+                    if (loaded === images.length) resolve();
+                } else {
+                    img.addEventListener('load', () => {
+                        loaded++;
+                        if (loaded === images.length) resolve();
+                    });
+                }
+            });
+        });
+    }
+    
+    async function initCarousel() {
+        await waitForImages();
+        
+        // Получаем ширину одного слайда с отступом
+        const slide = slides[0];
+        const slideWidth = slide.offsetWidth;
+        const gap = 16; // отступ между слайдами
+        const slideFullWidth = slideWidth + gap;
+        const slidesPerSet = 5; // 5 слайдов в одном наборе
+        const setWidth = slidesPerSet * slideFullWidth;
+        
+        // Смещаем трек на ширину одного набора (чтобы начать с середины)
+        // Это создаст видимость, что слева уже есть слайды
+        track.style.transform = `translateX(-${setWidth}px)`;
+        
+        // Анимация будет продолжаться с этого смещения
+        console.log(`✅ Карусель инициализирована, смещение: -${setWidth}px`);
+    }
+    
+    initCarousel();
+    
+    // При ресайзе пересчитываем
+    window.addEventListener('resize', function() {
+        setTimeout(initCarousel, 100);
+    });
+})();
 (function() {
-  console.log('🎯 Запуск подсветки центральной карточки...');
-  
-  const carousel = document.querySelector('.my-carousel');
-  const slides = document.querySelectorAll('.my-carousel-slide');
-  
-  if (!carousel || slides.length === 0) {
-    console.error('❌ Элементы карусели не найдены');
-    return;
-  }
-  
-  console.log(`✅ Найдено ${slides.length} слайдов`);
-  
-  function highlightCenterSlide() {
-    const carouselRect = carousel.getBoundingClientRect();
-    const centerX = carouselRect.left + carouselRect.width / 2;
+    console.log('🎯 Запуск подсветки центральной карточки...');
     
-    let closestSlide = null;
-    let minDistance = Infinity;
+    function highlightCenterSlide() {
+        const carousel = document.querySelector('.my-carousel');
+        const slides = document.querySelectorAll('.my-carousel-slide');
+        
+        if (!carousel || slides.length === 0) {
+            console.error('❌ Элементы карусели не найдены');
+            return;
+        }
+        
+        const carouselRect = carousel.getBoundingClientRect();
+        const centerX = carouselRect.left + carouselRect.width / 2;
+        
+        let closestSlide = null;
+        let minDistance = Infinity;
+        
+        slides.forEach(slide => {
+            const rect = slide.getBoundingClientRect();
+            const slideCenterX = rect.left + rect.width / 2;
+            const distance = Math.abs(centerX - slideCenterX);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestSlide = slide;
+            }
+        });
+        
+        if (closestSlide) {
+            slides.forEach(s => s.classList.remove('active'));
+            closestSlide.classList.add('active');
+        }
+    }
     
-    slides.forEach(slide => {
-      const rect = slide.getBoundingClientRect();
-      const slideCenterX = rect.left + rect.width / 2;
-      const distance = Math.abs(centerX - slideCenterX);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestSlide = slide;
-      }
+    // Запускаем подсветку сразу
+    setTimeout(highlightCenterSlide, 50);
+    
+    // Запускаем каждые 100 мс для плавности во время анимации
+    setInterval(highlightCenterSlide, 100);
+    
+    // Также запускаем при ресайзе окна
+    window.addEventListener('resize', function() {
+        setTimeout(highlightCenterSlide, 50);
     });
     
-    if (closestSlide) {
-      slides.forEach(s => s.classList.remove('active'));
-      closestSlide.classList.add('active');
-    }
-  }
-  
-  // Запускаем подсветку каждые 50 мс для плавности
-  setInterval(highlightCenterSlide, 50);
-  
-  // Первая подсветка
-  setTimeout(highlightCenterSlide, 50);
-  
-  console.log('✅ Подсветка работает!');
+    console.log('✅ Подсветка центрального слайда работает!');
 })();
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -1332,6 +1542,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         window.showPage('home');
     }
 });
+
+
 </script>
 
 </body>

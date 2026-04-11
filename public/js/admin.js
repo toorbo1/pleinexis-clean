@@ -28,6 +28,7 @@ async function initAdmin() {
     renderAdminNavButtons();
     updateAdminStats();
     renderShopApplicationsInAdmin();
+
 }
 function updateAdminStats() {
   const products = JSON.parse(localStorage.getItem("apex_products") || "[]");
@@ -635,14 +636,14 @@ function renderAdminNavButtons() {
   const sections = [
     { id: "adminMainSection", name: "📊 Главная", icon: "fa-tachometer-alt" },
     { id: "adminAdminsSection", name: "👥 Администраторы", icon: "fa-users" },
-    { id: "adminKeywordsSection", name: "🏷️ Ключевые слова", icon: "fa-tags" }, // <-- ДОБАВЛЕНО
+    { id: "adminKeywordsSection", name: "🏷️ Ключевые слова", icon: "fa-tags" },
     { id: "adminModerationSection", name: "📝 Модерация", icon: "fa-clipboard-list" },
     { id: "adminSlidersSection", name: "🖼️ Слайдеры", icon: "fa-images" },
     { id: "adminChatSection", name: "💬 Чат поддержки", icon: "fa-headset" },
     { id: "adminProductsSection", name: "📦 Товары", icon: "fa-box" },
     { id: "adminGamesSection", name: "🎮 Игры", icon: "fa-gamepad" },
     { id: "adminAppsSection", name: "📱 Приложения", icon: "fa-mobile-alt" },
-    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" }
+    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" } // <-- УЖЕ ДОБАВЛЕНО, ПРОВЕРЬТЕ
   ];
   
   container.innerHTML = sections.map(section => `
@@ -656,7 +657,7 @@ function showAdminSection(sectionId) {
   const sections = [
     "adminMainSection", "adminAdminsSection", "adminKeywordsSection",
     "adminModerationSection", "adminSlidersSection", "adminChatSection", 
-    "adminProductsSection", "adminGamesSection", "adminAppsSection"
+    "adminProductsSection", "adminGamesSection", "adminAppsSection", "adminShopSection" // <-- ДОБАВИТЬ
   ];
   
   sections.forEach(id => {

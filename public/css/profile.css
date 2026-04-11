@@ -82,26 +82,135 @@
   box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
 }
 
-/* Содержимое hero-секции */
+/* ========== ПРОФИЛЬ — ИСПРАВЛЕНИЯ ========== */
+
+/* Аватар выше всех элементов */
 .hero-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 40px;
-  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
   position: relative;
   z-index: 5;
 }
 
-/* Аватар */
 .avatar-centered {
+  order: -1; /* Гарантирует, что аватар всегда первый */
   flex-shrink: 0;
 }
 
-.avatar-wrapper {
-  position: relative;
-  cursor: pointer;
+/* Для десктопа */
+@media (min-width: 769px) {
+  .hero-content {
+    flex-direction: row;
+    text-align: left;
+    gap: 40px;
+  }
+  
+  .avatar-centered {
+    order: 0; /* Возвращаем нормальный порядок */
+  }
+  
+  .hero-info {
+    text-align: left;
+  }
+  
+  .hero-rating {
+    justify-content: flex-start;
+  }
 }
 
+/* Информация - центрирование на мобильных */
+.hero-info {
+  flex: 1;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.3px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+}
+
+/* Рейтинг и звезды */
+.hero-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+/* Звезды с прозрачностью в зависимости от рейтинга */
+.hero-stars {
+  font-size: 1rem;
+  letter-spacing: 2px;
+  background: linear-gradient(
+    90deg,
+    #fbbf24 0%,
+    #fbbf24 calc(var(--rating-percent, 0%) * 1%),
+    rgba(255, 255, 255, 0.15) calc(var(--rating-percent, 0%) * 1%),
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+/* Запасной вариант для браузеров без поддержки background-clip на тексте */
+@supports not (background-clip: text) {
+  .hero-stars {
+    color: #fbbf24;
+    opacity: 0.5;
+  }
+}
+
+.hero-rating-value {
+  color: #e0e0e0;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Скрываем "0 отзыва" */
+.hero-reviews {
+  display: none;
+}
+
+/* Показываем только если отзывов больше 0 */
+.hero-reviews.has-reviews {
+  display: inline;
+  color: #60a5fa;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hero-reviews.has-reviews:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+  text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+.hero-since {
+  color: #6b7a9e;
+  font-size: 0.75rem;
+  margin-top: 8px;
+}
+
+/* Аватар */
 .avatar-circle {
   width: 110px;
   height: 110px;
@@ -121,6 +230,7 @@
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
+  margin: 0 auto;
 }
 
 .avatar-circle:hover {
@@ -172,10 +282,11 @@
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
-/* Информация справа */
+/* Информация справа - ВЫРАВНИВАНИЕ ПО ЦЕНТРУ НА МОБИЛЬНЫХ */
 .hero-info {
   flex: 1;
-  text-align: left;
+  text-align: center;
+  width: 100%;
 }
 
 .hero-name {
@@ -193,6 +304,7 @@
 .hero-rating {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   margin-bottom: 8px;
   flex-wrap: wrap;
@@ -211,19 +323,64 @@
   font-size: 0.9rem;
 }
 
+/* ========== ССЫЛКА НА ОТЗЫВЫ В ПРОФИЛЕ ========== */
+
 .hero-reviews {
   color: #60a5fa;
   font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: transparent;
 }
 
 .hero-reviews:hover {
   color: #93c5fd;
-  text-decoration: underline;
-  text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+  background: rgba(59, 130, 246, 0.1);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.hero-reviews:active {
+  transform: translateY(0);
+}
+
+/* Стиль когда есть отзывы */
+.hero-reviews.has-reviews {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  font-weight: 600;
+}
+
+.hero-reviews.has-reviews:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Иконка перед ссылкой (опционально) */
+.hero-reviews::before {
+  content: '⭐';
+  margin-right: 4px;
+  font-size: 0.9rem;
+}
+
+.hero-reviews.has-reviews::before {
+  content: '📝';
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .hero-reviews {
+    font-size: 0.8rem;
+    padding: 3px 6px;
+  }
 }
 
 .hero-since {
@@ -231,7 +388,6 @@
   font-size: 0.75rem;
   margin-top: 8px;
 }
-
 /* ========== КАРТОЧКА БАЛАНСА ========== */
 
 .profile-balance-card {
@@ -351,10 +507,10 @@
 }
 
 .stat-item {
-  background: rgba(15, 20, 35, 0.6);
+  background: rgba(15, 20, 35, 0.957);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: 24px;
+  border-radius: 15px;
   padding: 20px 16px;
   text-align: center;
   border: 1px solid rgba(59, 130, 246, 0.1);
@@ -366,14 +522,12 @@
 
 .stat-item:hover {
   background: rgba(20, 30, 50, 0.7);
-  transform: translateY(-3px);
   border-color: rgba(59, 130, 246, 0.25);
   box-shadow: 
     0 15px 35px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(96, 165, 250, 0.15) inset,
     0 0 20px rgba(59, 130, 246, 0.15);
 }
-
 .stat-item .stat-number {
   font-size: 1.8rem;
   font-weight: 800;
@@ -381,7 +535,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .stat-item .stat-label {

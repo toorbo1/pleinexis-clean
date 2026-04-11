@@ -56,16 +56,44 @@
     resetProfileStats();
   }
   
-  // Кнопка витрины
-  function setupShopWindowButton() {
-    const shopBtn = document.querySelector('.shop-window-btn');
-    if (shopBtn) {
-      shopBtn.addEventListener('click', () => {
-        alert('🏪 Витрина магазина\n\nЗдесь будут отображаться ваши товары для покупателей.\nСкоро появится возможность настроить витрину!');
-      });
-    }
+function setupShopWindowButton() {
+  const shopBtn = document.querySelector('.shop-window-btn');
+  if (shopBtn) {
+    // Удаляем старый обработчик
+    const newBtn = shopBtn.cloneNode(true);
+    shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+    
+    newBtn.addEventListener('click', () => {
+      const user = localStorage.getItem('apex_user') || 'Гость';
+      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+      const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+      
+      // Если уже есть одобренная заявка
+      if (sellers.includes(user)) {
+        if (typeof showPage === 'function') {
+          showPage('products-manage');
+        }
+        return;
+      }
+      
+      // Если заявка на рассмотрении
+      if (application && application.status === 'pending') {
+        if (typeof showPage === 'function') {
+          showPage('shopConnectPage');
+        }
+        return;
+      }
+      
+      // Если заявка отклонена или нет заявки
+      if (typeof showPage === 'function') {
+        showPage('shopConnectPage');
+        if (typeof initShopConnectPage === 'function') {
+          setTimeout(initShopConnectPage, 50);
+        }
+      }
+    });
   }
-  
+}
   // Сброс статистики профиля
   function resetProfileStats() {
     if (window.userProfile) {
@@ -286,15 +314,83 @@ function setupBalanceClick() {
   }
 }
 
-  function setupReviewsClick() {
-    const reviewsLink = document.getElementById('profileReviewsLink');
-    if (reviewsLink) {
-      reviewsLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('⭐ 0.0 · 0 отзывов\n\n📝 Отзывы отсутствуют');
-      });
+// ========== ЗАМЕНИТЕ ЭТУ ФУНКЦИЮ В profile-new.js ==========
+function setupReviewsClick() {
+  const reviewsLink = document.getElementById('profileReviewsLink');
+  if (!reviewsLink) return;
+
+  // Удаляем старый обработчик, если он был
+  const newLink = reviewsLink.cloneNode(true);
+  reviewsLink.parentNode.replaceChild(newLink, reviewsLink);
+  
+  newLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Обновляем текст ссылки на актуальное количество отзывов
+    const reviewsCount = window.userProfile?.reviewsCount || 0;
+    const rating = window.userProfile?.rating || 0;
+    
+    // Используем глобальную функцию showPage для перехода
+    if (typeof window.showPage === 'function') {
+      // Перед переходом обновляем статистику на странице отзывов
+      if (typeof window.initReviewsPage === 'function') {
+        setTimeout(() => window.initReviewsPage(), 50);
+      }
+      window.showPage('reviewsPage');
+    } else if (typeof navigate === 'function') {
+      navigate('reviewsPage');
+    } else {
+      // Фолбэк если функции навигации недоступны
+      console.warn('Навигация не найдена, используем прямой переход');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('reviewsPage')?.classList.add('active');
     }
+  });
+
+  // Обновляем внешний вид ссылки в зависимости от наличия отзывов
+  updateReviewsLinkAppearance();
+}
+
+// ========== ДОБАВЬТЕ ЭТУ НОВУЮ ФУНКЦИЮ ==========
+function updateReviewsLinkAppearance() {
+  const link = document.getElementById('profileReviewsLink');
+  if (!link) return;
+
+  const reviewsCount = window.userProfile?.reviewsCount || 0;
+  const rating = window.userProfile?.rating || 0;
+
+  // Обновляем текст
+  if (reviewsCount > 0) {
+    const word = getReviewWord(reviewsCount);
+    link.textContent = `${reviewsCount} ${word}`;
+    link.classList.add('has-reviews');
+    link.style.display = 'inline';
+  } else {
+    link.textContent = '0 отзывов';
+    link.classList.remove('has-reviews');
   }
+
+  // Обновляем рейтинг и звёзды
+  const ratingEl = document.querySelector('.hero-rating-value');
+  const starsEl = document.querySelector('.hero-stars');
+  
+  if (ratingEl) ratingEl.textContent = rating.toFixed(1);
+  if (starsEl) {
+    const ratingPercent = (rating / 5) * 100;
+    starsEl.style.setProperty('--rating-percent', ratingPercent + '%');
+    starsEl.textContent = '★★★★★';
+  }
+}
+
+// ========== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ==========
+function getReviewWord(count) {
+  if (count % 10 === 1 && count % 100 !== 11) return 'отзыв';
+  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'отзыва';
+  return 'отзывов';
+}
+
+
   
   function updateNewProfileStats(profileData) {
     const productsCountEl = document.getElementById('profileProductsCount');
@@ -326,7 +422,107 @@ function setupBalanceClick() {
       avatarSpan.innerText = window.currentUser.charAt(0).toUpperCase();
     }
   }
+  // ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+
+// ========== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ ==========
+
+function setupShopWindowButton() {
+  const shopBtn = document.getElementById('connectShopBtn') || document.querySelector('.shop-window-btn');
   
+  if (!shopBtn) {
+    console.warn('Кнопка витрины не найдена');
+    return;
+  }
+  
+  // Удаляем старый onclick если есть
+  shopBtn.removeAttribute('onclick');
+  
+  // Клонируем чтобы убрать старые обработчики
+  const newBtn = shopBtn.cloneNode(true);
+  shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+  
+  newBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const user = localStorage.getItem('apex_user') || 'Гость';
+    
+    // Проверяем, является ли пользователь уже продавцом
+    const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+    
+    if (sellers.includes(user)) {
+      // Уже продавец - открываем управление товарами
+      if (typeof showPage === 'function') {
+        showPage('products-manage');
+      }
+      return;
+    }
+    
+    // Открываем страницу подключения витрины
+    if (typeof showPage === 'function') {
+      showPage('shopConnectPage');
+      
+      // Инициализируем страницу после перехода
+      setTimeout(() => {
+        if (typeof initShopConnectPage === 'function') {
+          initShopConnectPage();
+        }
+      }, 100);
+    }
+  });
+}
+
+// Вызываем при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+  setupShopWindowButton();
+  setupReviewsClick();
+});
+
+// Функция для обновления отображения рейтинга
+function updateProfileRating(rating, reviewsCount) {
+  const starsElement = document.querySelector('.hero-stars');
+  const ratingValueElement = document.querySelector('.hero-rating-value');
+  const reviewsElement = document.getElementById('profileReviewsLink');
+  
+  // Обновляем значение рейтинга
+  if (ratingValueElement) {
+    ratingValueElement.textContent = rating.toFixed(1);
+  }
+  
+  // Обновляем звезды с прозрачностью
+  if (starsElement) {
+    const ratingPercent = (rating / 5) * 100;
+    starsElement.style.setProperty('--rating-percent', ratingPercent);
+    starsElement.textContent = '★★★★★';
+  }
+  
+  // Скрываем или показываем количество отзывов
+  if (reviewsElement) {
+    if (reviewsCount > 0) {
+      reviewsElement.textContent = `${reviewsCount} ${getReviewWord(reviewsCount)}`;
+      reviewsElement.classList.add('has-reviews');
+      reviewsElement.style.display = 'inline';
+    } else {
+      reviewsElement.classList.remove('has-reviews');
+      reviewsElement.style.display = 'none';
+    }
+  }
+}
+
+// Вспомогательная функция для склонения слова "отзыв"
+function getReviewWord(count) {
+  if (count % 10 === 1 && count % 100 !== 11) return 'отзыв';
+  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'отзыва';
+  return 'отзывов';
+}
+
+// Использование при загрузке профиля
+function loadProfileData() {
+  const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"rating": 0, "reviewsCount": 0}');
+  updateProfileRating(userProfile.rating || 0, userProfile.reviewsCount || 0);
+}
+
+// Вызываем при загрузке
+document.addEventListener('DOMContentLoaded', loadProfileData);
   // Функция для подсчета активных и завершенных товаров
   function updateActiveCompletedCounts() {
     const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
