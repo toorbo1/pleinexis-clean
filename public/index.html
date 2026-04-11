@@ -1424,13 +1424,10 @@
 <!-- НЕ ПОДКЛЮЧАЙТЕ products-fixed.js, если он есть - он конфликтует -->
 <script>
   (function() {
-    console.log('🔥 Запуск оптимизированной бесконечной карусели...');
+    console.log('🔥 Карусель запущена');
     
     const track = document.getElementById('myCarouselTrack');
-    if (!track) {
-      console.error('❌ Трек карусели не найден');
-      return;
-    }
+    if (!track) return;
     
     const slides = document.querySelectorAll('.my-carousel-slide');
     if (slides.length === 0) return;
@@ -1442,12 +1439,10 @@
     let animFrame = null;
     let isVisible = true;
     
-    // Настройки
-    const gap = 16;             // отступ между слайдами
-    const slidesPerSet = 5;     // количество уникальных слайдов в одном наборе
-    const speed = 0.6;          // пикселей за кадр (плавность)
+    const gap = 16;
+    const slidesPerSet = 5;
+    const speed = 0.5;
     
-    // Ждём загрузки всех изображений для точного расчёта ширины
     function waitForImages() {
       return new Promise((resolve) => {
         const images = document.querySelectorAll('.my-carousel-slide img');
@@ -1463,12 +1458,15 @@
               loaded++;
               if (loaded === images.length) resolve();
             });
+            img.addEventListener('error', () => {
+              loaded++;
+              if (loaded === images.length) resolve();
+            });
           }
         });
       });
     }
     
-    // Пересчёт размеров и сброс позиции
     async function recalculateDimensions() {
       await waitForImages();
       
@@ -1477,14 +1475,12 @@
       slideFull = slideWidth + gap;
       setWidth = slidesPerSet * slideFull;
       
-      // Начинаем со второго набора (визуально по центру)
       position = setWidth;
       track.style.transform = `translateX(${-position}px)`;
       
-      console.log(`📐 Карусель пересчитана: ширина=${slideWidth}px, набор=${setWidth}px`);
+      console.log(`📐 Карусель: ширина=${slideWidth}px`);
     }
     
-    // Подсветка центрального слайда
     function highlightCenterSlide() {
       const carousel = document.querySelector('.my-carousel');
       if (!carousel) return;
@@ -1512,7 +1508,6 @@
       }
     }
     
-    // Основной цикл анимации
     function animate() {
       if (!isVisible) {
         animFrame = null;
@@ -1521,44 +1516,35 @@
       
       position += speed;
       
-      // Бесконечный цикл: когда дошли до конца третьего набора, перепрыгиваем на второй
       if (position >= setWidth * 2) {
         position -= setWidth;
       }
       
       track.style.transform = `translateX(${-position}px)`;
-      
-      // Обновляем подсветку
       highlightCenterSlide();
       
       animFrame = requestAnimationFrame(animate);
     }
     
-    // Observer для остановки анимации, когда карусель не видна
     const observer = new IntersectionObserver((entries) => {
       isVisible = entries[0].isIntersecting;
       
       if (isVisible && !animFrame) {
         animFrame = requestAnimationFrame(animate);
-        console.log('▶️ Карусель продолжает движение');
       } else if (!isVisible && animFrame) {
         cancelAnimationFrame(animFrame);
         animFrame = null;
-        console.log('⏸️ Карусель приостановлена (вне экрана)');
       }
     }, { threshold: 0.1 });
     
     observer.observe(track);
     
-    // Инициализация
     (async function init() {
       await recalculateDimensions();
       
-      // Запускаем анимацию
       if (animFrame) cancelAnimationFrame(animFrame);
       animFrame = requestAnimationFrame(animate);
       
-      // Обработка ресайза с debounce
       let resizeTimer;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
@@ -1568,17 +1554,9 @@
         }, 150);
       });
       
-      console.log('✅ Карусель полностью готова');
+      console.log('✅ Карусель готова');
     })();
     
-  })();
-</script>
-
-<script>
-  (function() {
-    console.log('🎯 Запуск подсветки центральной карточки (синхронизировано с каруселью)');
-    // Подсветка уже встроена в основной цикл карусели, этот блок оставлен для обратной совместимости.
-    // Никаких дополнительных setInterval – всё делается в requestAnimationFrame.
   })();
 </script>
 

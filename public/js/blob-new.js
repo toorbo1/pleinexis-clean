@@ -1,88 +1,139 @@
-// ========== ПРОСТАЯ АНИМАЦИЯ КАПЛИ ==========
+// ========== ФИНАЛЬНАЯ ВЕРСИЯ АНИМАЦИИ КАПЛИ (ИСПРАВЛЕННАЯ) ==========
 (function() {
-    console.log('💧 ЗАПУСК НОВОГО СКРИПТА КАПЛИ');
+    console.log('💧 BLOB СКРИПТ ЗАПУЩЕН (исправленная версия)');
     
-    const blob = document.getElementById('mainBlob');
-    const container = document.getElementById('navContainer');
-    const buttons = document.querySelectorAll('.nav-item');
+    let blob = null;
+    let container = null;
+    let buttons = [];
+    let initTimer = null;
     
-    if (!blob || !container) {
-        console.error('❌ Элементы не найдены!');
-        return;
+    function waitForElements() {
+        blob = document.getElementById('mainBlob');
+        container = document.getElementById('navContainer');
+        buttons = document.querySelectorAll('.nav-item');
+        
+        if (!blob || !container || buttons.length === 0) {
+            console.log('⏳ Ждем элементы...');
+            initTimer = setTimeout(waitForElements, 100);
+            return;
+        }
+        
+        console.log('✅ Все элементы найдены');
+        init();
     }
     
-    console.log('✅ Blob:', blob);
-    console.log('✅ Container:', container);
-    console.log('✅ Buttons:', buttons.length);
-    
-    // Функция перемещения капли
-    function moveBlob(btn) {
+    function getButtonPosition(btn) {
+        if (!btn || !container) return null;
+        
         const containerRect = container.getBoundingClientRect();
         const btnRect = btn.getBoundingClientRect();
         
-        const left = btnRect.left - containerRect.left;
-        const width = btnRect.width;
+        // Ждем пока размеры станут корректными
+        if (btnRect.width === 0 || containerRect.width === 0) {
+            console.warn('⚠️ Ширина 0, ждем...');
+            return null;
+        }
         
-        console.log(`📐 Перемещение: left=${left}px, width=${width}px`);
-        
-        // Устанавливаем transition
-        blob.style.transition = 'left 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
-        
-        // Двигаем
-        blob.style.left = left + 'px';
-        blob.style.width = width + 'px';
+        return {
+            left: btnRect.left - containerRect.left,
+            width: btnRect.width
+        };
     }
     
-    // Инициализация
-    function init() {
-        // Находим активную кнопку
+    function moveBlobToButton(btn) {
+        const pos = getButtonPosition(btn);
+        if (!pos) {
+            // Пробуем еще раз через 50ms
+            setTimeout(() => {
+                const retryPos = getButtonPosition(btn);
+                if (retryPos) {
+                    blob.style.transition = 'left 0.3s ease, width 0.3s ease';
+                    blob.style.left = retryPos.left + 'px';
+                    blob.style.width = retryPos.width + 'px';
+                }
+            }, 50);
+            return false;
+        }
+        
+        blob.style.transition = 'left 0.3s ease, width 0.3s ease';
+        blob.style.left = pos.left + 'px';
+        blob.style.width = pos.width + 'px';
+        
+        return true;
+    }
+    
+    function setInitialPosition() {
         const activeBtn = document.querySelector('.nav-item.active') || buttons[0];
         
-        // Устанавливаем начальную позицию БЕЗ анимации
-        const containerRect = container.getBoundingClientRect();
-        const btnRect = activeBtn.getBoundingClientRect();
+        // Пробуем несколько раз с задержкой
+        const trySet = (attempts = 0) => {
+            const pos = getButtonPosition(activeBtn);
+            if (pos) {
+                blob.style.transition = 'none';
+                blob.style.left = pos.left + 'px';
+                blob.style.width = pos.width + 'px';
+                blob.offsetHeight; // reflow
+                console.log('📍 Начальная позиция установлена');
+                return true;
+            } else if (attempts < 5) {
+                setTimeout(() => trySet(attempts + 1), 100);
+            }
+            return false;
+        };
         
-        blob.style.transition = 'none';
-        blob.style.left = (btnRect.left - containerRect.left) + 'px';
-        blob.style.width = btnRect.width + 'px';
-        
-        console.log('📍 Начальная позиция установлена');
+        trySet();
+    }
+    
+    function init() {
+        setInitialPosition();
         
         // Вешаем обработчики на кнопки
         buttons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const tabId = this.getAttribute('data-nav');
-                console.log('🖱️ Клик:', tabId);
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 
-                // Меняем активный класс
-                buttons.forEach(b => b.classList.remove('active'));
+                const tabId = this.getAttribute('data-nav');
+                console.log('🖱️ Клик по:', tabId);
+                
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Двигаем каплю
-                moveBlob(this);
+                moveBlobToButton(this);
                 
-                // Переключаем страницу
                 if (typeof window.showPage === 'function') {
                     window.showPage(tabId);
                 }
             });
         });
         
-        // Ресайз
+        buttons = document.querySelectorAll('.nav-item');
+        
+        // Ресайз с debounce
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
-            const currentActive = document.querySelector('.nav-item.active');
-            if (currentActive) {
-                const rect = currentActive.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                
-                blob.style.transition = 'none';
-                blob.style.left = (rect.left - containerRect.left) + 'px';
-                blob.style.width = rect.width + 'px';
-            }
+            if (resizeTimer) clearTimeout(resizeTimer);
+            
+            resizeTimer = setTimeout(() => {
+                const activeBtn = document.querySelector('.nav-item.active');
+                if (activeBtn) {
+                    const pos = getButtonPosition(activeBtn);
+                    if (pos) {
+                        blob.style.transition = 'none';
+                        blob.style.left = pos.left + 'px';
+                        blob.style.width = pos.width + 'px';
+                    }
+                }
+                resizeTimer = null;
+            }, 100);
         });
+        
+        console.log('✅ BLOB НАВИГАЦИЯ ГОТОВА!');
     }
     
-    // Запускаем с небольшой задержкой
-    setTimeout(init, 100);
+    setTimeout(waitForElements, 200);
     
 })();

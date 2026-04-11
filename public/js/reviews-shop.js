@@ -1,6 +1,6 @@
 // ========== ОТЗЫВЫ И ПОДКЛЮЧЕНИЕ ВИТРИНЫ ==========
-
-let shopDocuments = [];
+// Используем уникальное имя чтобы избежать конфликта с shop-connect.js
+let reviewShopDocuments = [];
 let selectedRating = 0;
 let reviewPhotoFile = null;
 

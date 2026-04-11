@@ -1,20 +1,20 @@
-/* ========== ХЕДЕР — ПОЛНЫЙ КОД ========== */
+/* ========== ХЕДЕР — ПОЛНЫЙ КОД (ИСПРАВЛЕННЫЙ) ========== */
 
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  padding: 12px 24px;
-  background: rgba(10, 15, 28, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 8px 16px;
+  background: rgba(10, 15, 28, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(59, 130, 246, 0.15);
   z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -22,168 +22,124 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-shrink: 0;
 }
 
 .header-logo {
-  height: 36px;
+  height: 32px;
   width: auto;
   object-fit: contain;
   border-radius: 8px;
-  filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.3));
 }
 
 .company-name {
-  font-weight: 800;
-  font-size: 1.4rem;
-  background: linear-gradient(135deg, #ffffff, #a78bfa, #60a5fa);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  letter-spacing: -0.5px;
-  text-shadow: 0 0 30px rgba(96, 165, 250, 0.3);
+  display: none; /* Скрываем текст на всех устройствах для компактности */
 }
 
-/* Центральная часть — поиск + кнопка админа (занимает всё свободное место) */
+/* Центральная часть — поиск + кнопка админа */
 .header-center {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex: 1;
-  max-width: 600px;
-  min-width: 280px;
+  min-width: 0;
 }
 
-/* Поисковая строка — занимает всё доступное пространство */
+/* Поисковая строка */
 .header-search {
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(15, 20, 35, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 60px;
-  padding: 6px 6px 6px 18px;
-  gap: 8px;
+  background: rgba(15, 20, 35, 0.8);
+  border-radius: 40px;
+  padding: 4px 6px 4px 14px;
+  gap: 6px;
   border: 1px solid rgba(96, 165, 250, 0.2);
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  width: 100%;
+  transition: all 0.2s ease;
   flex: 1;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.05) inset;
+  min-width: 0;
 }
 
 .header-search:focus-within {
   border-color: #3b82f6;
-  background: rgba(20, 30, 50, 0.8);
-  box-shadow: 
-    0 0 25px rgba(59, 130, 246, 0.4),
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(96, 165, 250, 0.3) inset;
-  transform: scale(1.01);
+  background: rgba(20, 30, 50, 0.9);
 }
 
-/* Иконка поиска */
 .header-search .fa-search {
   color: #5f6b8a;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
-.header-search:focus-within .fa-search {
-  color: #60a5fa;
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.6));
-}
-
-/* Поле ввода */
 .global-search-input {
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   outline: none;
   width: 100%;
   flex: 1;
-  font-weight: 400;
-  padding: 10px 0;
-  letter-spacing: 0.2px;
+  padding: 8px 0;
 }
 
 .global-search-input::placeholder {
   color: #4a5568;
-  font-weight: 400;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-size: 0.85rem;
 }
 
-.header-search:focus-within .global-search-input::placeholder {
-  color: #6b7a9e;
-  opacity: 0.7;
-}
-
-/* Кнопка очистки */
 .clear-search-icon {
   color: #5f6b8a;
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   border-radius: 50%;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .clear-search-icon:hover {
   color: #ef4444;
   background: rgba(239, 68, 68, 0.15);
-  transform: scale(1.1);
 }
 
 /* Кнопка поиска */
 .search-btn {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   border: none;
-  border-radius: 50px;
-  width: 42px;
-  height: 42px;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .search-btn i {
-  font-size: 1rem;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  font-size: 0.9rem;
 }
 
 .search-btn:hover {
   background: linear-gradient(135deg, #4f46e5, #3b82f6);
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
-}
-
-.search-btn:active {
-  transform: scale(0.95);
+  transform: scale(1.02);
 }
 
 /* Кнопка админ-панели */
 .admin-toggle-btn {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 40px;
-  width: 44px;
-  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #94a3b8;
   cursor: pointer;
-  transition: all 0.25s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -191,8 +147,6 @@
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border-color: transparent;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-  transform: scale(1.02);
 }
 
 /* Выпадающий список результатов */
@@ -204,11 +158,9 @@
   background: rgba(15, 20, 35, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
+  border-radius: 20px;
   border: 1px solid rgba(59, 130, 246, 0.25);
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(96, 165, 250, 0.1) inset;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
@@ -218,25 +170,13 @@
 
 .search-results-dropdown.active {
   display: block;
-  animation: dropdownFadeIn 0.25s ease;
-}
-
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .search-result-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 18px;
+  gap: 12px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
@@ -252,8 +192,8 @@
 
 .search-result-item i {
   color: #60a5fa;
-  font-size: 1.1rem;
-  width: 24px;
+  font-size: 1rem;
+  width: 20px;
   text-align: center;
 }
 
@@ -263,49 +203,40 @@
 
 .search-result-title {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #f0f0f0;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .search-result-price {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #22c55e;
   font-weight: 700;
 }
 
 .search-result-category {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: #6b7a9e;
   margin-top: 2px;
 }
 
 .search-no-results {
-  padding: 24px 20px;
+  padding: 20px;
   text-align: center;
   color: #6b7a9e;
-  font-size: 0.9rem;
-}
-
-.search-no-results i {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  opacity: 0.5;
-  display: block;
+  font-size: 0.85rem;
 }
 
 /* Десктопная навигация */
 .nav-links {
   display: none;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: rgba(10, 15, 28, 0.6);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 5px;
-  border-radius: 50px;
+  padding: 4px;
+  border-radius: 40px;
   border: 1px solid rgba(59, 130, 246, 0.2);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   flex-shrink: 0;
 }
 
@@ -314,71 +245,29 @@
   border: none;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 8px 18px;
+  padding: 6px 14px;
   border-radius: 40px;
-  transition: all 0.25s ease;
-  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  position: relative;
 }
 
 .nav-link i {
-  font-size: 1rem;
-  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .nav-link:hover {
   color: white;
   background: rgba(59, 130, 246, 0.15);
-  text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
-}
-
-.nav-link:hover i {
-  transform: translateY(-1px);
-  filter: drop-shadow(0 0 4px #60a5fa);
 }
 
 .nav-link.active {
   color: white;
   background: linear-gradient(105deg, #3b82f6, #4f46e5);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2);
-}
-
-.nav-link.active i {
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
-}
-
-.nav-link:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  right: -3px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 18px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* Анимация пульсации при поиске */
-@keyframes searchPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-  }
-}
-
-.header-search.searching {
-  animation: searchPulse 1.5s ease;
 }
 
 /* Скроллбар для выпадающего списка */
@@ -388,7 +277,6 @@
 
 .search-results-dropdown::-webkit-scrollbar-track {
   background: transparent;
-  margin: 8px 0;
 }
 
 .search-results-dropdown::-webkit-scrollbar-thumb {
@@ -396,121 +284,79 @@
   border-radius: 10px;
 }
 
-.search-results-dropdown::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.6);
-}
-
 /* ========== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ ========== */
 
 @media (max-width: 768px) {
   .header {
-    padding: 8px 12px;
-    flex-wrap: nowrap;        /* ← запрещаем перенос */
-    gap: 8px;
+    padding: 6px 10px;
+    gap: 6px;
   }
-
-  .header-left {
-    flex-shrink: 0;
-  }
-
+  
   .header-logo {
     height: 28px;
   }
-
-  .company-name {
-    display: none;            /* ← скрываем текст "Плейнексис" */
-  }
-
-  .header-center {
-    flex: 1;
-    min-width: 0;             /* ← разрешаем сжатие */
-    margin-top: 0;
-    order: 0;
-    gap: 6px;
-  }
-
+  
   .header-search {
-    padding: 4px 6px 4px 12px;
-    flex: 1;
+    padding: 2px 4px 2px 10px;
   }
-
+  
   .global-search-input {
     font-size: 0.85rem;
-    padding: 8px 0;
+    padding: 6px 0;
   }
-
+  
   .global-search-input::placeholder {
     font-size: 0.8rem;
   }
-
+  
   .search-btn {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
   }
-
+  
   .admin-toggle-btn {
-    width: 36px;
-    height: 36px;
-    margin-left: 4px;
-    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
   }
-
-  /* Выпадающий список поиска – теперь фиксирован по ширине экрана */
+  
   .search-results-dropdown {
     position: fixed;
-    top: 55px;
+    top: 50px;
     left: 10px;
     right: 10px;
     max-height: 60vh;
-    width: auto;
+  }
+  
+  .nav-links {
+    display: none !important;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 380px) {
   .header {
-    padding: 8px 12px;
+    padding: 4px 8px;
   }
   
   .header-logo {
-    height: 26px;
-  }
-  
-  .company-name {
-    font-size: 1.1rem;
-  }
-  
-  .header-center {
-    gap: 8px;
+    height: 24px;
   }
   
   .header-search {
-    padding: 3px 3px 3px 12px;
+    padding: 2px 4px 2px 8px;
   }
   
   .global-search-input {
-    font-size: 0.85rem;
-  }
-  
-  .global-search-input::placeholder {
     font-size: 0.8rem;
   }
   
   .search-btn {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
   }
   
   .admin-toggle-btn {
-    width: 38px;
-    height: 38px;
-  }
-  
-  .search-result-item {
-    padding: 10px 14px;
-  }
-  
-  .search-result-title {
-    font-size: 0.85rem;
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -528,20 +374,4 @@
 /* Скрываем старый поиск на главной */
 .home-search {
   display: none;
-}
-
-/* Анимация появления хедера */
-@keyframes headerFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.header {
-  animation: headerFadeIn 0.4s ease;
 }
