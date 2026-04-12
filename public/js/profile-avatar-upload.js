@@ -375,9 +375,9 @@
     loadSavedImages();
   }
 
-  // ========== ДОБАВЛЕННЫЕ ФУНКЦИИ ==========
+// Добавляем недостающие функции прямо в консоль
 window.openAvatarBgModal = function() {
-    console.log('🎨 openAvatarBgModal вызвана');
+    console.log('🎨 openAvatarBgModal');
     let modal = document.getElementById('profileAvatarBgModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -386,10 +386,8 @@ window.openAvatarBgModal = function() {
         modal.innerHTML = `
             <div class="profile-modal-card" style="max-width: 320px;">
                 <h4>🎨 Выберите аватар</h4>
-                <div class="bg-options" id="avatarBgOptionsList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;"></div>
-                <div class="modal-actions">
-                    <button class="modal-btn" id="closeAvatarBgModalBtn">Закрыть</button>
-                </div>
+                <div id="avatarBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
+                <button class="modal-btn" id="closeAvatarBgModalBtn">Закрыть</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -399,37 +397,35 @@ window.openAvatarBgModal = function() {
             'linear-gradient(135deg, #f093fb, #f5576c)',
             'linear-gradient(135deg, #4facfe, #00f2fe)',
             'linear-gradient(135deg, #43e97b, #38f9d7)',
-            'linear-gradient(135deg, #fa709a, #fee140)',
             'radial-gradient(circle, #1a0f2e, #1e1b4b)'
         ];
         
         const container = modal.querySelector('#avatarBgOptionsList');
         presets.forEach(preset => {
-            const option = document.createElement('div');
-            option.style.cssText = `width: 80px; height: 80px; border-radius: 50%; background: ${preset}; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;`;
-            option.onmouseenter = () => option.style.borderColor = '#3b82f6';
-            option.onmouseleave = () => option.style.borderColor = 'transparent';
-            option.onclick = () => {
-                const avatarCircle = document.getElementById('profileAvatarCircle');
-                if (avatarCircle) {
-                    avatarCircle.style.backgroundImage = preset;
-                    avatarCircle.style.backgroundSize = 'cover';
-                    avatarCircle.classList.add('has-bg');
+            const div = document.createElement('div');
+            div.style.cssText = `width: 70px; height: 70px; border-radius: 50%; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
+            div.onmouseenter = () => div.style.borderColor = '#3b82f6';
+            div.onmouseleave = () => div.style.borderColor = 'transparent';
+            div.onclick = () => {
+                const avatar = document.getElementById('profileAvatarCircle');
+                if (avatar) {
+                    avatar.style.backgroundImage = preset;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.classList.add('has-bg');
                     localStorage.setItem('profileAvatarBg', preset);
                 }
                 modal.classList.remove('active');
             };
-            container.appendChild(option);
+            container.appendChild(div);
         });
         
         modal.querySelector('#closeAvatarBgModalBtn').onclick = () => modal.classList.remove('active');
-        modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     }
     modal.classList.add('active');
 };
 
 window.openHeroBgModal = function() {
-    console.log('🎨 openHeroBgModal вызвана');
+    console.log('🎨 openHeroBgModal');
     let modal = document.getElementById('profileHeroBgModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -438,10 +434,8 @@ window.openHeroBgModal = function() {
         modal.innerHTML = `
             <div class="profile-modal-card" style="max-width: 320px;">
                 <h4>🎨 Выберите фон</h4>
-                <div class="bg-options" id="heroBgOptionsList" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0;"></div>
-                <div class="modal-actions">
-                    <button class="modal-btn" id="closeHeroBgModalBtn">Закрыть</button>
-                </div>
+                <div id="heroBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
+                <button class="modal-btn" id="closeHeroBgModalBtn">Закрыть</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -450,31 +444,30 @@ window.openHeroBgModal = function() {
             'linear-gradient(135deg, #11131f, #0a0c16)',
             'radial-gradient(circle at 30% 20%, #0f0c29, #24243e)',
             'linear-gradient(145deg, #2b0f1c, #5e2a3e)',
-            'linear-gradient(125deg, #001f3f, #0a2f44)',
-            'linear-gradient(115deg, #1e1a3a, #2b2d5c)',
-            'linear-gradient(105deg, #2c1a2e, #803d3d)'
+            'linear-gradient(125deg, #001f3f, #0a2f44)'
         ];
         
         const container = modal.querySelector('#heroBgOptionsList');
         presets.forEach(preset => {
-            const option = document.createElement('div');
-            option.style.cssText = `width: 80px; height: 80px; border-radius: 16px; background: ${preset}; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;`;
-            option.onmouseenter = () => option.style.borderColor = '#3b82f6';
-            option.onmouseleave = () => option.style.borderColor = 'transparent';
-            option.onclick = () => {
-                const heroSection = document.getElementById('profileHeroSection');
-                if (heroSection) {
-                    heroSection.style.background = preset;
+            const div = document.createElement('div');
+            div.style.cssText = `width: 70px; height: 70px; border-radius: 12px; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
+            div.onmouseenter = () => div.style.borderColor = '#3b82f6';
+            div.onmouseleave = () => div.style.borderColor = 'transparent';
+            div.onclick = () => {
+                const hero = document.getElementById('profileHeroSection');
+                if (hero) {
+                    hero.style.background = preset;
                     localStorage.setItem('profileHeroBg', preset);
                 }
                 modal.classList.remove('active');
             };
-            container.appendChild(option);
+            container.appendChild(div);
         });
         
         modal.querySelector('#closeHeroBgModalBtn').onclick = () => modal.classList.remove('active');
-        modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     }
     modal.classList.add('active');
 };
+
+console.log('✅ Функции добавлены, теперь кликайте на баланс!');
 })();
