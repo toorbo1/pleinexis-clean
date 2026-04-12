@@ -424,3 +424,81 @@
     max-width: 340px !important;
   }
 }
+
+/* ========== ПРИНУДИТЕЛЬНАЯ АДАПТИВНАЯ СЕТКА ТОВАРОВ ========== */
+/* Эти правила переопределяют любые другие стили для сетки */
+
+.products-grid {
+  display: grid !important;
+  gap: 16px !important;
+}
+
+/* Телефоны до 600px — 2 колонки */
+@media (max-width: 600px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+/* Планшеты 601px - 768px — 3 колонки */
+@media (min-width: 601px) and (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+/* Ноутбуки 769px - 1024px — 4 колонки */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
+  }
+}
+
+/* Десктоп 1025px - 1280px — 5 колонок */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+/* Большие экраны 1281px+ — 5 колонок */
+@media (min-width: 1281px) {
+  .products-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+/* Для страницы ключевого слова - та же логика */
+#keywordProductsGrid {
+  display: grid !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 600px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 768px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  #keywordProductsGrid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
