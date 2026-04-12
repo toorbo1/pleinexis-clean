@@ -56,6 +56,8 @@ async function loadShopApplications() {
     }
 }
 
+// ========== ЗАЯВКИ НА ВИТРИНУ ==========
+
 async function renderShopApplicationsInAdmin() {
     console.log('🔄 Рендеринг заявок на витрину...');
     
@@ -65,191 +67,141 @@ async function renderShopApplicationsInAdmin() {
         return;
     }
     
-    try {
-        // Пытаемся загрузить с сервера
-        let applications = await loadShopApplications();
-        
-        // Если нет на сервере, проверяем localStorage
-        if (!applications || applications.length === 0) {
-            applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
-        }
-        
-        console.log(`📋 Загружено заявок: ${applications.length}`, applications);
-        
-        if (applications.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="text-align: center; padding: 40px; color: #6b7a9e;">
-                    <i class="fas fa-store" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.4;"></i>
-                    <p>Нет заявок на подключение витрины</p>
-                    <p style="font-size: 0.8rem; margin-top: 8px;">Пользователи пока не отправляли заявки</p>
-                </div>
-            `;
-            return;
-        }
-        
-        let html = '';
-        for (const app of applications) {
-            html += `
-                <div class="shop-application-item" style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,0.1);">
-                    <div class="app-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="admin-user-avatar" style="width: 45px; height: 45px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-store"></i>
-                            </div>
-                            <div>
-                                <span class="app-user" style="font-weight: 600; font-size: 1.1rem;">${escapeHtml(app.userId || app.userName || 'Пользователь')}</span>
-                                <div style="font-size: 0.7rem; color: #6b7a9e;">${escapeHtml(app.shopName || 'Без названия')}</div>
-                            </div>
-                        </div>
-                        <span class="app-status ${app.status}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; ${
-                            app.status === 'pending' ? 'background: rgba(245,158,11,0.2); color: #f59e0b;' :
-                            app.status === 'approved' ? 'background: rgba(34,197,94,0.2); color: #22c55e;' :
-                            'background: rgba(239,68,68,0.2); color: #ef4444;'
-                        }">${getStatusText(app.status)}</span>
-                    </div>
-                    
-                    <div class="app-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; color: #cbd5e1; font-size: 0.85rem;">
-                        <div><strong>🏪 Магазин:</strong> ${escapeHtml(app.shopName || '—')}</div>
-                        <div><strong>📋 Тип:</strong> ${getShopTypeText(app.shopType)}</div>
-                        <div><strong>📞 Телефон:</strong> ${escapeHtml(app.phone || '—')}</div>
-                        <div><strong>✉️ Email:</strong> ${escapeHtml(app.email || '—')}</div>
-                        <div><strong>📝 Описание:</strong> ${escapeHtml((app.description || '—').substring(0, 100))}${(app.description || '').length > 100 ? '...' : ''}</div>
-                        <div><strong>📅 Дата:</strong> ${new Date(app.createdAt).toLocaleString()}</div>
-                    </div>
-                    
-                    ${app.documents && app.documents.length > 0 ? `
-                        <div class="app-documents" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <strong style="font-size: 0.8rem;">📎 Документы (${app.documents.length}):</strong>
-                            <div class="documents-grid" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                                ${app.documents.map((doc, i) => `
-                                    <div class="doc-item" onclick="window.open('${doc.data}', '_blank')" style="width: 80px; text-align: center; cursor: pointer;">
-                                        ${doc.type && doc.type.startsWith('image/') ? 
-                                            `<img src="${doc.data}" alt="${escapeHtml(doc.name)}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(59,130,246,0.2);">` : 
-                                            `<div class="file-icon" style="width: 80px; height: 80px; background: rgba(59,130,246,0.1); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #3b82f6;">
-                                                <i class="fas fa-file-pdf" style="font-size: 2rem;"></i>
-                                                <span style="font-size: 0.6rem;">PDF</span>
-                                            </div>`
-                                        }
-                                        <span style="display: block; font-size: 0.6rem; color: #8f8f9e; margin-top: 4px; word-break: break-all;">${escapeHtml((doc.name || '').substring(0, 12))}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : '<div style="margin-top: 12px; font-size: 0.7rem; color: #6b7a9e;"><i class="fas fa-info-circle"></i> Документы не прикреплены</div>'}
-                    
-                    ${app.status === 'pending' ? `
-                        <div class="app-actions" style="display: flex; gap: 12px; margin-top: 20px;">
-                            <button class="approve-btn" onclick="approveShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); transition: all 0.2s;">
-                                <i class="fas fa-check"></i> Одобрить
-                            </button>
-                            <button class="reject-btn" onclick="rejectShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); transition: all 0.2s;">
-                                <i class="fas fa-times"></i> Отклонить
-                            </button>
-                        </div>
-                    ` : ''}
-                    
-                    ${app.status === 'rejected' && app.rejectReason ? `
-                        <div class="reject-reason" style="margin-top: 16px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 12px; color: #f87171; font-size: 0.85rem;">
-                            <strong>❌ Причина отказа:</strong> ${escapeHtml(app.rejectReason)}
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-        }
-        
-        container.innerHTML = html;
-        console.log('✅ Заявки отрендерены');
-        
-    } catch (error) {
-        console.error('Ошибка рендеринга заявок:', error);
-        container.innerHTML = '<div class="empty-state" style="color: #ef4444;">Ошибка загрузки заявок</div>';
+    // Получаем заявки из localStorage
+    const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
+    console.log(`📋 Загружено заявок: ${applications.length}`);
+    
+    if (applications.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="text-align: center; padding: 40px; color: #6b7a9e;">
+                <i class="fas fa-store" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.4;"></i>
+                <p>Нет заявок на подключение витрины</p>
+                <p style="font-size: 0.8rem; margin-top: 8px;">Пользователи пока не отправляли заявки</p>
+            </div>
+        `;
+        return;
     }
+    
+    let html = '';
+    for (const app of applications) {
+        html += `
+            <div class="shop-application-item" style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,0.1);">
+                <div class="app-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="admin-user-avatar" style="width: 45px; height: 45px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <span class="app-user" style="font-weight: 600; font-size: 1.1rem;">${escapeHtml(app.userId || 'Пользователь')}</span>
+                            <div style="font-size: 0.7rem; color: #6b7a9e;">${escapeHtml(app.shopName || 'Без названия')}</div>
+                        </div>
+                    </div>
+                    <span class="app-status ${app.status}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; ${
+                        app.status === 'pending' ? 'background: rgba(245,158,11,0.2); color: #f59e0b;' :
+                        app.status === 'approved' ? 'background: rgba(34,197,94,0.2); color: #22c55e;' :
+                        'background: rgba(239,68,68,0.2); color: #ef4444;'
+                    }">${getStatusText(app.status)}</span>
+                </div>
+                
+                <div class="app-info" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; color: #cbd5e1; font-size: 0.85rem;">
+                    <div><strong>🏪 Магазин:</strong> ${escapeHtml(app.shopName || '—')}</div>
+                    <div><strong>📋 Тип:</strong> ${getShopTypeText(app.shopType)}</div>
+                    <div><strong>📞 Телефон:</strong> ${escapeHtml(app.phone || '—')}</div>
+                    <div><strong>✉️ Email:</strong> ${escapeHtml(app.email || '—')}</div>
+                    <div><strong>📝 Описание:</strong> ${escapeHtml((app.description || '—').substring(0, 100))}</div>
+                    <div><strong>📅 Дата:</strong> ${new Date(app.createdAt).toLocaleString()}</div>
+                </div>
+                
+                ${app.documents && app.documents.length > 0 ? `
+                    <div class="app-documents" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <strong style="font-size: 0.8rem;">📎 Документы (${app.documents.length}):</strong>
+                        <div class="documents-grid" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
+                            ${app.documents.map((doc, i) => `
+                                <div class="doc-item" onclick="window.open('${doc.data}', '_blank')" style="width: 80px; text-align: center; cursor: pointer;">
+                                    ${doc.type && doc.type.startsWith('image/') ? 
+                                        `<img src="${doc.data}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px;">` : 
+                                        `<div style="width: 80px; height: 80px; background: rgba(59,130,246,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-file-pdf" style="font-size: 2rem; color: #3b82f6;"></i>
+                                        </div>`
+                                    }
+                                    <span style="font-size: 0.6rem; color: #8f8f9e;">${escapeHtml((doc.name || '').substring(0, 10))}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${app.status === 'pending' ? `
+                    <div class="app-actions" style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button class="approve-btn" onclick="approveShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(34,197,94,0.2); color: #22c55e; border: 1px solid rgba(34,197,94,0.3);">
+                            <i class="fas fa-check"></i> Одобрить
+                        </button>
+                        <button class="reject-btn" onclick="rejectShopApplication('${app.id}')" style="padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 500; background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);">
+                            <i class="fas fa-times"></i> Отклонить
+                        </button>
+                    </div>
+                ` : ''}
+                
+                ${app.status === 'rejected' && app.rejectReason ? `
+                    <div class="reject-reason" style="margin-top: 16px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 12px; color: #f87171;">
+                        <strong>❌ Причина отказа:</strong> ${escapeHtml(app.rejectReason)}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
 }
 
 function getStatusText(status) {
-    const texts = {
-        'pending': '⏳ На проверке',
-        'approved': '✅ Одобрено',
-        'rejected': '❌ Отклонено'
-    };
+    const texts = { 'pending': '⏳ На проверке', 'approved': '✅ Одобрено', 'rejected': '❌ Отклонено' };
     return texts[status] || status;
 }
 
 function getShopTypeText(type) {
-    const texts = {
-        'individual': 'Самозанятый / ИП',
-        'company': 'Юридическое лицо (ООО)',
-        'private': 'Частное лицо'
-    };
+    const texts = { 'individual': 'Самозанятый / ИП', 'company': 'Юридическое лицо', 'private': 'Частное лицо' };
     return texts[type] || type;
 }
 
-async function approveShopApplication(appId) {
-    try {
-        const response = await fetch(`/api/shop-applications/${appId}/approve`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
+function approveShopApplication(appId) {
+    if (!confirm('Одобрить эту заявку? Пользователь получит доступ к витрине.')) return;
+    
+    const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
+    const appIndex = applications.findIndex(a => a.id === appId);
+    
+    if (appIndex !== -1) {
+        applications[appIndex].status = 'approved';
+        applications[appIndex].updatedAt = new Date().toISOString();
+        localStorage.setItem('apex_shop_applications', JSON.stringify(applications));
         
-        if (!response.ok) throw new Error('Ошибка одобрения');
-        
-        await renderShopApplicationsInAdmin();
-        showToast('✅ Заявка одобрена! Пользователь теперь продавец.', 'success');
-        
-    } catch (error) {
-        console.error('Ошибка:', error);
-        // Fallback на localStorage
-        const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
-        const appIndex = applications.findIndex(a => a.id === appId);
-        
-        if (appIndex !== -1) {
-            applications[appIndex].status = 'approved';
-            applications[appIndex].updatedAt = new Date().toISOString();
-            localStorage.setItem('apex_shop_applications', JSON.stringify(applications));
-            
-            const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-            if (!sellers.includes(applications[appIndex].userId)) {
-                sellers.push(applications[appIndex].userId);
-                localStorage.setItem('apex_verified_sellers', JSON.stringify(sellers));
-            }
-            
-            await renderShopApplicationsInAdmin();
-            showToast('✅ Заявка одобрена (локально)!', 'success');
+        // Добавляем в список продавцов
+        const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+        if (!sellers.includes(applications[appIndex].userId)) {
+            sellers.push(applications[appIndex].userId);
+            localStorage.setItem('apex_verified_sellers', JSON.stringify(sellers));
         }
+        
+        renderShopApplicationsInAdmin();
+        showToast('✅ Заявка одобрена! Пользователь теперь продавец.', 'success');
     }
 }
 
-async function rejectShopApplication(appId) {
+function rejectShopApplication(appId) {
     const reason = prompt('Укажите причину отказа:');
     if (!reason) return;
     
-    try {
-        const response = await fetch(`/api/shop-applications/${appId}/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ reason })
-        });
+    const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
+    const appIndex = applications.findIndex(a => a.id === appId);
+    
+    if (appIndex !== -1) {
+        applications[appIndex].status = 'rejected';
+        applications[appIndex].rejectReason = reason;
+        applications[appIndex].updatedAt = new Date().toISOString();
+        localStorage.setItem('apex_shop_applications', JSON.stringify(applications));
         
-        if (!response.ok) throw new Error('Ошибка отклонения');
-        
-        await renderShopApplicationsInAdmin();
+        renderShopApplicationsInAdmin();
         showToast('❌ Заявка отклонена', 'warning');
-        
-    } catch (error) {
-        console.error('Ошибка:', error);
-        // Fallback на localStorage
-        const applications = JSON.parse(localStorage.getItem('apex_shop_applications') || '[]');
-        const appIndex = applications.findIndex(a => a.id === appId);
-        
-        if (appIndex !== -1) {
-            applications[appIndex].status = 'rejected';
-            applications[appIndex].rejectReason = reason;
-            applications[appIndex].updatedAt = new Date().toISOString();
-            localStorage.setItem('apex_shop_applications', JSON.stringify(applications));
-            
-            await renderShopApplicationsInAdmin();
-            showToast('❌ Заявка отклонена', 'warning');
-        }
     }
 }
 // ==================== 1. НАЙМ АДМИНОВ ====================
@@ -863,7 +815,7 @@ function renderAdminNavButtons() {
     { id: "adminProductsSection", name: "📦 Товары", icon: "fa-box" },
     { id: "adminGamesSection", name: "🎮 Игры", icon: "fa-gamepad" },
     { id: "adminAppsSection", name: "📱 Приложения", icon: "fa-mobile-alt" },
-    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" } // <-- УЖЕ ДОБАВЛЕНО, ПРОВЕРЬТЕ
+    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" }  // <-- ЭТА СТРОЧКА ДОЛЖНА БЫТЬ
   ];
   
   container.innerHTML = sections.map(section => `
@@ -887,23 +839,19 @@ function showAdminSection(sectionId) {
   
   const target = document.getElementById(sectionId);
   if (target) target.style.display = "block";
-      if (sectionId === 'adminShopSection') {
-        renderShopApplicationsInAdmin();
-    }
-  // 🔥 ДОБАВЛЯЕМ ЭТУ СТРОКУ:
+  
+  // ВАЖНО: при открытии секции витрин - загружаем заявки
   if (sectionId === 'adminShopSection') {
     renderShopApplicationsInAdmin();
   }
-  // 🔥 КОНЕЦ ДОБАВЛЕНИЯ
   
+  // Обновляем активную кнопку
   document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     btn.classList.remove('active');
+    if (btn.getAttribute('onclick')?.includes(sectionId)) {
+      btn.classList.add('active');
+    }
   });
-  
-  const activeBtn = Array.from(document.querySelectorAll('.admin-nav-btn')).find(
-    btn => btn.getAttribute('onclick')?.includes(sectionId)
-  );
-  if (activeBtn) activeBtn.classList.add('active');
 }
 // ==================== 6. БЛОКИ ИГР И ПРИЛОЖЕНИЙ ====================
 // ==================== БЛОКИ ИГР И ПРИЛОЖЕНИЙ (ИСПРАВЛЕННЫЕ) ====================
