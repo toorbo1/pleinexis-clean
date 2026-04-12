@@ -1,0 +1,117 @@
+/* ========== СТИЛИ ДЛЯ АВТОРИЗАЦИИ ========== */
+
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 50px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-radius: 40px;
+    color: #94a3b8;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-tab.active {
+    background: #3b82f6;
+    color: white;
+}
+
+.auth-divider {
+    text-align: center;
+    color: #6b7a9e;
+    font-size: 0.8rem;
+    margin: 20px 0;
+    position: relative;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 30px);
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-divider::before { left: 0; }
+.auth-divider::after { right: 0; }
+
+.social-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.social-btn.google {
+    background: #fff;
+    color: #333;
+}
+
+.social-btn.google:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.social-btn.vk {
+    background: #4a76a8;
+    color: white;
+}
+
+.social-btn.vk:hover {
+    background: #3d5f8a;
+    transform: translateY(-2px);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: #6b7a9e;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+}
+
+.close-modal:hover {
+    color: #ef4444;
+}
