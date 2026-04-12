@@ -427,18 +427,21 @@ function setupBalanceClick() {
             window.showPage('withdrawPage');
         }
         
-        // Инициализируем страницу вывода после того, как она отобразится
+        // Инициализируем страницу вывода ПОСЛЕ того, как она отобразилась
         setTimeout(function() {
             if (typeof window.initWithdrawPage === 'function') {
                 window.initWithdrawPage();
                 console.log('✅ withdrawPage инициализирована');
             } else {
                 console.error('❌ initWithdrawPage не найдена');
+                // Fallback - пробуем найти и вызвать
+                if (typeof initWithdrawPage === 'function') {
+                    initWithdrawPage();
+                }
             }
-        }, 100);
+        }, 150);
     });
 }
-
 
   function setupReviewsClick() {
     const reviewsLink = document.getElementById('profileReviewsLink');

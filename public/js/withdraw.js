@@ -219,17 +219,32 @@
     initWithdrawPage();
   }
 })();
-// Автоматическая инициализация при открытии страницы через MutationObserver
+// В конце файла withdraw.js добавьте:
 (function() {
+    // Функция для принудительной инициализации
+    window.forceInitWithdraw = function() {
+        console.log('🔄 Принудительная инициализация withdrawPage');
+        if (typeof window.initWithdrawPage === 'function') {
+            window.initWithdrawPage();
+        } else if (typeof initWithdrawPage === 'function') {
+            initWithdrawPage();
+        }
+    };
+    
+    // Наблюдатель за появлением страницы
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'class') {
+            if (mutation.attributeName === 'class' || mutation.attributeName === 'style') {
                 const withdrawPage = document.getElementById('withdrawPage');
-                if (withdrawPage && withdrawPage.classList.contains('active')) {
-                    console.log('📄 withdrawPage стала активной, инициализируем...');
-                    if (typeof window.initWithdrawPage === 'function') {
-                        window.initWithdrawPage();
-                    }
+                if (withdrawPage && (withdrawPage.classList.contains('active') || withdrawPage.style.display === 'block')) {
+                    console.log('📄 withdrawPage стала видимой, инициализируем...');
+                    setTimeout(function() {
+                        if (typeof window.initWithdrawPage === 'function') {
+                            window.initWithdrawPage();
+                        } else if (typeof initWithdrawPage === 'function') {
+                            initWithdrawPage();
+                        }
+                    }, 50);
                 }
             }
         });
@@ -239,4 +254,20 @@
     if (withdrawPage) {
         observer.observe(withdrawPage, { attributes: true });
     }
+    
+    // Также проверяем при каждом клике
+    document.addEventListener('click', function() {
+        setTimeout(function() {
+            const withdrawPage = document.getElementById('withdrawPage');
+            if (withdrawPage && (withdrawPage.classList.contains('active') || withdrawPage.style.display === 'block')) {
+                if (typeof window.initWithdrawPage === 'function') {
+                    window.initWithdrawPage();
+                }
+            }
+        }, 100);
+    });
 })();
+
+
+// В конце withdraw.js добавьте:
+window.initWithdrawPage = initWithdrawPage;
