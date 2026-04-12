@@ -1,21 +1,16 @@
-// detail-page.js - ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ ДЛЯ ВАШЕГО CSS
+// detail-page.js - ПОЛНОСТЬЮ ПЕРЕРАБОТАННАЯ ВЕРСИЯ
 
 // Открытие страницы с деталями товара
 window.openProductDetailById = async function(productId) {
     console.log('🔍 Открываем детали товара:', productId);
     
     try {
-        // Загружаем свежие данные с сервера
         const response = await fetch(`/api/products/${productId}?_=${Date.now()}`);
         if (!response.ok) throw new Error('Товар не найден');
         const product = await response.json();
         
-        console.log('✅ Товар загружен:', product);
-        
-        // Заполняем страницу деталей
         renderDetailPage(product);
         
-        // Показываем страницу деталей
         const detailPage = document.getElementById('detailPage');
         if (detailPage) {
             detailPage.classList.add('active');
@@ -37,7 +32,7 @@ window.closeDetail = function() {
     }
 };
 
-// Основная функция рендеринга
+// Основная функция рендеринга - БЕЗ ТАБОВ, ВСЁ В СТОЛБИК
 function renderDetailPage(product) {
     const container = document.getElementById('detailContent');
     if (!container) return;
@@ -55,8 +50,40 @@ function renderDetailPage(product) {
     const contact = product.contact || '';
     const createdAt = product.created_at ? new Date(product.created_at).toLocaleDateString('ru-RU') : 'Недавно';
     
-    // Формируем HTML в соответствии с вашим CSS
+    // Вычисляем процент скидки, если указана в ₽
+    let discountPercent = '';
+    let formattedOriginalPrice = '';
+    let formattedCurrentPrice = price;
+    
+    if (originalPrice) {
+        const origNum = parseFloat(originalPrice.replace(/[^0-9.-]/g, ''));
+        const currNum = parseFloat(price.replace(/[^0-9.-]/g, ''));
+        if (!isNaN(origNum) && !isNaN(currNum) && origNum > 0) {
+            discountPercent = Math.round(((origNum - currNum) / origNum) * 100);
+            formattedOriginalPrice = originalPrice;
+        }
+    } else if (discount && discount.includes('%')) {
+        discountPercent = discount.replace('%', '');
+    } else if (discount && !discount.includes('%')) {
+        // Если скидка в рублях, пересчитываем в проценты
+        const priceNum = parseFloat(price.replace(/[^0-9.-]/g, ''));
+        const discountNum = parseFloat(discount.replace(/[^0-9.-]/g, ''));
+        if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
+            const totalOriginal = priceNum + discountNum;
+            discountPercent = Math.round((discountNum / totalOriginal) * 100);
+            formattedOriginalPrice = totalOriginal + ' ₽';
+        }
+    }
+    
     container.innerHTML = `
+        <!-- Кнопка назад -->
+        <div style="margin-bottom: 20px;">
+            <button onclick="window.closeDetail()" style="background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-arrow-left"></i> Назад
+            </button>
+        </div>
+        
+        <!-- Блок: Фото + информация -->
         <div class="detail-top-row">
             <!-- Фото товара слева -->
             <div class="detail-image-col">
@@ -64,7 +91,6 @@ function renderDetailPage(product) {
                      src="${escapeHtml(imageUrl)}" 
                      alt="${title}"
                      onerror="this.src='https://picsum.photos/id/42/500/375'">
-                ${discount ? `<div style="margin-top: 12px; background: rgba(239,68,68,0.2); color:#ef4444; padding: 6px 12px; border-radius: 20px; text-align: center; font-size:0.8rem;">🔥 Скидка ${escapeHtml(discount)}</div>` : ''}
             </div>
             
             <!-- Информация справа -->
@@ -76,16 +102,16 @@ function renderDetailPage(product) {
                 <h1 class="product-detail-name">${title}</h1>
                 
                 <div class="product-detail-price">
-                    ${originalPrice ? `<span style="text-decoration: line-through; font-size:1rem; color:#8f8f9e; margin-right:12px;">${escapeHtml(originalPrice)}</span>` : ''}
-                    ${price}
+                    ${formattedOriginalPrice ? `<span style="text-decoration: line-through; font-size:1rem; color:#8f8f9e; margin-right:12px;">${formattedOriginalPrice}</span>` : ''}
+                    ${formattedCurrentPrice}
+                    ${discountPercent ? `<span class="discount-badge" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; margin-left: 12px;">-${discountPercent}%</span>` : ''}
                 </div>
                 
-                <!-- Кнопки вертикально на мобилке, горизонтально на ПК -->
+                <!-- Кнопки -->
                 <div class="detail-buttons-row">
                     <button class="buy-button-inline" onclick="buyProduct('${id}')">
                         <i class="fas fa-shopping-cart"></i> Купить
                     </button>
-                    
                 </div>
                 
                 <!-- Информация о продавце -->
@@ -99,10 +125,10 @@ function renderDetailPage(product) {
                         <span class="reviews-count">${sales} отзывов</span>
                     </div>
                 </div>
-                
-
+            </div>
+        </div>
         
-        <!-- Блок с контактом продавца (KPP) -->
+        <!-- KPP блок (контакт продавца) -->
         ${contact ? `
         <div class="kpp-block">
             <div style="font-size:0.7rem; color:#8f8f9e; margin-bottom:8px;">📞 Контакт продавца</div>
@@ -110,45 +136,35 @@ function renderDetailPage(product) {
         </div>
         ` : ''}
         
-        <!-- Блок описания товара -->
+        <!-- ОПИСАНИЕ ТОВАРА (всегда первое) -->
         <div class="seller-description-block">
             <div style="font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
                 <i class="fas fa-align-left"></i> Описание товара
             </div>
-            <div class="seller-contact-text">${formatDescription(description)}</div>
+            <div class="seller-contact-text" style="white-space: pre-wrap; word-wrap: break-word;">${formatDescription(description)}</div>
         </div>
         
-        <!-- Табы -->
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab('desc')">📝 Описание</button>
-            <button class="tab-btn" onclick="switchTab('reviews')">⭐ Отзывы (${sales})</button>
-            <button class="tab-btn" onclick="switchTab('guarantee')">🛡️ Гарантия</button>
-        </div>
-        
-        <!-- Панель: Описание -->
-        <div id="tabDesc" class="tab-pane active">
-            <div class="seller-contact-text">${formatDescription(description)}</div>
-        </div>
-        
-        <!-- Панель: Отзывы -->
-        <div id="tabReviews" class="tab-pane">
-            <div class="reviews-list">
-                ${generateReviews(sales)}
+        <!-- ГАРАНТИИ (второй блок) -->
+        <div class="guarantee-block">
+            <div class="guarantee-title">
+                <i class="fas fa-shield-alt"></i> Гарантии продавца
+            </div>
+            <div class="guarantee-items">
+                <div class="guarantee-item"><i class="fas fa-check-circle"></i> Моментальная выдача товара</div>
+                <div class="guarantee-item"><i class="fas fa-check-circle"></i> Гарантия возврата средств</div>
+                <div class="guarantee-item"><i class="fas fa-check-circle"></i> Техническая поддержка 24/7</div>
+                <div class="guarantee-item"><i class="fas fa-check-circle"></i> Только официальные ключи</div>
             </div>
         </div>
         
-        <!-- Панель: Гарантия -->
-        <div id="tabGuarantee" class="tab-pane">
-            <div class="guarantee-block">
-                <div class="guarantee-title">
-                    <i class="fas fa-shield-alt"></i> Гарантии продавца
-                </div>
-                <div class="guarantee-items">
-                    <div class="guarantee-item"><i class="fas fa-check-circle"></i> Моментальная выдача товара</div>
-                    <div class="guarantee-item"><i class="fas fa-check-circle"></i> Гарантия возврата средств</div>
-                    <div class="guarantee-item"><i class="fas fa-check-circle"></i> Техническая поддержка 24/7</div>
-                    <div class="guarantee-item"><i class="fas fa-check-circle"></i> Только официальные ключи</div>
-                </div>
+        <!-- ОТЗЫВЫ (третий блок) -->
+        <div class="reviews-section">
+            <div class="reviews-section-header">
+                <h3><i class="fas fa-star" style="color: #fbbf24;"></i> Отзывы покупателей</h3>
+                <span class="reviews-count-badge">${sales} отзывов</span>
+            </div>
+            <div class="reviews-list">
+                ${generateReviews(sales)}
             </div>
         </div>
         
@@ -164,8 +180,8 @@ function renderDetailPage(product) {
 
 // Генерация отзывов
 function generateReviews(salesCount) {
-    if (salesCount === 0) {
-        return '<div class="review-item" style="text-align:center; color:#8f8f9e;">Нет отзывов. Будьте первым!</div>';
+    if (salesCount === 0 || salesCount < 1) {
+        return '<div class="review-item" style="text-align:center; color:#8f8f9e; padding: 30px;">✨ Нет отзывов. Будьте первым, кто оставит отзыв!</div>';
     }
     
     const reviews = [];
@@ -188,30 +204,7 @@ function generateReviews(salesCount) {
     return reviews.join('');
 }
 
-// Переключение табов
-window.switchTab = function(tabName) {
-    // Скрываем все панели
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-        pane.classList.remove('active');
-    });
-    
-    // Убираем активный класс со всех кнопок
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Показываем выбранную панель
-    const activePane = document.getElementById(`tab${tabName === 'desc' ? 'Desc' : tabName === 'reviews' ? 'Reviews' : 'Guarantee'}`);
-    if (activePane) activePane.classList.add('active');
-    
-    // Активируем нажатую кнопку
-    const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
-        btn.textContent.includes(tabName === 'desc' ? 'Описание' : tabName === 'reviews' ? 'Отзывы' : 'Гарантия')
-    );
-    if (clickedBtn) clickedBtn.classList.add('active');
-};
-
-// Форматирование описания
+// Форматирование описания (сохраняем переносы строк)
 function formatDescription(text) {
     if (!text) return 'Нет описания';
     // Заменяем переносы строк на <br>
@@ -242,9 +235,7 @@ window.buyProduct = async function(productId) {
         
         alert(`✅ Заказ оформлен!\n\n📦 Товар: ${product.title}\n💰 Сумма: ${product.price}\n👤 Продавец: ${product.seller}\n\n📝 Продавец свяжется с вами в ближайшее время.\n\n💬 Вы можете написать продавцу в чат.`);
         
-        // Отправляем уведомление продавцу
         sendPurchaseNotification(product.seller, product.title, currentUser);
-        
         closeDetail();
         
     } catch (error) {
@@ -350,14 +341,12 @@ function escapeHtml(str) {
 document.addEventListener('DOMContentLoaded', function() {
     const detailPage = document.getElementById('detailPage');
     if (detailPage) {
-        // Закрытие по клику на фон
         detailPage.addEventListener('click', function(e) {
             if (e.target === detailPage) {
                 closeDetail();
             }
         });
         
-        // Закрытие по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && detailPage.classList.contains('active')) {
                 closeDetail();
@@ -366,4 +355,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('✅ detail-page.js загружен');
+console.log('✅ detail-page.js загружен (обновленная версия)');

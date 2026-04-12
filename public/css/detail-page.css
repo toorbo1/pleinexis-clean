@@ -515,3 +515,124 @@
   content: "";
   margin: 4px 0;
 }
+
+
+/* ========== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ ДЕТАЛЬНОЙ СТРАНИЦЫ ========== */
+
+/* Блок отзывов */
+.reviews-section {
+    margin: 24px 0;
+}
+
+.reviews-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reviews-section-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reviews-count-badge {
+    background: rgba(59, 130, 246, 0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: #60a5fa;
+}
+
+/* Автоматическое расширение блока описания */
+.seller-description-block {
+    background: var(--bg-elevated);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.seller-contact-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* Блок гарантий */
+.guarantee-block {
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.guarantee-title {
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.guarantee-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guarantee-item {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.guarantee-item i {
+    color: #22c55e;
+    width: 20px;
+}
+
+/* KPP блок */
+.kpp-block {
+    background: var(--bg-elevated);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--accent-primary);
+}
+
+.kpp-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    letter-spacing: 1px;
+    font-family: monospace;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 550px) {
+    .seller-contact-text {
+        font-size: 0.85rem;
+    }
+    
+    .guarantee-item {
+        font-size: 0.75rem;
+    }
+    
+    .reviews-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
