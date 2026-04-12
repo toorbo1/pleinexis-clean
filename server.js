@@ -543,7 +543,120 @@ app.post('/api/admins', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+// ========== ЗАЯВКИ НА ВИТРИНУ ==========
 
+// GET все заявки
+app.get('/api/shop-applications', async (req, res) => {
+    try {
+        const { rows } = await pool.query(`
+            SELECT * FROM shop_applications 
+            ORDER BY created_at DESC
+        `);
+        res.json(rows);
+    } catch (error) {
+        // Если таблицы нет, создаём
+        await ensureShopTables();
+        const { rows } = await pool.query('SELECT * FROM shop_applications ORDER BY created_at DESC');
+        res.json(rows);
+    }
+});
+
+// POST новая заявка
+app.post('/api/shop-applications', async (req, res) => {
+    try {
+        const { id, userId, shopName, shopType, phone, email, description, documents, status } = req.body;
+        await pool.query(`
+            INSERT INTO shop_applications (id, user_id, shop_name, shop_type, phone, email, description, documents, status, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+        `, [id, userId, shopName, shopType, phone, email, description, JSON.stringify(documents), status || 'pending']);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST одобрить заявку
+app.post('/api/shop-applications/:id/approve', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        
+        const { rows } = await client.query('SELECT * FROM shop_applications WHERE id = $1', [req.params.id]);
+        if (rows.length === 0) throw new Error('Заявка не найдена');
+        
+        const app = rows[0];
+        
+        // Обновляем статус заявки
+        await client.query(
+            'UPDATE shop_applications SET status = $1, updated_at = NOW() WHERE id = $2',
+            ['approved', req.params.id]
+        );
+        
+        // Добавляем пользователя в таблицу продавцов
+        await client.query(`
+            INSERT INTO sellers (user_id, shop_name, approved_at)
+            VALUES ($1, $2, NOW())
+            ON CONFLICT (user_id) DO UPDATE SET approved_at = NOW()
+        `, [app.user_id, app.shop_name]);
+        
+        await client.query('COMMIT');
+        res.json({ success: true });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(500).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+// POST отклонить заявку
+app.post('/api/shop-applications/:id/reject', async (req, res) => {
+    try {
+        const { reason } = req.body;
+        await pool.query(
+            'UPDATE shop_applications SET status = $1, reject_reason = $2, updated_at = NOW() WHERE id = $3',
+            ['rejected', reason, req.params.id]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Функция создания таблиц для витрины
+async function ensureShopTables() {
+    const client = await pool.connect();
+    try {
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS shop_applications (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                shop_name TEXT NOT NULL,
+                shop_type TEXT,
+                phone TEXT,
+                email TEXT,
+                description TEXT,
+                documents JSONB,
+                status TEXT DEFAULT 'pending',
+                reject_reason TEXT,
+                created_at TIMESTAMP DEFAULT NOW(),
+                updated_at TIMESTAMP DEFAULT NOW()
+            );
+            
+            CREATE TABLE IF NOT EXISTS sellers (
+                user_id TEXT PRIMARY KEY,
+                shop_name TEXT,
+                approved_at TIMESTAMP DEFAULT NOW()
+            );
+            
+            CREATE INDEX IF NOT EXISTS idx_shop_applications_status ON shop_applications(status);
+            CREATE INDEX IF NOT EXISTS idx_shop_applications_user_id ON shop_applications(user_id);
+        `);
+        console.log('✅ Таблицы для витрины созданы');
+    } finally {
+        client.release();
+    }
+}
 app.delete('/api/admins/:id', async (req, res) => {
     try {
         await pool.query('DELETE FROM admins WHERE id = $1 AND is_owner = false', [req.params.id]);
