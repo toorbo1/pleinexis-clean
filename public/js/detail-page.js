@@ -83,11 +83,9 @@ function renderDetailPage(product) {
                 <!-- Кнопки вертикально на мобилке, горизонтально на ПК -->
                 <div class="detail-buttons-row">
                     <button class="buy-button-inline" onclick="buyProduct('${id}')">
-                        <i class="fas fa-shopping-cart"></i> Купить сейчас
+                        <i class="fas fa-shopping-cart"></i> Купить
                     </button>
-                    <button class="buy-button-inline" onclick="contactSeller('${escapeHtml(seller)}')" style="background: rgba(59,130,246,0.2); backdrop-filter: blur(10px);">
-                        <i class="fas fa-comment"></i> Связаться с продавцом
-                    </button>
+                    
                 </div>
                 
                 <!-- Информация о продавце -->
@@ -102,23 +100,7 @@ function renderDetailPage(product) {
                     </div>
                 </div>
                 
-                <!-- Статистика -->
-                <div class="stats-row">
-                    <div class="stat-cell">
-                        <div class="stat-number">${sales}</div>
-                        <div class="stat-label">продаж</div>
-                    </div>
-                    <div class="stat-cell">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">гарантия</div>
-                    </div>
-                    <div class="stat-cell">
-                        <div class="stat-number">мгновенно</div>
-                        <div class="stat-label">доставка</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
         
         <!-- Блок с контактом продавца (KPP) -->
         ${contact ? `
