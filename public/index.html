@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="css/tasks-create.css">
   <link rel="stylesheet" href="css/withdraw.css">
   <link rel="stylesheet" href="css/reviews.css">
-</head>
-<style>
+
+  <style>
   /* дополнительные стили именно для страницы (демо) */
     .demo-content {
       text-align: center;
@@ -210,7 +210,90 @@
 @media (min-width: 769px) {
     .carousel-slide { width: 380px; }
 }
+
+
+  /* ГЛАВНАЯ СЕТКА */
+  .products-grid,
+  #productsGrid {
+    display: grid !important;
+  }
+  
+  @media (max-width: 600px) {
+    .products-grid,
+    #productsGrid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+    }
+  }
+  
+  @media (min-width: 601px) and (max-width: 768px) {
+    .products-grid,
+    #productsGrid {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 12px !important;
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .products-grid,
+    #productsGrid {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 14px !important;
+    }
+  }
+  
+  @media (min-width: 1025px) and (max-width: 1280px) {
+    .products-grid,
+    #productsGrid {
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 16px !important;
+    }
+  }
+  
+  @media (min-width: 1281px) {
+    .products-grid,
+    #productsGrid {
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 16px !important;
+    }
+  }
+  
+  /* СТРАНИЦА КЛЮЧЕВОГО СЛОВА */
+  #keywordProductsGrid {
+    display: grid !important;
+  }
+  
+  @media (max-width: 600px) {
+    #keywordProductsGrid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+    }
+  }
+  
+  @media (min-width: 601px) and (max-width: 768px) {
+    #keywordProductsGrid {
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 12px !important;
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    #keywordProductsGrid {
+      grid-template-columns: repeat(4, 1fr) !important;
+      gap: 14px !important;
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    #keywordProductsGrid {
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 16px !important;
+    }
+  }
+
 </style>
+</head>
+
 <body>
 
 <!-- ==================== ХЕДЕР ==================== -->
