@@ -9,7 +9,7 @@ window.openProductDetailById = async function(productId) {
         if (!response.ok) throw new Error('Товар не найден');
         const product = await response.json();
         
-        renderDetailPage(product);
+        await renderDetailPage(product);
         
         const detailPage = document.getElementById('detailPage');
         if (detailPage) {
@@ -32,15 +32,36 @@ window.closeDetail = function() {
     }
 };
 
-// Основная функция рендеринга - БЕЗ ТАБОВ, ВСЁ В СТОЛБИК
-function renderDetailPage(product) {
+// Загрузка похожих товаров
+async function loadSimilarProducts(keyword, currentProductId) {
+    try {
+        const response = await fetch('/api/products?_=' + Date.now());
+        const products = await response.json();
+        
+        const similar = products.filter(p => 
+            p.keyword === keyword && 
+            p.id !== currentProductId
+        ).slice(0, 4);
+        
+        return similar;
+    } catch (error) {
+        console.error('Ошибка загрузки похожих товаров:', error);
+        return [];
+    }
+}
+
+// Основная функция рендеринга
+async function renderDetailPage(product) {
     const container = document.getElementById('detailContent');
     if (!container) return;
+    
+    // Загружаем похожие товары
+    const similarProducts = await loadSimilarProducts(product.keyword, product.id);
     
     // Безопасное экранирование
     const id = product.id;
     const title = escapeHtml(product.title || 'Без названия');
-    const price = escapeHtml(product.price || '0 ₽');
+    const price = product.price || '0 ₽';
     const seller = escapeHtml(product.seller || 'Продавец');
     const description = product.description || 'Нет описания';
     const imageUrl = product.image_url || 'https://picsum.photos/id/42/500/375';
@@ -48,33 +69,55 @@ function renderDetailPage(product) {
     const originalPrice = product.original_price;
     const sales = product.sales || 0;
     const contact = product.contact || '';
-    const createdAt = product.created_at ? new Date(product.created_at).toLocaleDateString('ru-RU') : 'Недавно';
+    const rating = product.rating || 5.0;
     
-    // Вычисляем процент скидки, если указана в ₽
+    // Обработка скидки
     let discountPercent = '';
     let formattedOriginalPrice = '';
     let formattedCurrentPrice = price;
+    const priceNum = parseFloat(String(price).replace(/[^0-9.-]/g, ''));
     
     if (originalPrice) {
-        const origNum = parseFloat(originalPrice.replace(/[^0-9.-]/g, ''));
-        const currNum = parseFloat(price.replace(/[^0-9.-]/g, ''));
-        if (!isNaN(origNum) && !isNaN(currNum) && origNum > 0) {
-            discountPercent = Math.round(((origNum - currNum) / origNum) * 100);
+        const origNum = parseFloat(String(originalPrice).replace(/[^0-9.-]/g, ''));
+        if (!isNaN(origNum) && !isNaN(priceNum) && origNum > 0) {
+            discountPercent = Math.round(((origNum - priceNum) / origNum) * 100);
             formattedOriginalPrice = originalPrice;
+            formattedCurrentPrice = price;
         }
-    } else if (discount && discount.includes('%')) {
-        discountPercent = discount.replace('%', '');
-    } else if (discount && !discount.includes('%')) {
-        // Если скидка в рублях, пересчитываем в проценты
-        const priceNum = parseFloat(price.replace(/[^0-9.-]/g, ''));
-        const discountNum = parseFloat(discount.replace(/[^0-9.-]/g, ''));
-        if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
-            const totalOriginal = priceNum + discountNum;
-            discountPercent = Math.round((discountNum / totalOriginal) * 100);
-            formattedOriginalPrice = totalOriginal + ' ₽';
+    } else if (discount) {
+        if (String(discount).includes('%')) {
+            discountPercent = String(discount).replace('%', '');
+            if (!isNaN(priceNum) && discountPercent > 0) {
+                const oldPrice = priceNum / (1 - discountPercent / 100);
+                formattedOriginalPrice = Math.round(oldPrice) + ' ₽';
+                formattedCurrentPrice = price;
+            }
+        } else {
+            const discountNum = parseFloat(String(discount).replace(/[^0-9.-]/g, ''));
+            if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
+                const oldPrice = priceNum + discountNum;
+                formattedOriginalPrice = Math.round(oldPrice) + ' ₽';
+                formattedCurrentPrice = price;
+                discountPercent = Math.round((discountNum / oldPrice) * 100);
+            }
         }
     }
     
+    // Генерация звёзд
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    let starsHtml = '';
+    for (let i = 0; i < 5; i++) {
+        if (i < fullStars) {
+            starsHtml += '<i class="fas fa-star"></i>';
+        } else if (i === fullStars && hasHalfStar) {
+            starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        } else {
+            starsHtml += '<i class="far fa-star"></i>';
+        }
+    }
+    
+    // Рендеринг
     container.innerHTML = `
         <!-- Кнопка назад -->
         <div style="margin-bottom: 20px;">
@@ -85,7 +128,6 @@ function renderDetailPage(product) {
         
         <!-- Блок: Фото + информация -->
         <div class="detail-top-row">
-            <!-- Фото товара слева -->
             <div class="detail-image-col">
                 <img class="product-detail-image" 
                      src="${escapeHtml(imageUrl)}" 
@@ -93,7 +135,6 @@ function renderDetailPage(product) {
                      onerror="this.src='https://picsum.photos/id/42/500/375'">
             </div>
             
-            <!-- Информация справа -->
             <div class="detail-info-col">
                 <div class="active-badge">
                     <span class="active-dot"></span> Активный товар
@@ -102,33 +143,33 @@ function renderDetailPage(product) {
                 <h1 class="product-detail-name">${title}</h1>
                 
                 <div class="product-detail-price">
-                    ${formattedOriginalPrice ? `<span style="text-decoration: line-through; font-size:1rem; color:#8f8f9e; margin-right:12px;">${formattedOriginalPrice}</span>` : ''}
-                    ${formattedCurrentPrice}
-                    ${discountPercent ? `<span class="discount-badge" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; margin-left: 12px;">-${discountPercent}%</span>` : ''}
+                    ${formattedOriginalPrice ? `<span class="old-price">${formattedOriginalPrice}</span>` : ''}
+                    <span class="current-price">${formattedCurrentPrice}</span>
+                    ${discountPercent ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
                 </div>
                 
-                <!-- Кнопки -->
                 <div class="detail-buttons-row">
                     <button class="buy-button-inline" onclick="buyProduct('${id}')">
                         <i class="fas fa-shopping-cart"></i> Купить
                     </button>
+                    <button class="chat-button-inline" onclick="contactSeller('${escapeHtml(seller)}')">
+                        <i class="fas fa-comment"></i> Связаться
+                    </button>
                 </div>
                 
-                <!-- Информация о продавце -->
                 <div class="seller-info-block">
                     <div class="seller-name-large">
                         <i class="fas fa-store"></i> ${seller}
                     </div>
                     <div class="seller-rating">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-value">5.0</span>
+                        <div class="stars">${starsHtml}</div>
+                        <span class="rating-value">${rating.toFixed(1)}</span>
                         <span class="reviews-count">${sales} отзывов</span>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- KPP блок (контакт продавца) -->
         ${contact ? `
         <div class="kpp-block">
             <div style="font-size:0.7rem; color:#8f8f9e; margin-bottom:8px;">📞 Контакт продавца</div>
@@ -136,15 +177,15 @@ function renderDetailPage(product) {
         </div>
         ` : ''}
         
-        <!-- ОПИСАНИЕ ТОВАРА (всегда первое) -->
+        <!-- ОПИСАНИЕ ТОВАРА (без фона) -->
         <div class="seller-description-block">
-            <div style="font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+            <div class="block-title">
                 <i class="fas fa-align-left"></i> Описание товара
             </div>
             <div class="seller-contact-text" style="white-space: pre-wrap; word-wrap: break-word;">${formatDescription(description)}</div>
         </div>
         
-        <!-- ГАРАНТИИ (второй блок) -->
+        <!-- ГАРАНТИИ -->
         <div class="guarantee-block">
             <div class="guarantee-title">
                 <i class="fas fa-shield-alt"></i> Гарантии продавца
@@ -157,7 +198,7 @@ function renderDetailPage(product) {
             </div>
         </div>
         
-        <!-- ОТЗЫВЫ (третий блок) -->
+        <!-- ОТЗЫВЫ -->
         <div class="reviews-section">
             <div class="reviews-section-header">
                 <h3><i class="fas fa-star" style="color: #fbbf24;"></i> Отзывы покупателей</h3>
@@ -167,6 +208,29 @@ function renderDetailPage(product) {
                 ${generateReviews(sales)}
             </div>
         </div>
+        
+        <!-- ПОХОЖИЕ ТОВАРЫ -->
+        ${similarProducts.length > 0 ? `
+        <div class="similar-products-section">
+            <div class="similar-products-header">
+                <h3><i class="fas fa-tag"></i> Похожие товары</h3>
+                <span class="reviews-count-badge">с ключевым словом "${escapeHtml(product.keyword || '')}"</span>
+            </div>
+            <div class="similar-products-grid">
+                ${similarProducts.map(p => `
+                    <div class="similar-product-card" onclick="window.openProductDetailById('${p.id}')">
+                        <img class="similar-product-image" src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
+                             alt="${escapeHtml(p.title)}"
+                             onerror="this.src='https://picsum.photos/id/42/400/300'">
+                        <div class="similar-product-body">
+                            <div class="similar-product-title">${escapeHtml(p.title.substring(0, 40))}</div>
+                            <div class="similar-product-price">${escapeHtml(p.price)}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
         
         <!-- Футер ссылки -->
         <div class="footer-links">
@@ -185,7 +249,7 @@ function generateReviews(salesCount) {
     }
     
     const reviews = [];
-    const reviewCount = Math.min(salesCount, 5);
+    const reviewCount = Math.min(salesCount, 3);
     
     for (let i = 0; i < reviewCount; i++) {
         const date = new Date(Date.now() - (i * 86400000 * 3)).toLocaleDateString('ru-RU');
@@ -204,10 +268,9 @@ function generateReviews(salesCount) {
     return reviews.join('');
 }
 
-// Форматирование описания (сохраняем переносы строк)
+// Форматирование описания
 function formatDescription(text) {
     if (!text) return 'Нет описания';
-    // Заменяем переносы строк на <br>
     return text.replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
 }
 
@@ -221,7 +284,6 @@ window.buyProduct = async function(productId) {
             if (name && name.trim()) {
                 localStorage.setItem('apex_user', name.trim());
                 currentUser = name.trim();
-                window.currentUser = currentUser;
                 buyProduct(productId);
             }
         }
