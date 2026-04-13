@@ -135,11 +135,9 @@
   font-size: 1.6rem;
 }
 
-.method-icon.qiwi { color: #ff8c00; }
 .method-icon.card { color: #22c55e; }
+.method-icon.qiwi { color: #ff8c00; }
 .method-icon.crypto { color: #f7931a; }
-.method-icon.phone { color: #3b82f6; }
-.method-icon.telegram { color: #26a5e4; }
 
 .method-info {
   flex: 1;
@@ -148,6 +146,7 @@
 .method-name {
   font-weight: 700;
   margin-bottom: 4px;
+  color: white;
 }
 
 .method-desc {
@@ -162,7 +161,6 @@
   border-radius: 20px;
   color: #3b82f6;
 }
-
 .input-group {
   margin-bottom: 16px;
 }
