@@ -78,17 +78,22 @@
     .glass-panel { padding: 32px 48px; }
 }
 
-/* ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ ===== */
+/* ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ - БОЛЬШЕ И ПЛАВНЕЕ ===== */
 .my-carousel {
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
     position: relative;
     scrollbar-width: thin;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
     scroll-behavior: smooth;
+    padding: 10px 0;
+}
+
+.my-carousel:active {
+    cursor: grabbing;
 }
 
 .my-carousel::-webkit-scrollbar {
@@ -107,21 +112,23 @@
 
 .my-carousel-track {
     display: flex;
-    gap: 16px;
+    gap: 24px;
     width: fit-content;
-    padding: 20px 0;
+    padding: 10px 0;
+    transition: transform 0.1s ease-out;
 }
 
+/* Слайды - БОЛЬШЕ РАЗМЕР */
 .my-carousel-slide {
     flex: 0 0 auto;
-    width: 340px;
+    width: 420px;
     aspect-ratio: 16 / 9;
-    border-radius: 24px;
+    border-radius: 28px;
     overflow: hidden;
-    transition: all 0.4s ease;
-    opacity: 0.6;
-    transform: scale(0.9);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0.5;
+    transform: scale(0.92);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(59, 130, 246, 0.2);
     cursor: pointer;
 }
@@ -129,7 +136,7 @@
 .my-carousel-slide.active {
     opacity: 1 !important;
     transform: scale(1) !important;
-    box-shadow: 0 0 50px rgba(59, 130, 246, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.7), 0 15px 35px rgba(0, 0, 0, 0.5) !important;
     border: 1px solid rgba(96, 165, 250, 0.6) !important;
     z-index: 10;
 }
@@ -139,7 +146,53 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    pointer-events: none;
+    transition: transform 0.5s ease;
+}
+
+.my-carousel-slide:hover img {
+    transform: scale(1.05);
+}
+
+/* Плавная анимация при скролле */
+.my-carousel {
+    scroll-snap-type: x mandatory;
+}
+
+.my-carousel-slide {
+    scroll-snap-align: center;
+}
+
+/* Адаптация для разных экранов */
+@media (max-width: 768px) {
+    .my-carousel-slide {
+        width: 320px;
+        border-radius: 22px;
+    }
+    .my-carousel-track {
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .my-carousel-slide {
+        width: 280px;
+        border-radius: 18px;
+    }
+    .my-carousel-track {
+        gap: 12px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .my-carousel-slide {
+        width: 500px;
+    }
+}
+
+@media (min-width: 1800px) {
+    .my-carousel-slide {
+        width: 580px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -2923,19 +2976,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-// ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ =====
+// ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ - ПЛАВНАЯ ПРОКРУТКА =====
 (function() {
     const carousel = document.querySelector('.my-carousel');
     const track = document.querySelector('.my-carousel-track');
     
     if (!carousel || !track) return;
     
-    // Копируем слайды для бесконечности
-    const slides = Array.from(document.querySelectorAll('.my-carousel-slide'));
-    const slidesPerView = Math.ceil(carousel.clientWidth / 320);
+    let autoScrollInterval;
+    let isDragging = false;
+    let startX;
+    let scrollLeft;
+    let autoScrollSpeed = 1.2;
     
-    // Добавляем копии слайдов в начало и конец
-    for (let i = 0; i < slidesPerView + 2; i++) {
+    // Создаем копии слайдов для бесконечности
+    const slides = Array.from(document.querySelectorAll('.my-carousel-slide'));
+    const slidesToClone = 5;
+    
+    // Добавляем копии в конец
+    for (let i = 0; i < slidesToClone; i++) {
         slides.forEach(slide => {
             const clone = slide.cloneNode(true);
             track.appendChild(clone);
@@ -2943,78 +3002,140 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Добавляем копии в начало
-    for (let i = 0; i < slidesPerView + 2; i++) {
+    for (let i = 0; i < slidesToClone; i++) {
         slides.slice().reverse().forEach(slide => {
             const clone = slide.cloneNode(true);
             track.insertBefore(clone, track.firstChild);
         });
     }
     
-    let scrollPosition = track.scrollWidth / 2;
+    // Устанавливаем начальную позицию в середину
+    let scrollPosition = track.scrollWidth / 2 - carousel.clientWidth / 2;
     carousel.scrollLeft = scrollPosition;
     
-    let autoScrollInterval;
-    let isDragging = false;
-    
+    // Функция плавной автопрокрутки
     function startAutoScroll() {
         if (autoScrollInterval) clearInterval(autoScrollInterval);
         autoScrollInterval = setInterval(() => {
             if (!isDragging && carousel) {
-                scrollPosition += 1.5;
+                scrollPosition += autoScrollSpeed;
                 carousel.scrollLeft = scrollPosition;
                 
-                // Сброс позиции для бесконечности
-                if (scrollPosition >= track.scrollWidth - carousel.clientWidth - 500) {
-                    scrollPosition = 500;
+                // Бесконечный цикл - сброс позиции
+                if (scrollPosition >= track.scrollWidth - carousel.clientWidth - 300) {
+                    scrollPosition = 300;
                     carousel.scrollLeft = scrollPosition;
                 }
                 if (scrollPosition <= 100) {
-                    scrollPosition = track.scrollWidth - carousel.clientWidth - 500;
+                    scrollPosition = track.scrollWidth - carousel.clientWidth - 300;
                     carousel.scrollLeft = scrollPosition;
                 }
             }
-        }, 20);
+        }, 30);
     }
     
     function stopAutoScroll() {
         if (autoScrollInterval) clearInterval(autoScrollInterval);
     }
     
-    // Ручная прокрутка
-    carousel.addEventListener('mousedown', () => { isDragging = true; stopAutoScroll(); });
-    carousel.addEventListener('mouseup', () => { isDragging = false; startAutoScroll(); });
-    carousel.addEventListener('mouseleave', () => { isDragging = false; startAutoScroll(); });
-    carousel.addEventListener('touchstart', () => { isDragging = true; stopAutoScroll(); });
-    carousel.addEventListener('touchend', () => { isDragging = false; startAutoScroll(); });
+    // Мышь для ручной прокрутки
+    carousel.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        stopAutoScroll();
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+        carousel.style.cursor = 'grabbing';
+    });
     
-    startAutoScroll();
+    carousel.addEventListener('mouseleave', () => {
+        isDragging = false;
+        carousel.style.cursor = 'grab';
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('mouseup', () => {
+        isDragging = false;
+        carousel.style.cursor = 'grab';
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        scrollPosition = scrollLeft - walk;
+        carousel.scrollLeft = scrollPosition;
+    });
+    
+    // Touch для мобильных
+    carousel.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        stopAutoScroll();
+        startX = e.touches[0].pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+    });
+    
+    carousel.addEventListener('touchend', () => {
+        isDragging = false;
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const x = e.touches[0].pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        scrollPosition = scrollLeft - walk;
+        carousel.scrollLeft = scrollPosition;
+    });
     
     // Подсветка центрального слайда
-    function highlightCenter() {
+    function highlightCenterSlide() {
+        if (!carousel) return;
+        const allSlides = document.querySelectorAll('.my-carousel-slide');
         const carouselRect = carousel.getBoundingClientRect();
         const centerX = carouselRect.left + carouselRect.width / 2;
-        const allSlides = document.querySelectorAll('.my-carousel-slide');
         
-        let closest = null;
-        let minDist = Infinity;
+        let closestSlide = null;
+        let minDistance = Infinity;
         
         allSlides.forEach(slide => {
             const rect = slide.getBoundingClientRect();
-            const dist = Math.abs(centerX - (rect.left + rect.width / 2));
-            if (dist < minDist) {
-                minDist = dist;
-                closest = slide;
+            const slideCenterX = rect.left + rect.width / 2;
+            const distance = Math.abs(centerX - slideCenterX);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestSlide = slide;
             }
         });
         
-        if (closest) {
+        if (closestSlide) {
             allSlides.forEach(s => s.classList.remove('active'));
-            closest.classList.add('active');
+            closestSlide.classList.add('active');
         }
     }
     
-    carousel.addEventListener('scroll', highlightCenter);
-    setTimeout(highlightCenter, 100);
+    // Обработчики для подсветки
+    carousel.addEventListener('scroll', () => {
+        requestAnimationFrame(highlightCenterSlide);
+    });
+    
+    // Запуск
+    startAutoScroll();
+    setTimeout(highlightCenterSlide, 200);
+    
+    // Обновление при ресайзе
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            scrollPosition = track.scrollWidth / 2 - carousel.clientWidth / 2;
+            carousel.scrollLeft = scrollPosition;
+            highlightCenterSlide();
+        }, 200);
+    });
+    
+    console.log('✅ Бесконечная карусель с плавной прокруткой запущена');
 })();
 </script>
 
