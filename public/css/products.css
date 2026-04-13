@@ -2,7 +2,7 @@
 
 /* Базовые стили карточки - БЕЗ ФОНА, ПРОЗРАЧНЫЙ */
 .product-card {
-  background: transparent;
+  background: none;
   border-radius: 24px;
   overflow: hidden;
   cursor: pointer;
@@ -371,7 +371,7 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #0055ff;
+  color: #6b7280;
   background: transparent;
   border-radius: 24px;
   grid-column: 1 / -1;
@@ -405,5 +405,38 @@
 
 #productCountStat {
   font-size: 0.7rem;
-  color: #00ff44;
+  color: #6b7280;
+}
+
+/* ФИКС: звёзды всегда на одной линии */
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-title {
+  flex: 1;
+}
+
+.rating {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+.stars {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rating-value {
+  flex-shrink: 0;
+}
+
+.reviews-count {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
