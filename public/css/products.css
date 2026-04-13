@@ -371,7 +371,7 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #6b7280;
+  color: #0055ff;
   background: transparent;
   border-radius: 24px;
   grid-column: 1 / -1;
@@ -405,5 +405,5 @@
 
 #productCountStat {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: #00ff44;
 }
