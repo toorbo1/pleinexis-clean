@@ -1,32 +1,29 @@
-/* ========== ПРЕМИУМ КАРТОЧКИ ТОВАРОВ - МИНИМАЛИСТИЧНЫЙ ДИЗАЙН ========== */
+/* ========== ПРЕМИУМ КАРТОЧКИ ТОВАРОВ ========== */
 
-/* Базовые стили карточки - БЕЗ ФОНА, ПРОЗРАЧНЫЙ */
+/* Базовые стили карточки - фон совпадает с основным фоном страницы */
 .product-card {
-  background: none;
+  background: transparent;
   border-radius: 24px;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   border: none;
   display: flex;
   flex-direction: column;
-  transition: none;
   height: 100%;
   max-width: 100%;
-  position: relative;
+  transition: none;
 }
 
-/* НЕТ НИКАКОГО ВЗАИМОДЕЙСТВИЯ ПРИ НАВЕДЕНИИ */
 .product-card:hover {
   transform: none;
   box-shadow: none;
-  border-color: transparent;
 }
 
 .product-card:active {
   transform: none;
 }
 
-/* ========== БЛОК ИЗОБРАЖЕНИЯ - ПОЛНОСТЬЮ ЗАКРУГЛЕННЫЕ УГЛЫ ========== */
+/* ========== БЛОК ИЗОБРАЖЕНИЯ ========== */
 .card-image {
   position: relative;
   width: 100%;
@@ -48,7 +45,7 @@
   border-radius: 24px;
 }
 
-/* НЕТ ЭФФЕКТА ПРИ НАВЕДЕНИИ */
+/* НЕТ УВЕЛИЧЕНИЯ ПРИ НАВЕДЕНИИ */
 .product-card:hover .card-image img {
   transform: none;
 }
@@ -57,7 +54,7 @@
   display: none !important;
 }
 
-/* Бейдж скидки - ТОЛЬКО ПРОЦЕНТ */
+/* Бейдж скидки */
 .discount-badge {
   position: absolute;
   top: 12px;
@@ -69,44 +66,47 @@
   padding: 6px 14px;
   border-radius: 40px;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-  letter-spacing: 0.5px;
-  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-/* Тело карточки - МИНИМАЛЬНЫЕ ОТСТУПЫ */
+/* Тело карточки - ОТСТУПЫ ПО КРАЯМ */
 .card-body {
-  padding: 8px 4px 6px;
+  padding: 10px 8px 8px 8px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  background: transparent;
 }
 
-/* ЦЕНА - МИНИМАЛЬНЫЙ ОТСТУП */
+/* ЦЕНА - СНАЧАЛА НОВАЯ (КРАСНАЯ), ПОТОМ ЗАЧЕРКНУТАЯ (СЕРАЯ) */
 .price-wrapper {
   display: flex;
   align-items: baseline;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 0;
+  margin-bottom: 2px;
 }
 
-.old-price {
-  color: #6b7280;
-  font-size: 0.75rem;
-  text-decoration: line-through;
-  font-weight: 500;
-}
-
+/* Новая цена (со скидкой) - КРАСНАЯ, ПЕРВАЯ */
 .current-price {
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   letter-spacing: -0.3px;
   background: linear-gradient(135deg, #ef4444, #f97316);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  order: 1;
+}
+
+/* Зачеркнутая старая цена - ВТОРАЯ */
+.old-price {
+  color: #6b7280;
+  font-size: 0.75rem;
+  text-decoration: line-through;
+  font-weight: 500;
+  order: 2;
 }
 
 /* Цена без скидки - зелёная */
@@ -115,15 +115,16 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  order: 1;
 }
 
-/* Название товара - КОМПАКТНО */
+/* Название товара */
 .product-title {
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   margin: 0;
   color: #e0e0e0;
-  line-height: 1.3;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -131,25 +132,29 @@
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
+  flex: 1;
 }
 
-/* РЕЙТИНГ - МИНИМАЛЬНЫЕ ОТСТУПЫ */
+/* РЕЙТИНГ - ЗВЁЗДЫ ВСЕГДА ВНИЗУ НА ОДНОЙ ЛИНИИ */
 .rating {
+  margin-top: 6px;
   display: flex;
   align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-  margin-top: 2px;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 5px;
   padding-top: 0;
   border-top: none;
 }
 
 .stars {
+  white-space: nowrap;
+  flex-shrink: 0;
   color: #fbbf24;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   letter-spacing: 2px;
   display: flex;
-  gap: 1px;
+  gap: 2px;
 }
 
 .stars i,
@@ -167,27 +172,30 @@
 }
 
 .rating-value {
-  font-size: 0.65rem;
+  flex-shrink: 0;
+  font-size: 0.68rem;
   font-weight: 600;
   color: #fbbf24;
 }
 
 .reviews-count {
-  font-size: 0.55rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 0.6rem;
   color: #6b7280;
 }
 
 /* ========== СЕТКА ТОВАРОВ ========== */
 .products-grid {
   display: grid !important;
-  gap: 16px !important;
+  gap: 20px !important;
 }
 
 /* Телефоны (до 600px) — 2 колонки */
 @media (max-width: 600px) {
   .products-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    gap: 14px !important;
   }
   
   .card-image {
@@ -199,7 +207,7 @@
   }
   
   .card-body {
-    padding: 6px 2px 4px;
+    padding: 8px 6px 6px 6px;
   }
   
   .current-price {
@@ -223,7 +231,6 @@
   
   .stars {
     font-size: 0.55rem;
-    letter-spacing: 1px;
   }
   
   .rating-value {
@@ -231,14 +238,14 @@
   }
   
   .reviews-count {
-    font-size: 0.5rem;
+    font-size: 0.55rem;
   }
 }
 
 /* Маленькие телефоны (до 400px) */
 @media (max-width: 400px) {
   .products-grid {
-    gap: 10px !important;
+    gap: 12px !important;
   }
   
   .card-image {
@@ -250,7 +257,7 @@
   }
   
   .card-body {
-    padding: 5px 2px 3px;
+    padding: 6px 4px 5px 4px;
   }
   
   .current-price {
@@ -260,22 +267,13 @@
   .product-title {
     font-size: 0.7rem;
   }
-  
-  .discount-badge {
-    font-size: 0.6rem;
-    padding: 3px 8px;
-  }
-  
-  .stars {
-    font-size: 0.5rem;
-  }
 }
 
 /* Планшеты (601px - 768px) — 2 колонки */
 @media (min-width: 601px) and (max-width: 768px) {
   .products-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 16px !important;
+    gap: 18px !important;
   }
   
   .card-image {
@@ -288,10 +286,6 @@
   
   .current-price {
     font-size: 1.05rem;
-  }
-  
-  .product-title {
-    font-size: 0.78rem;
   }
 }
 
@@ -309,17 +303,13 @@
   .card-image img {
     border-radius: 22px;
   }
-  
-  .current-price {
-    font-size: 1.1rem;
-  }
 }
 
-/* Десктоп (1025px+) — 4 колонки (максимум) */
+/* Десктоп (1025px+) — 4 колонки */
 @media (min-width: 1025px) {
   .products-grid {
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 20px !important;
+    gap: 24px !important;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -336,20 +326,20 @@
 /* ========== СТРАНИЦА КЛЮЧЕВОГО СЛОВА ========== */
 #keywordProductsGrid {
   display: grid !important;
-  gap: 16px !important;
+  gap: 20px !important;
 }
 
 @media (max-width: 600px) {
   #keywordProductsGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+    gap: 14px !important;
   }
 }
 
 @media (min-width: 601px) and (max-width: 768px) {
   #keywordProductsGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 16px !important;
+    gap: 18px !important;
   }
 }
 
@@ -363,7 +353,7 @@
 @media (min-width: 1025px) {
   #keywordProductsGrid {
     grid-template-columns: repeat(4, 1fr) !important;
-    gap: 20px !important;
+    gap: 24px !important;
   }
 }
 
@@ -392,7 +382,8 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin: 20px 0 12px;
+  margin: 20px 0 16px;
+  padding: 0 4px;
 }
 
 .products-header h4 {
@@ -406,37 +397,4 @@
 #productCountStat {
   font-size: 0.7rem;
   color: #6b7280;
-}
-
-/* ФИКС: звёзды всегда на одной линии */
-.card-body {
-  display: flex;
-  flex-direction: column;
-}
-
-.product-title {
-  flex: 1;
-}
-
-.rating {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  gap: 4px;
-}
-
-.stars {
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.rating-value {
-  flex-shrink: 0;
-}
-
-.reviews-count {
-  flex-shrink: 0;
-  white-space: nowrap;
 }
