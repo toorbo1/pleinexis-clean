@@ -1141,7 +1141,12 @@
           <option value="">Общий отзыв о маркетплейсе</option>
         </select>
       </div>
-      
+          <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
+      <button class="btn-primary" onclick="submitReview()">Опубликовать</button>
+    </div>
+  </div>
+</div>
       <!-- Оценка -->
       <div class="rating-select">
         <label>Ваша оценка <span class="required">*</span></label>
@@ -1378,6 +1383,7 @@
   </div>
 </div>
 
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">

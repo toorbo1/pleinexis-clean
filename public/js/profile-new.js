@@ -422,27 +422,81 @@ function setupBalanceClick() {
         
         console.log('💰 Клик по балансу, открываем страницу вывода');
         
-        // Показываем страницу вывода
-        if (typeof window.showPage === 'function') {
-            window.showPage('withdrawPage');
+        // 1. Прячем все другие страницы
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        
+        // 2. Находим или создаем страницу вывода
+        let withdrawPage = document.getElementById('withdrawPage');
+        
+        // Если страницы нет (на всякий случай), создаем примитивный контейнер
+        if (!withdrawPage) {
+            console.warn('Страница withdrawPage не найдена, создаем заново');
+            withdrawPage = document.createElement('div');
+            withdrawPage.id = 'withdrawPage';
+            withdrawPage.className = 'page';
+            document.body.appendChild(withdrawPage);
+            
+            // Заполняем базовой структурой (копия из HTML)
+            withdrawPage.innerHTML = `
+                <div class="withdraw-header">
+                    <button class="back-btn" onclick="showPage('profile')"><i class="fas fa-arrow-left"></i></button>
+                    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+                </div>
+                <div class="withdraw-container">
+                    <div class="balance-card">
+                        <div class="balance-label">Доступно для вывода</div>
+                        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+                    </div>
+                    <div class="section-card">
+                        <div class="section-title"><i class="fas fa-wallet"></i> Способ вывода</div>
+                        <div class="methods-grid" id="methodsList"></div>
+                    </div>
+                    <div class="section-card">
+                        <div class="section-title"><i class="fas fa-address-card"></i> Реквизиты</div>
+                        <div class="input-group">
+                            <label class="input-label" id="detailsLabel">Номер карты</label>
+                            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <div class="section-title"><i class="fas fa-coins"></i> Сумма вывода</div>
+                        <div class="amount-row">
+                            <input type="number" id="withdrawAmount" placeholder="Введите сумму">
+                            <div class="amount-presets">
+                                <button class="preset-btn" data-amount="500">500₽</button>
+                                <button class="preset-btn" data-amount="1000">1000₽</button>
+                                <button class="preset-btn" data-amount="5000">5000₽</button>
+                            </div>
+                        </div>
+                        <div class="commission-info"><span>Комиссия:</span> <span id="commissionValue">0 ₽</span></div>
+                        <div class="commission-info"><span>Итого:</span> <span id="totalWithdraw">0 ₽</span></div>
+                    </div>
+                    <button class="withdraw-btn" id="submitWithdrawBtn">Запросить вывод</button>
+                </div>
+            `;
         }
         
-        // Инициализируем страницу вывода ПОСЛЕ того, как она отобразилась
-        setTimeout(function() {
+        // 3. Показываем страницу
+        withdrawPage.style.display = 'block';
+        withdrawPage.classList.add('active');
+        
+        // 4. Инициализируем функционал страницы вывода
+        setTimeout(() => {
             if (typeof window.initWithdrawPage === 'function') {
                 window.initWithdrawPage();
-                console.log('✅ withdrawPage инициализирована');
             } else {
-                console.error('❌ initWithdrawPage не найдена');
-                // Fallback - пробуем найти и вызвать
-                if (typeof initWithdrawPage === 'function') {
-                    initWithdrawPage();
-                }
+                console.error('❌ Функция initWithdrawPage не найдена');
+                // Fallback: попробуем загрузить данные вручную
+                const profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+                const balanceEl = document.getElementById('withdrawBalanceAmount');
+                if (balanceEl) balanceEl.innerText = (profile.balance || 0).toFixed(2) + ' ₽';
             }
-        }, 150);
+        }, 50);
     });
 }
-
   function setupReviewsClick() {
     const reviewsLink = document.getElementById('profileReviewsLink');
     if (!reviewsLink) return;

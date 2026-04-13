@@ -211,8 +211,7 @@
     }
   });
   
-  // Экспортируем
-  window.initWithdrawPage = initWithdrawPage;
+
   
   // Автозапуск если страница активна
   if (document.getElementById('withdrawPage') && document.getElementById('withdrawPage').classList.contains('active')) {
