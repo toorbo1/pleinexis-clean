@@ -63,8 +63,8 @@
       avatarSpan.textContent = (userProfile.username || currentUser).charAt(0).toUpperCase();
     }
     
-    // Аватар из Google/VK
-    const savedAvatar = localStorage.getItem('apex_user_picture');
+    // Аватар из Google/VK или сохранённый
+    const savedAvatar = localStorage.getItem('apex_user_picture') || localStorage.getItem('profileAvatarImage');
     if (savedAvatar && avatarCircle) {
       avatarCircle.style.backgroundImage = `url(${savedAvatar})`;
       avatarCircle.style.backgroundSize = 'cover';
@@ -159,7 +159,6 @@
     if (!container) return;
     
     try {
-      // Пробуем загрузить с сервера
       let products = [];
       try {
         const response = await fetch('/api/products?_=' + Date.now());
@@ -167,7 +166,6 @@
           products = await response.json();
         }
       } catch (e) {
-        // Сервер не доступен - используем localStorage
         products = JSON.parse(localStorage.getItem('apex_products') || '[]');
       }
       
@@ -234,7 +232,6 @@
   
   // ===== НАСТРОЙКА ОБРАБОТЧИКОВ =====
   function setupEventListeners() {
-    // Клик по карточке баланса
     const balanceCard = document.querySelector('.balance-card');
     if (balanceCard) {
       balanceCard.addEventListener('click', function() {
@@ -246,7 +243,6 @@
       });
     }
     
-    // Клик по отзывам
     const reviewsLink = document.getElementById('profileReviewsLink');
     if (reviewsLink) {
       reviewsLink.addEventListener('click', function(e) {
@@ -259,19 +255,16 @@
       });
     }
     
-    // Табы
     const tabBtns = document.querySelectorAll('.profile-tab-btn');
     tabBtns.forEach(btn => {
       btn.addEventListener('click', function() {
         tabBtns.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
-        
         const tab = this.getAttribute('data-tab');
         filterProducts(tab);
       });
     });
     
-    // Кнопка выхода
     const logoutBtn = document.getElementById('profileLogoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', logout);
@@ -304,7 +297,6 @@
       adminBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
     }
     
-    // Удаляем старые обработчики
     const newBtn = adminBtn.cloneNode(true);
     adminBtn.parentNode.replaceChild(newBtn, adminBtn);
     
@@ -373,8 +365,6 @@
       if (sellers.includes(currentUser)) {
         if (typeof window.showPage === 'function') {
           window.showPage('products-manage');
-        } else {
-          showToast('🏪 Управление товарами', 'info');
         }
       } else if (application && application.status === 'pending') {
         if (typeof window.showPage === 'function') {
@@ -384,8 +374,6 @@
               window.initShopConnectPage();
             }
           }, 50);
-        } else {
-          showToast('⏳ Заявка на рассмотрении', 'info');
         }
       } else {
         if (typeof window.showPage === 'function') {
@@ -395,14 +383,11 @@
               window.initShopConnectPage();
             }
           }, 50);
-        } else {
-          showToast('🏪 Подключение витрины', 'info');
         }
       }
     });
   }
   
-  // ===== ВЫХОД ИЗ АККАУНТА =====
   function logout() {
     if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
       localStorage.removeItem('apex_user');
@@ -413,7 +398,6 @@
     }
   }
   
-  // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
   function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -431,15 +415,13 @@
       toast.className = 'toast-notification';
       document.body.appendChild(toast);
     }
-    
     const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle');
     toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
     toast.classList.add('show', type);
-    
     setTimeout(() => toast.classList.remove('show'), 3000);
   }
   
-  // ===== РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ТОВАРОВ =====
+  // ===== ГЛОБАЛЬНЫЕ ФУНКЦИИ =====
   window.editProduct = function(productId) {
     console.log('✏️ Редактирование товара:', productId);
     if (typeof window.showPage === 'function') {
@@ -450,23 +432,18 @@
   
   window.deleteProduct = async function(productId) {
     if (!confirm('Удалить этот товар?')) return;
-    
     try {
       const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Ошибка удаления');
-      
       showToast('✅ Товар удалён', 'success');
       loadUserProducts();
-      
       if (typeof window.loadProducts === 'function') {
         await window.loadProducts();
       }
     } catch (e) {
-      // Fallback на localStorage
       let products = JSON.parse(localStorage.getItem('apex_products') || '[]');
       products = products.filter(p => p.id !== productId);
       localStorage.setItem('apex_products', JSON.stringify(products));
-      
       showToast('✅ Товар удалён (локально)', 'success');
       loadUserProducts();
     }
@@ -485,12 +462,11 @@
     }
   };
   
-  // ===== ЭКСПОРТ =====
   window.initProfilePage = initProfilePage;
   window.updateProfileInfo = updateProfileInfo;
   window.loadUserProducts = loadUserProducts;
   
-  // Автозапуск при открытии страницы профиля
+  // Автозапуск
   const observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.target.id === 'profile' && mutation.target.classList.contains('active')) {
@@ -504,7 +480,6 @@
     observer.observe(profilePage, { attributes: true, attributeFilter: ['class'] });
   }
   
-  // Также запускаем при загрузке если профиль активен
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       if (profilePage && profilePage.classList.contains('active')) {
