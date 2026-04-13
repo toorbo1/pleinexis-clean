@@ -103,7 +103,7 @@
   border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
-/* БЕЙДЖ СКИДКИ НА ФОТО (в левом верхнем углу) */
+/* БЕЙДЖ СКИДКИ НА ФОТО (без огня и без мигания) */
 .detail-discount-badge {
   position: absolute;
   top: 16px;
@@ -115,15 +115,17 @@
   padding: 8px 20px;
   border-radius: 40px;
   z-index: 10;
-  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
   backdrop-filter: blur(4px);
   letter-spacing: 1px;
-  animation: badgePulse 2s infinite;
+  /* Убираем анимацию */
+  animation: none;
 }
 
+/* Удаляем старую анимацию badgePulse, если она есть */
 @keyframes badgePulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.95; }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 /* Информация справа */
