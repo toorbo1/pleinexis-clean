@@ -1174,71 +1174,6 @@
   </defs>
 </svg>
 
-<!-- ==================== СТРАНИЦА ОТЗЫВОВ ==================== -->
-<div class="page" id="reviewsPage">
-  <div class="reviews-page-container">
-    <!-- Хедер -->
-    <div class="reviews-header">
-      <button class="back-btn" onclick="showPage('home')">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h1><i class="fas fa-star"></i> Отзывы</h1>
-    </div>
-    
-    <!-- Статистика -->
-    <div class="reviews-stats-card">
-      <div class="reviews-overall">
-        <div class="reviews-rating-large" id="avgRatingDisplay">4.8</div>
-        <div class="reviews-stars-large" id="avgStarsDisplay">★★★★★</div>
-        <div class="reviews-total" id="totalReviewsDisplay">на основе 0 отзывов</div>
-      </div>
-      <div class="reviews-bars" id="ratingBarsContainer">
-        <!-- Бары будут заполняться через JS -->
-      </div>
-    </div>
-    
-    <!-- Кнопка написать отзыв -->
-    <button class="write-review-btn" onclick="openWriteReviewModal()">
-      <i class="fas fa-pen"></i> Написать отзыв
-    </button>
-    
-    <!-- Фильтры -->
-    <div class="reviews-filters">
-      <button class="filter-btn active" data-filter="all">Все</button>
-      <button class="filter-btn" data-filter="5">5 ★</button>
-      <button class="filter-btn" data-filter="4">4 ★</button>
-      <button class="filter-btn" data-filter="3">3 ★</button>
-      <button class="filter-btn" data-filter="2">2 ★</button>
-      <button class="filter-btn" data-filter="1">1 ★</button>
-      <button class="filter-btn" data-filter="with-photo"><i class="fas fa-camera"></i> С фото</button>
-    </div>
-    
-    <!-- Сортировка -->
-    <div class="reviews-sort">
-      <select id="reviewsSortSelect" class="sort-select">
-        <option value="newest">Сначала новые</option>
-        <option value="oldest">Сначала старые</option>
-        <option value="highest">Высокий рейтинг</option>
-        <option value="lowest">Низкий рейтинг</option>
-        <option value="popular">Популярные</option>
-      </select>
-    </div>
-    
-    <!-- Список отзывов -->
-    <div class="reviews-list-container" id="reviewsList">
-      <div class="loading-reviews">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Загрузка отзывов...</p>
-      </div>
-    </div>
-    
-    <!-- Кнопка "Показать ещё" -->
-    <button class="load-more-btn" id="loadMoreReviewsBtn" style="display: none;">
-      <i class="fas fa-chevron-down"></i> Показать ещё
-    </button>
-  </div>
-</div>
-
 <!-- ==================== МОДАЛКА НАПИСАНИЯ ОТЗЫВА ==================== -->
 <div class="modal-glass" id="writeReviewModal">
   <div class="modal-content review-modal">
@@ -1257,12 +1192,7 @@
           <option value="">Общий отзыв о маркетплейсе</option>
         </select>
       </div>
-          <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
-      <button class="btn-primary" onclick="submitReview()">Опубликовать</button>
-    </div>
-  </div>
-</div>
+      
       <!-- Оценка -->
       <div class="rating-select">
         <label>Ваша оценка <span class="required">*</span></label>
@@ -1311,16 +1241,14 @@
           <textarea id="reviewCons" class="input-modern" rows="2" placeholder="Что можно улучшить?"></textarea>
         </div>
       </div>
-    </div>
+    </div> <!-- закрытие modal-body -->
     
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
-      <button class="btn-primary" onclick="submitReview()">
-        <i class="fas fa-paper-plane"></i> Опубликовать
-      </button>
+      <button class="btn-primary" onclick="submitReview()">Опубликовать</button>
     </div>
-  </div>
-</div>
+  </div> <!-- закрытие modal-content -->
+</div> <!-- закрытие modal-glass -->
 
 <!-- ==================== МОДАЛКА ПРОСМОТРА ФОТО ==================== -->
 <div class="modal-glass" id="photoViewerModal">
