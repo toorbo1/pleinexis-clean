@@ -1418,3 +1418,33 @@
     text-overflow: ellipsis;
   }
 }
+
+/* ===== ДОПОЛНИТЕЛЬНАЯ ОПТИМИЗАЦИЯ ДЛЯ ЭКРАНОВ ≤ 360px ===== */
+@media (max-width: 360px) {
+  .balance-amount {
+    font-size: 1.2rem !important;
+    word-break: break-word;
+  }
+  .profile-username {
+    font-size: 1.1rem !important;
+    word-break: break-word;
+  }
+  .avatar-wrapper {
+    width: 70px !important;
+    height: 70px !important;
+  }
+  .btn-gradient, .btn-glass, .btn-logout {
+    padding: 8px 12px !important;
+    font-size: 0.7rem !important;
+  }
+  .stat-value {
+    font-size: 1.2rem !important;
+  }
+  .stat-label {
+    font-size: 0.55rem !important;
+  }
+  .profile-tab-btn {
+    padding: 6px 8px !important;
+    font-size: 0.65rem !important;
+  }
+}
