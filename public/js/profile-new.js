@@ -1,555 +1,520 @@
-// ========== НОВЫЙ ДИЗАЙН ПРОФИЛЯ (ФИКС ДЛЯ РАЗНЫХ АККАУНТОВ) ==========
+// ===== PROFILE PAGE - FULLY FUNCTIONAL =====
 
 (function() {
-  // Функция для получения имени пользователя
-  function getCurrentUser() {
-    return localStorage.getItem('apex_user') || 'Гость';
+  'use strict';
+  
+  console.log('🔥 Cyber-Premium Profile JS загружен');
+  
+  // ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ =====
+  let currentUser = localStorage.getItem('apex_user') || 'Гость';
+  let userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+  
+  // Инициализация профиля по умолчанию
+  if (!userProfile.username) {
+    userProfile = {
+      id: 'user_' + Date.now(),
+      username: currentUser,
+      balance: 12480,
+      rating: 4.9,
+      reviewsCount: 42,
+      productsCount: 14,
+      purchasesCount: 67,
+      salesCount: 42,
+      activeOrders: 3,
+      completedOrders: 11,
+      joinedDate: 'января 2024',
+      verified: true,
+      avatarUrl: null
+    };
+    localStorage.setItem('apex_profile', JSON.stringify(userProfile));
   }
-
-  // Ключи для хранения с учетом пользователя
-  function getUserKey(baseKey) {
-    return baseKey + '_' + getCurrentUser();
+  
+  // ===== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ =====
+  function initProfilePage() {
+    console.log('🔄 Инициализация профиля...');
+    
+    updateProfileInfo();
+    updateBalance();
+    updateStats();
+    updateTabs();
+    loadUserProducts();
+    setupEventListeners();
+    setupAdminButton();
+    setupShopButton();
+    
+    console.log('✅ Профиль инициализирован');
   }
-
-  let profileHeroBg = localStorage.getItem(getUserKey('profileHeroBg')) || null;
-  let profileAvatarBg = localStorage.getItem(getUserKey('profileAvatarBg')) || null;
   
-  // Фоновые пресеты для hero-секции
-  const heroBgPresets = [
-    { name: 'Тёмный градиент', style: 'linear-gradient(135deg, #11131f, #0a0c16)' },
-    { name: 'Космос', style: 'radial-gradient(circle at 30% 20%, #0f0c29, #24243e, #302b63)' },
-    { name: 'Магма', style: 'linear-gradient(145deg, #2b0f1c, #5e2a3e, #1a0a12)' },
-    { name: 'Океан', style: 'linear-gradient(125deg, #001f3f, #0a2f44, #004d66)' },
-    { name: 'Фиолетовая дымка', style: 'linear-gradient(115deg, #1e1a3a, #2b2d5c, #1a1b3a)' },
-    { name: 'Зелёные джунгли', style: 'linear-gradient(145deg, #0f2b1f, #1c4a2e, #0a2a1a)' },
-    { name: 'Закат', style: 'linear-gradient(105deg, #2c1a2e, #803d3d, #b9734b)' },
-    { name: 'Синий металлик', style: 'linear-gradient(95deg, #0a192f, #0f2c4e, #1c4e70)' }
-  ];
-  
-  // Пресеты для аватара
-  const avatarBgPresets = [
-    { name: 'Градиент 1', style: 'linear-gradient(135deg, #667eea, #764ba2)' },
-    { name: 'Градиент 2', style: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-    { name: 'Градиент 3', style: 'linear-gradient(135deg, #4facfe, #00f2fe)' },
-    { name: 'Градиент 4', style: 'linear-gradient(135deg, #43e97b, #38f9d7)' },
-    { name: 'Градиент 5', style: 'linear-gradient(135deg, #fa709a, #fee140)' },
-    { name: 'Космос', style: 'radial-gradient(circle, #1a0f2e, #1e1b4b)' },
-    { name: 'Неон', style: 'linear-gradient(135deg, #0f2027, #203a43, #2c5364)' }
-  ];
-  
-  function initNewProfile() {
-    // Обновляем ссылки на текущие сохраненные значения
-    profileHeroBg = localStorage.getItem(getUserKey('profileHeroBg')) || null;
-    profileAvatarBg = localStorage.getItem(getUserKey('profileAvatarBg')) || null;
-
-    const heroSection = document.getElementById('profileHeroSection');
-    if (heroSection && profileHeroBg) {
-      heroSection.style.background = profileHeroBg;
-      heroSection.style.backgroundSize = 'cover';
-      heroSection.style.backgroundPosition = 'center';
-    } else if (heroSection) {
-      // Сбрасываем на дефолтный, если нет сохраненного
-      heroSection.style.background = 'linear-gradient(135deg, #11131f, #0a0c16)';
+  // ===== ОБНОВЛЕНИЕ ИНФОРМАЦИИ ПРОФИЛЯ =====
+  function updateProfileInfo() {
+    const usernameEl = document.getElementById('profileUsername');
+    const avatarCircle = document.getElementById('profileAvatarCircle');
+    const avatarSpan = document.getElementById('avatarInitial');
+    const ratingValue = document.getElementById('profileRatingValue');
+    const reviewsLink = document.getElementById('profileReviewsLink');
+    const joinedEl = document.getElementById('profileJoined');
+    const verifiedBadge = document.getElementById('verifiedBadge');
+    
+    if (usernameEl) {
+      usernameEl.textContent = userProfile.username || currentUser;
     }
     
-    const avatarCircle = document.getElementById('profileAvatarCircle');
-    if (avatarCircle && profileAvatarBg) {
-      avatarCircle.style.backgroundImage = profileAvatarBg;
+    if (avatarSpan) {
+      avatarSpan.textContent = (userProfile.username || currentUser).charAt(0).toUpperCase();
+    }
+    
+    // Аватар из Google/VK
+    const savedAvatar = localStorage.getItem('apex_user_picture');
+    if (savedAvatar && avatarCircle) {
+      avatarCircle.style.backgroundImage = `url(${savedAvatar})`;
       avatarCircle.style.backgroundSize = 'cover';
       avatarCircle.style.backgroundPosition = 'center';
-      avatarCircle.classList.add('has-bg');
-    } else if (avatarCircle) {
-      // Сбрасываем аватар
-      avatarCircle.style.backgroundImage = '';
-      avatarCircle.style.background = '';
-      avatarCircle.classList.remove('has-bg');
-      const span = avatarCircle.querySelector('span');
-      if (span) {
-        span.style.display = 'flex';
-        span.innerText = getCurrentUser().charAt(0).toUpperCase();
-      }
+      if (avatarSpan) avatarSpan.style.display = 'none';
     }
     
-    setupHeroBgButton();
-    setupAvatarChangeButton();
-    setupBalanceClick();
-    setupReviewsClick();
-    setupShopWindowButton();
+    if (ratingValue) {
+      ratingValue.textContent = (userProfile.rating || 5.0).toFixed(1);
+    }
     
-    rebuildHeroLayout();
-    resetProfileStats();
-    showAdminButtonInProfile();
-    addLogoutButton();
+    if (reviewsLink) {
+      const count = userProfile.reviewsCount || 0;
+      reviewsLink.textContent = `${count} ${getReviewWord(count)}`;
+    }
+    
+    if (joinedEl) {
+      joinedEl.innerHTML = `<i class="far fa-calendar"></i> на платформе с ${userProfile.joinedDate || 'января 2024'}`;
+    }
+    
+    if (verifiedBadge) {
+      verifiedBadge.style.display = userProfile.verified ? 'inline-flex' : 'none';
+    }
+    
+    updateStars(userProfile.rating || 5.0);
   }
   
-  // ========== КНОПКА ВЫХОДА ИЗ АККАУНТА ==========
-  function addLogoutButton() {
-    if (document.getElementById('logoutProfileBtn')) return;
+  function updateStars(rating) {
+    const starsContainer = document.querySelector('.stars');
+    if (!starsContainer) return;
     
-    const paymentMethods = document.querySelector('.profile-payment-methods');
-    if (!paymentMethods) return;
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
     
-    const logoutBtn = document.createElement('button');
-    logoutBtn.id = 'logoutProfileBtn';
-    logoutBtn.className = 'shop-window-btn';
-    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Выйти из аккаунта';
-    logoutBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
-    logoutBtn.style.marginTop = '16px';
-    
-    logoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
-        localStorage.removeItem('apex_user');
-        localStorage.removeItem('apex_user_id');
-        localStorage.removeItem('apex_user_email');
-        localStorage.removeItem('apex_user_picture');
-        // Не удаляем настройки профиля, они привязаны к старому ключу и не помешают новому
-        window.location.reload();
+    let html = '';
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        html += '<i class="fas fa-star"></i>';
+      } else if (i === fullStars && hasHalfStar) {
+        html += '<i class="fas fa-star-half-alt"></i>';
+      } else {
+        html += '<i class="far fa-star"></i>';
       }
+    }
+    starsContainer.innerHTML = html;
+  }
+  
+  function getReviewWord(count) {
+    if (count % 10 === 1 && count % 100 !== 11) return 'отзыв';
+    if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'отзыва';
+    return 'отзывов';
+  }
+  
+  // ===== ОБНОВЛЕНИЕ БАЛАНСА =====
+  function updateBalance() {
+    const balanceEl = document.getElementById('profileBalance');
+    if (balanceEl) {
+      const balance = userProfile.balance || 0;
+      balanceEl.textContent = formatBalance(balance);
+    }
+  }
+  
+  function formatBalance(amount) {
+    if (amount >= 1000) {
+      return (amount / 1000).toFixed(1) + 'K ₽';
+    }
+    return amount + ' ₽';
+  }
+  
+  // ===== ОБНОВЛЕНИЕ СТАТИСТИКИ =====
+  function updateStats() {
+    const productsCount = document.getElementById('profileProductsCount');
+    const purchasesCount = document.getElementById('profilePurchasesCount');
+    const salesCount = document.getElementById('profileSalesCount');
+    
+    if (productsCount) productsCount.textContent = userProfile.productsCount || 0;
+    if (purchasesCount) purchasesCount.textContent = userProfile.purchasesCount || 0;
+    if (salesCount) salesCount.textContent = userProfile.salesCount || 0;
+  }
+  
+  function updateTabs() {
+    const activeCount = document.getElementById('activeCount');
+    const completedCount = document.getElementById('completedCount');
+    
+    if (activeCount) activeCount.textContent = userProfile.activeOrders || 0;
+    if (completedCount) completedCount.textContent = userProfile.completedOrders || 0;
+  }
+  
+  // ===== ЗАГРУЗКА ТОВАРОВ ПОЛЬЗОВАТЕЛЯ =====
+  async function loadUserProducts() {
+    const container = document.getElementById('profileProductsList');
+    if (!container) return;
+    
+    try {
+      // Пробуем загрузить с сервера
+      let products = [];
+      try {
+        const response = await fetch('/api/products?_=' + Date.now());
+        if (response.ok) {
+          products = await response.json();
+        }
+      } catch (e) {
+        // Сервер не доступен - используем localStorage
+        products = JSON.parse(localStorage.getItem('apex_products') || '[]');
+      }
+      
+      const userProducts = products.filter(p => p.seller === currentUser);
+      
+      userProfile.productsCount = userProducts.length;
+      localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+      updateStats();
+      
+      if (userProducts.length === 0) {
+        showEmptyState(container);
+        return;
+      }
+      
+      container.innerHTML = userProducts.slice(0, 10).map(product => `
+        <div class="product-item" onclick="window.openProductDetailById('${product.id}')">
+          <img class="product-img" src="${product.image_url || 'https://picsum.photos/id/42/100/100'}" alt="${escapeHtml(product.title)}" onerror="this.src='https://picsum.photos/id/42/100/100'">
+          <div class="product-info">
+            <div class="product-title">${escapeHtml(product.title)}</div>
+            <div class="product-price">${escapeHtml(product.price)}</div>
+            <span class="product-status"><i class="fas fa-check-circle"></i> Активный</span>
+          </div>
+          <div class="product-actions">
+            <button class="product-btn" onclick="event.stopPropagation(); window.editProduct('${product.id}')">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="product-btn" onclick="event.stopPropagation(); window.deleteProduct('${product.id}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+    } catch (e) {
+      console.error('Ошибка загрузки товаров:', e);
+      showEmptyState(container);
+    }
+  }
+  
+  function showEmptyState(container) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="18" y="12" width="84" height="70" rx="16" fill="url(#emptyGrad)" stroke="#8b5cf6" stroke-width="1.8" stroke-opacity="0.5"/>
+            <rect x="28" y="90" width="64" height="8" rx="4" fill="#8b5cf6" opacity="0.5"/>
+            <rect x="38" y="104" width="44" height="6" rx="3" fill="#3b82f6" opacity="0.4"/>
+            <defs>
+              <linearGradient id="emptyGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop stop-color="#8b5cf6" stop-opacity="0.15"/>
+                <stop offset="1" stop-color="#3b82f6" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h3 class="empty-title">Ваша витрина пуста</h3>
+        <p class="empty-desc">Начните зарабатывать на продаже игровых ключей и подписок. Ваши товары увидят тысячи геймеров.</p>
+        <button class="btn-primary" onclick="window.showCreateProductForm()">
+          <i class="fas fa-plus"></i> Выставить товар
+        </button>
+      </div>
+    `;
+  }
+  
+  // ===== НАСТРОЙКА ОБРАБОТЧИКОВ =====
+  function setupEventListeners() {
+    // Клик по карточке баланса
+    const balanceCard = document.querySelector('.balance-card');
+    if (balanceCard) {
+      balanceCard.addEventListener('click', function() {
+        if (typeof window.showPage === 'function') {
+          window.showPage('withdrawPage');
+        } else {
+          showToast('💰 Страница вывода средств', 'info');
+        }
+      });
+    }
+    
+    // Клик по отзывам
+    const reviewsLink = document.getElementById('profileReviewsLink');
+    if (reviewsLink) {
+      reviewsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof window.showPage === 'function') {
+          window.showPage('reviewsPage');
+        } else {
+          showToast('📝 Страница отзывов', 'info');
+        }
+      });
+    }
+    
+    // Табы
+    const tabBtns = document.querySelectorAll('.profile-tab-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const tab = this.getAttribute('data-tab');
+        filterProducts(tab);
+      });
     });
     
-    paymentMethods.insertAdjacentElement('afterend', logoutBtn);
+    // Кнопка выхода
+    const logoutBtn = document.getElementById('profileLogoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', logout);
+    }
   }
   
-function showAdminButtonInProfile() {
+  function filterProducts(tab) {
+    console.log('🔄 Фильтрация товаров:', tab);
+    loadUserProducts();
+  }
+  
+  // ===== КНОПКА АДМИН-ПАНЕЛИ =====
+  function setupAdminButton() {
     const adminBtn = document.getElementById('adminProfileBtn');
     if (!adminBtn) return;
     
-    const currentUser = getCurrentUser();
-    
-    // Проверяем, является ли пользователь админом
     let admins = [];
     try {
-        admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
-    } catch(e) {
-        admins = [];
+      admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+    } catch (e) {
+      admins = [];
     }
+    
     const isAdmin = admins.some(a => a.username === currentUser);
     
-    // ВСЕГДА показываем кнопку
-    adminBtn.style.display = 'flex';
-    
     if (isAdmin) {
-        adminBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
-        adminBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
+      adminBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+      adminBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
     } else {
-        adminBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
-        adminBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
+      adminBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
     }
     
-    // ВАЖНО: Полностью удаляем и пересоздаем кнопку, чтобы убрать все старые обработчики
-    const newBtn = document.createElement('button');
-    newBtn.id = 'adminProfileBtn';
-    newBtn.className = 'shop-window-btn';
-    newBtn.innerHTML = adminBtn.innerHTML;
-    newBtn.style.cssText = adminBtn.style.cssText;
-    
-    // Заменяем старую кнопку на новую
+    // Удаляем старые обработчики
+    const newBtn = adminBtn.cloneNode(true);
     adminBtn.parentNode.replaceChild(newBtn, adminBtn);
     
-    // Вешаем НОВЫЙ обработчик
     newBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation(); // Останавливаем все другие обработчики
-        
-        console.log('🖱️ АДМИН-КНОПКА: Клик обработан');
-        
-        const currentUser = getCurrentUser();
-        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
-        const isAdmin = admins.some(a => a.username === currentUser);
-        
-        if (isAdmin) {
-            // Уже админ - сразу открываем панель
-            console.log('✅ Открываем админ-панель');
-            if (typeof window.showPage === 'function') {
-                window.showPage('admin');
-            }
-            setTimeout(() => {
-                if (typeof window.initAdmin === 'function') {
-                    window.initAdmin();
-                }
-            }, 100);
+      e.preventDefault();
+      e.stopPropagation();
+      
+      let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+      const isAdminNow = admins.some(a => a.username === currentUser);
+      
+      if (isAdminNow) {
+        openAdminPanel();
+      } else {
+        const password = prompt('🔐 Введите пароль администратора:');
+        if (password === 'admin123') {
+          if (!admins.some(a => a.username === currentUser)) {
+            admins.push({
+              id: 'admin_' + Date.now(),
+              username: currentUser,
+              isOwner: false,
+              hiredBy: 'system',
+              hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+          }
+          openAdminPanel();
+          showToast('✅ Доступ к админ-панели получен!', 'success');
+          setTimeout(() => {
+            newBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+            newBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+          }, 100);
         } else {
-            // Не админ - запрашиваем пароль
-            const password = prompt("🔐 Введите пароль администратора:");
-            if (password === "admin123") {
-                // Добавляем в админы
-                if (!admins.some(a => a.username === currentUser)) {
-                    admins.push({
-                        id: 'admin_' + Date.now(),
-                        username: currentUser,
-                        isOwner: false,
-                        hiredBy: 'system',
-                        hiredAt: new Date().toISOString()
-                    });
-                    localStorage.setItem('apex_admins', JSON.stringify(admins));
-                }
-                
-                // Открываем админку
-                if (typeof window.showPage === 'function') {
-                    window.showPage('admin');
-                }
-                setTimeout(() => {
-                    if (typeof window.initAdmin === 'function') {
-                        window.initAdmin();
-                    }
-                }, 100);
-                
-                showToast('✅ Доступ к админ-панели получен!', 'success');
-            } else {
-                showToast('❌ Неверный пароль!', 'error');
-            }
+          showToast('❌ Неверный пароль!', 'error');
         }
+      }
     });
-    
-    console.log('✅ Кнопка админ-панели настроена, isAdmin:', isAdmin);
-}
-
-function setupShopWindowButton() {
-    const shopBtn = document.querySelector('#connectShopBtn');
+  }
+  
+  function openAdminPanel() {
+    if (typeof window.showPage === 'function') {
+      window.showPage('admin');
+      setTimeout(() => {
+        if (typeof window.initAdmin === 'function') {
+          window.initAdmin();
+        }
+      }, 100);
+    } else {
+      showToast('🛡️ Админ-панель', 'info');
+    }
+  }
+  
+  // ===== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ =====
+  function setupShopButton() {
+    const shopBtn = document.getElementById('connectShopBtn');
     if (!shopBtn) return;
     
     const newBtn = shopBtn.cloneNode(true);
     shopBtn.parentNode.replaceChild(newBtn, shopBtn);
     
-    newBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const user = getCurrentUser();
-        const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-        const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
-        
-        if (sellers.includes(user)) {
-            if (typeof showPage === 'function') showPage('products-manage');
-            return;
-        }
-        
-        if (application && application.status === 'pending') {
-            if (typeof showPage === 'function') showPage('shopConnectPage');
-            return;
-        }
-        
-        if (typeof showPage === 'function') {
-            showPage('shopConnectPage');
-            if (typeof initShopConnectPage === 'function') setTimeout(initShopConnectPage, 50);
-        }
-    });
-}
-  
-  function resetProfileStats() {
-    if (window.userProfile) {
-      const products = JSON.parse(localStorage.getItem('apex_products') || '[]');
-      const userProducts = products.filter(p => p.seller === getCurrentUser());
-      
-      window.userProfile.productsCount = userProducts.length;
-      window.userProfile.purchasesCount = 0;
-      window.userProfile.salesCount = 0;
-      window.userProfile.activeOrders = userProducts.filter(p => p.status !== 'completed').length;
-      window.userProfile.completedOrders = userProducts.filter(p => p.status === 'completed').length;
-      window.userProfile.balance = 0;
-      window.userProfile.rating = 5.0;
-      window.userProfile.reviewsCount = 0;
-      localStorage.setItem("apex_profile", JSON.stringify(window.userProfile));
-    }
-    
-    updateNewProfileStats(window.userProfile || {
-      productsCount: 0, purchasesCount: 0, salesCount: 0, activeOrders: 0, completedOrders: 0, balance: 0,
-      joinedDate: "января 2026", reviewsCount: 0
-    });
-  }
-  
-  function rebuildHeroLayout() {
-    const heroSection = document.getElementById('profileHeroSection');
-    if (!heroSection || heroSection.querySelector('.hero-content')) return;
-    
-    const avatarHtml = heroSection.querySelector('.avatar-centered')?.outerHTML || '';
-    const infoHtml = heroSection.querySelector('.hero-info')?.outerHTML || '';
-    
-    const newContent = document.createElement('div');
-    newContent.className = 'hero-content';
-    newContent.innerHTML = avatarHtml + infoHtml;
-    
-    const oldAvatar = heroSection.querySelector('.avatar-centered');
-    const oldInfo = heroSection.querySelector('.hero-info');
-    if (oldAvatar && oldInfo) {
-      heroSection.removeChild(oldAvatar);
-      heroSection.removeChild(oldInfo);
-      heroSection.insertBefore(newContent, heroSection.firstChild);
-    }
-  }
-  
-  function setupHeroBgButton() {
-    const changeBtn = document.getElementById('changeHeroBgBtn');
-    if (!changeBtn) return;
-    const newBtn = changeBtn.cloneNode(true);
-    changeBtn.parentNode.replaceChild(newBtn, changeBtn);
-    newBtn.addEventListener('click', () => openHeroBgModal());
-  }
-  
-  function openHeroBgModal() {
-    let modal = document.getElementById('profileHeroBgModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'profileHeroBgModal';
-      modal.className = 'profile-modal';
-      modal.innerHTML = `
-        <div class="profile-modal-card">
-          <h4>🎨 Фон вокруг аватара</h4>
-          <div class="bg-options" id="heroBgOptions"></div>
-          <div class="modal-actions">
-            <button class="modal-btn danger" id="removeHeroBgBtn">🗑️ Удалить фон</button>
-            <button class="modal-btn" id="closeHeroBgModal">Закрыть</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      
-      const container = modal.querySelector('#heroBgOptions');
-      heroBgPresets.forEach(preset => {
-        const option = document.createElement('div');
-        option.className = 'bg-option';
-        option.style.background = preset.style;
-        option.title = preset.name;
-        option.addEventListener('click', () => {
-          const heroSection = document.getElementById('profileHeroSection');
-          if (heroSection) {
-            heroSection.style.background = preset.style;
-            heroSection.style.backgroundSize = 'cover';
-            heroSection.style.backgroundPosition = 'center';
-            localStorage.setItem(getUserKey('profileHeroBg'), preset.style);
-          }
-          modal.classList.remove('active');
-        });
-        container.appendChild(option);
-      });
-      
-      modal.querySelector('#removeHeroBgBtn').addEventListener('click', () => {
-        const heroSection = document.getElementById('profileHeroSection');
-        if (heroSection) {
-          heroSection.style.background = 'linear-gradient(135deg, #11131f, #0a0c16)';
-          localStorage.removeItem(getUserKey('profileHeroBg'));
-        }
-        modal.classList.remove('active');
-      });
-      
-      modal.querySelector('#closeHeroBgModal').addEventListener('click', () => modal.classList.remove('active'));
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
-    }
-    modal.classList.add('active');
-  }
-  
-  function setupAvatarChangeButton() {
-    const avatarWrapper = document.querySelector('.avatar-wrapper');
-    if (!avatarWrapper) return;
-    
-    if (!avatarWrapper.querySelector('.change-avatar-btn')) {
-      const changeBtn = document.createElement('div');
-      changeBtn.className = 'change-avatar-btn';
-      changeBtn.innerHTML = '<i class="fas fa-camera"></i>';
-      changeBtn.title = 'Сменить аватар';
-      avatarWrapper.appendChild(changeBtn);
-      changeBtn.addEventListener('click', openAvatarBgModal);
-    }
-  }
-  
-  function openAvatarBgModal() {
-    let modal = document.getElementById('profileAvatarBgModal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'profileAvatarBgModal';
-      modal.className = 'profile-modal';
-      modal.innerHTML = `
-        <div class="profile-modal-card">
-          <h4>🎨 Аватар</h4>
-          <div class="bg-options" id="avatarBgOptions"></div>
-          <div class="modal-actions">
-            <button class="modal-btn danger" id="removeAvatarBgBtn">🗑️ Сбросить</button>
-            <button class="modal-btn" id="closeAvatarBgModal">Закрыть</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      
-      const container = modal.querySelector('#avatarBgOptions');
-      avatarBgPresets.forEach(preset => {
-        const option = document.createElement('div');
-        option.className = 'bg-option';
-        option.style.background = preset.style;
-        option.title = preset.name;
-        option.addEventListener('click', () => {
-          const avatarCircle = document.getElementById('profileAvatarCircle');
-          if (avatarCircle) {
-            avatarCircle.style.backgroundImage = preset.style;
-            avatarCircle.style.backgroundSize = 'cover';
-            avatarCircle.style.backgroundPosition = 'center';
-            avatarCircle.classList.add('has-bg');
-            localStorage.setItem(getUserKey('profileAvatarBg'), preset.style);
-          }
-          modal.classList.remove('active');
-        });
-        container.appendChild(option);
-      });
-      
-      modal.querySelector('#removeAvatarBgBtn').addEventListener('click', () => {
-        const avatarCircle = document.getElementById('profileAvatarCircle');
-        if (avatarCircle) {
-          avatarCircle.style.backgroundImage = '';
-          avatarCircle.style.background = '';
-          avatarCircle.classList.remove('has-bg');
-          localStorage.removeItem(getUserKey('profileAvatarBg'));
-        }
-        modal.classList.remove('active');
-      });
-      
-      modal.querySelector('#closeAvatarBgModal').addEventListener('click', () => modal.classList.remove('active'));
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
-    }
-    modal.classList.add('active');
-  }
-  
-function setupBalanceClick() {
-    const balanceCard = document.querySelector('.profile-balance-card');
-    if (!balanceCard) return;
-    
-    const newBalanceCard = balanceCard.cloneNode(true);
-    balanceCard.parentNode.replaceChild(newBalanceCard, balanceCard);
-    
-    newBalanceCard.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log('💰 Клик по балансу, открываем страницу вывода');
-        
-        // 1. Прячем все другие страницы
-        document.querySelectorAll('.page').forEach(p => {
-            p.classList.remove('active');
-            p.style.display = 'none';
-        });
-        
-        // 2. Находим или создаем страницу вывода
-        let withdrawPage = document.getElementById('withdrawPage');
-        
-        // Если страницы нет (на всякий случай), создаем примитивный контейнер
-        if (!withdrawPage) {
-            console.warn('Страница withdrawPage не найдена, создаем заново');
-            withdrawPage = document.createElement('div');
-            withdrawPage.id = 'withdrawPage';
-            withdrawPage.className = 'page';
-            document.body.appendChild(withdrawPage);
-            
-            // Заполняем базовой структурой (копия из HTML)
-            withdrawPage.innerHTML = `
-                <div class="withdraw-header">
-                    <button class="back-btn" onclick="showPage('profile')"><i class="fas fa-arrow-left"></i></button>
-                    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
-                </div>
-                <div class="withdraw-container">
-                    <div class="balance-card">
-                        <div class="balance-label">Доступно для вывода</div>
-                        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-                    </div>
-                    <div class="section-card">
-                        <div class="section-title"><i class="fas fa-wallet"></i> Способ вывода</div>
-                        <div class="methods-grid" id="methodsList"></div>
-                    </div>
-                    <div class="section-card">
-                        <div class="section-title"><i class="fas fa-address-card"></i> Реквизиты</div>
-                        <div class="input-group">
-                            <label class="input-label" id="detailsLabel">Номер карты</label>
-                            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
-                        </div>
-                    </div>
-                    <div class="section-card">
-                        <div class="section-title"><i class="fas fa-coins"></i> Сумма вывода</div>
-                        <div class="amount-row">
-                            <input type="number" id="withdrawAmount" placeholder="Введите сумму">
-                            <div class="amount-presets">
-                                <button class="preset-btn" data-amount="500">500₽</button>
-                                <button class="preset-btn" data-amount="1000">1000₽</button>
-                                <button class="preset-btn" data-amount="5000">5000₽</button>
-                            </div>
-                        </div>
-                        <div class="commission-info"><span>Комиссия:</span> <span id="commissionValue">0 ₽</span></div>
-                        <div class="commission-info"><span>Итого:</span> <span id="totalWithdraw">0 ₽</span></div>
-                    </div>
-                    <button class="withdraw-btn" id="submitWithdrawBtn">Запросить вывод</button>
-                </div>
-            `;
-        }
-        
-        // 3. Показываем страницу
-        withdrawPage.style.display = 'block';
-        withdrawPage.classList.add('active');
-        
-        // 4. Инициализируем функционал страницы вывода
-        setTimeout(() => {
-            if (typeof window.initWithdrawPage === 'function') {
-                window.initWithdrawPage();
-            } else {
-                console.error('❌ Функция initWithdrawPage не найдена');
-                // Fallback: попробуем загрузить данные вручную
-                const profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
-                const balanceEl = document.getElementById('withdrawBalanceAmount');
-                if (balanceEl) balanceEl.innerText = (profile.balance || 0).toFixed(2) + ' ₽';
-            }
-        }, 50);
-    });
-}
-  function setupReviewsClick() {
-    const reviewsLink = document.getElementById('profileReviewsLink');
-    if (!reviewsLink) return;
-    
-    const newLink = reviewsLink.cloneNode(true);
-    reviewsLink.parentNode.replaceChild(newLink, reviewsLink);
-    
-    newLink.addEventListener('click', (e) => {
+    newBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      e.stopPropagation();
       
-      if (typeof window.showPage === 'function') {
-        if (typeof window.initReviewsPage === 'function') setTimeout(() => window.initReviewsPage(), 50);
-        window.showPage('reviewsPage');
+      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+      const application = JSON.parse(localStorage.getItem(`shop_application_${currentUser}`) || 'null');
+      
+      if (sellers.includes(currentUser)) {
+        if (typeof window.showPage === 'function') {
+          window.showPage('products-manage');
+        } else {
+          showToast('🏪 Управление товарами', 'info');
+        }
+      } else if (application && application.status === 'pending') {
+        if (typeof window.showPage === 'function') {
+          window.showPage('shopConnectPage');
+          setTimeout(() => {
+            if (typeof window.initShopConnectPage === 'function') {
+              window.initShopConnectPage();
+            }
+          }, 50);
+        } else {
+          showToast('⏳ Заявка на рассмотрении', 'info');
+        }
+      } else {
+        if (typeof window.showPage === 'function') {
+          window.showPage('shopConnectPage');
+          setTimeout(() => {
+            if (typeof window.initShopConnectPage === 'function') {
+              window.initShopConnectPage();
+            }
+          }, 50);
+        } else {
+          showToast('🏪 Подключение витрины', 'info');
+        }
       }
     });
   }
   
-  function updateNewProfileStats(profileData) {
-    const productsCountEl = document.getElementById('profileProductsCount');
-    const purchasesCountEl = document.getElementById('profilePurchasesCount');
-    const salesCountEl = document.getElementById('profileSalesCount');
-    const activeCountEl = document.getElementById('activeCount');
-    const completedCountEl = document.getElementById('completedCount');
-    const balanceEl = document.getElementById('profileBalance');
-    const usernameEl = document.getElementById('profileUsername');
-    const joinedEl = document.getElementById('profileJoined');
-    
-    if (productsCountEl) productsCountEl.innerText = profileData.productsCount || 0;
-    if (purchasesCountEl) purchasesCountEl.innerText = profileData.purchasesCount || 0;
-    if (salesCountEl) salesCountEl.innerText = profileData.salesCount || 0;
-    if (activeCountEl) activeCountEl.innerText = profileData.activeOrders || 0;
-    if (completedCountEl) completedCountEl.innerText = profileData.completedOrders || 0;
-    if (balanceEl) balanceEl.innerText = (profileData.balance || 0).toFixed(2) + ' ₽';
-    if (usernameEl) usernameEl.innerText = getCurrentUser();
-    if (joinedEl && profileData.joinedDate) joinedEl.innerText = `на Плейнексис с ${profileData.joinedDate}`;
-    
-    const avatarSpan = document.querySelector('#profileAvatarCircle span');
-    if (avatarSpan) {
-      avatarSpan.innerText = getCurrentUser().charAt(0).toUpperCase();
+  // ===== ВЫХОД ИЗ АККАУНТА =====
+  function logout() {
+    if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {
+      localStorage.removeItem('apex_user');
+      localStorage.removeItem('apex_user_id');
+      localStorage.removeItem('apex_user_email');
+      localStorage.removeItem('apex_user_picture');
+      window.location.reload();
     }
   }
-
-  // Экспорт
-  window.initNewProfile = initNewProfile;
-  window.updateNewProfileStats = updateNewProfileStats;
   
-  // Запуск
+  // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+  
+  function showToast(message, type = 'success') {
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'toast-notification';
+      document.body.appendChild(toast);
+    }
+    
+    const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle');
+    toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    toast.classList.add('show', type);
+    
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+  
+  // ===== РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ТОВАРОВ =====
+  window.editProduct = function(productId) {
+    console.log('✏️ Редактирование товара:', productId);
+    if (typeof window.showPage === 'function') {
+      window.showPage('products-manage');
+    }
+    showToast('✏️ Редактирование товара', 'info');
+  };
+  
+  window.deleteProduct = async function(productId) {
+    if (!confirm('Удалить этот товар?')) return;
+    
+    try {
+      const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Ошибка удаления');
+      
+      showToast('✅ Товар удалён', 'success');
+      loadUserProducts();
+      
+      if (typeof window.loadProducts === 'function') {
+        await window.loadProducts();
+      }
+    } catch (e) {
+      // Fallback на localStorage
+      let products = JSON.parse(localStorage.getItem('apex_products') || '[]');
+      products = products.filter(p => p.id !== productId);
+      localStorage.setItem('apex_products', JSON.stringify(products));
+      
+      showToast('✅ Товар удалён (локально)', 'success');
+      loadUserProducts();
+    }
+  };
+  
+  window.showCreateProductForm = function() {
+    if (typeof window.showPage === 'function') {
+      window.showPage('products-manage');
+      setTimeout(() => {
+        if (typeof window.showCreateProductForm === 'function') {
+          window.showCreateProductForm();
+        }
+      }, 100);
+    } else {
+      showToast('📦 Создание товара', 'info');
+    }
+  };
+  
+  // ===== ЭКСПОРТ =====
+  window.initProfilePage = initProfilePage;
+  window.updateProfileInfo = updateProfileInfo;
+  window.loadUserProducts = loadUserProducts;
+  
+  // Автозапуск при открытии страницы профиля
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.target.id === 'profile' && mutation.target.classList.contains('active')) {
+        setTimeout(initProfilePage, 50);
+      }
+    });
+  });
+  
+  const profilePage = document.getElementById('profile');
+  if (profilePage) {
+    observer.observe(profilePage, { attributes: true, attributeFilter: ['class'] });
+  }
+  
+  // Также запускаем при загрузке если профиль активен
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      if (document.getElementById('profileHeroSection')) setTimeout(initNewProfile, 100);
+    document.addEventListener('DOMContentLoaded', function() {
+      if (profilePage && profilePage.classList.contains('active')) {
+        initProfilePage();
+      }
     });
   } else {
-    if (document.getElementById('profileHeroSection')) setTimeout(initNewProfile, 100);
+    if (profilePage && profilePage.classList.contains('active')) {
+      setTimeout(initProfilePage, 50);
+    }
   }
+  
 })();

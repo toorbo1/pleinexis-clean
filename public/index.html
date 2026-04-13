@@ -29,6 +29,8 @@
   <link rel="stylesheet" href="css/tasks-create.css">
   <link rel="stylesheet" href="css/withdraw.css">
   <link rel="stylesheet" href="css/reviews.css">
+  <link rel="stylesheet" href="css/profile.css">
+<link rel="stylesheet" href="css/toast.css">
 
   <style>
   /* дополнительные стили именно для страницы (демо) */
@@ -625,86 +627,122 @@
 
 <!-- ==================== ПРОФИЛЬ ==================== -->
 <div class="page" id="profile">
-  <div class="profile-new-container">
-    <div class="profile-hero-section" id="profileHeroSection">
-      <button class="change-bg-btn-hero" id="changeHeroBgBtn" title="Сменить фон вокруг аватара"><i class="fas fa-palette"></i> Сменить фон</button>
-      <div class="hero-content">
-        <div class="avatar-centered">
-          <div class="avatar-wrapper">
-            <div class="avatar-circle" id="profileAvatarCircle"><span id="avatarInitial">Г</span></div>
+  <div class="profile-page-container">
+    
+    <!-- САЙДБАР (КАРТОЧКА ПРОФИЛЯ) -->
+    <aside class="profile-sidebar">
+      <div class="profile-card">
+        
+        <!-- Аватар с вращающимся кольцом -->
+        <div class="avatar-wrapper">
+          <div class="avatar-ring"></div>
+          <div class="avatar-inner" id="profileAvatarCircle">
+            <span id="avatarInitial" class="avatar-initial">Г</span>
+          </div>
+          <div class="avatar-status"></div>
+        </div>
+        
+        <!-- Никнейм -->
+        <h2 class="profile-username" id="profileUsername">Гость</h2>
+        
+        <!-- Verified бейдж -->
+        <span class="verified-badge" id="verifiedBadge">
+          <i class="fas fa-check-circle"></i> Verified Seller
+        </span>
+        
+        <!-- Рейтинг -->
+        <div class="profile-rating">
+          <span class="stars" id="profileStars">★★★★★</span>
+          <span class="rating-value" id="profileRatingValue">5.0</span>
+        </div>
+        <a href="#" class="reviews-link" id="profileReviewsLink">0 отзывов</a>
+        
+        <!-- Дата регистрации -->
+        <p class="profile-joined" id="profileJoined">
+          <i class="far fa-calendar"></i> на платформе с янв 2024
+        </p>
+        
+        <!-- Кнопки действий -->
+        <div class="profile-actions">
+          <button class="btn-gradient" id="adminProfileBtn">
+            <i class="fas fa-user-shield"></i> Админ-панель
+          </button>
+          <button class="btn-glass" id="connectShopBtn">
+            <i class="fas fa-store"></i> Подключить витрину
+          </button>
+          <button class="btn-logout" id="profileLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- ОСНОВНАЯ ОБЛАСТЬ -->
+    <main class="profile-main">
+      
+      <!-- Карточка баланса -->
+      <div class="balance-card">
+        <div class="balance-left">
+          <div class="balance-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="balance-info">
+            <span class="balance-label">Доступный баланс</span>
+            <span class="balance-amount" id="profileBalance">12.4K ₽</span>
+            <span class="balance-trend"><i class="fas fa-arrow-up"></i> +18% за месяц</span>
           </div>
         </div>
-        <div class="hero-info">
-          <div class="hero-name" id="profileUsername">Гость</div>
-          <div class="hero-rating">
-            <span class="hero-stars">★★★★★</span>
-            <span class="hero-rating-value">5.0</span>
-          </div>
-          <div><span class="hero-reviews" id="profileReviewsLink">0 отзывов</span></div>
-          <div class="hero-since" id="profileJoined">на Плейнексис с января 2026</div>
+        <div class="balance-chevron">
+          <i class="fas fa-chevron-right"></i>
         </div>
       </div>
-    </div>
-    
-<!-- Блок баланса -->
-<div class="profile-balance-card">
-  <div class="balance-left">
-    <span class="balance-amount" id="profileBalance">0 ₽</span>
-  </div>
-  <div class="balance-chevron">›</div>
-</div>
-<!-- Кнопка админ-панели в профиле (ВСЕГДА ВИДНА) -->
-<button class="shop-window-btn admin-profile-btn" id="adminProfileBtn" style="background: linear-gradient(105deg, #ef4444, #dc2626); margin-bottom: 16px;">
-  <i class="fas fa-user-shield"></i> Админ-панель
-</button>
-<!-- Новая кнопка витрины -->
-<button class="shop-window-btn" id="connectShopBtn">
-  🏪 Вы магазин? Подключить витрину
-</button>
-    
-    <div class="profile-stats-grid">
-      <div class="stat-item">
-        <div class="stat-number" id="profileProductsCount">0</div>
-        <div class="stat-label">Мои товары</div>
-
-
+      
+      <!-- Сетка статистики -->
+      <div class="stats-grid">
+        <div class="stat-card products">
+          <div class="stat-icon"><i class="fas fa-box"></i></div>
+          <div class="stat-value" id="profileProductsCount">0</div>
+          <div class="stat-label">Мои товары</div>
+          <svg class="stat-sparkline" viewBox="0 0 80 25">
+            <path d="M0 20 L10 10 L20 15 L30 5 L40 18 L50 8 L60 22 L70 12 L80 15" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="stat-card purchases">
+          <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+          <div class="stat-value" id="profilePurchasesCount">0</div>
+          <div class="stat-label">Покупки</div>
+          <svg class="stat-sparkline" viewBox="0 0 80 25">
+            <path d="M0 15 L10 8 L20 18 L30 12 L40 5 L50 20 L60 10 L70 18 L80 8" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="stat-card sales">
+          <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="stat-value" id="profileSalesCount">0</div>
+          <div class="stat-label">Продажи</div>
+          <svg class="stat-sparkline" viewBox="0 0 80 25">
+            <path d="M0 18 L10 22 L20 10 L30 8 L40 20 L50 15 L60 5 L70 12 L80 8" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
+          </svg>
+        </div>
       </div>
-      <div class="stat-item">
-        <div class="stat-number" id="profilePurchasesCount">0</div>
-        <div class="stat-label">Покупки</div>
+      
+      <!-- Табы -->
+      <div class="profile-tabs">
+        <button class="profile-tab-btn active" data-tab="active">
+          <i class="far fa-clock"></i> Активные
+          <span class="tab-badge" id="activeCount">0</span>
+        </button>
+        <button class="profile-tab-btn" data-tab="completed">
+          <i class="far fa-check-circle"></i> Завершённые
+          <span class="tab-badge" id="completedCount">0</span>
+        </button>
       </div>
-      <div class="stat-item">
-        <div class="stat-number" id="profileSalesCount">0</div>
-        <div class="stat-label">Продажи</div>
+      
+      <!-- Список товаров -->
+      <div class="products-list-container" id="profileProductsList">
+        <!-- Загружается через JS -->
       </div>
-    </div>
-    
-    <div class="profile-tabs">
-      <button class="profile-tab-btn active" data-tab="active"><i class="fas fa-fire"></i> Активные <span id="activeCount">0</span></button>
-      <button class="profile-tab-btn" data-tab="completed"><i class="fas fa-check-circle"></i> Завершённые <span id="completedCount">0</span></button>
-    </div>
-    
-    <div class="profile-products-list" id="profileProductsList">
-      <div class="empty-products">
-        <i class="fas fa-box-open"></i>
-        <p>Нет товаров</p>
-        <p class="empty-subtitle">Пора выставить свой товар на продажу</p>
-        <button class="btn-glow sell-btn" onclick="window.showPage('products-manage')">Выставить товар</button>
-      </div>
-    </div>
-    
-    <div class="profile-payment-methods">
-      <h4><i class="fas fa-credit-card"></i> Способы оплаты</h4>
-      <div class="payment-icons">
-        <i class="fab fa-cc-visa"></i>
-        <i class="fab fa-cc-mastercard"></i>
-        <i class="fab fa-cc-mir"></i>
-        <i class="fab fa-apple-pay"></i>
-        <i class="fab fa-google-pay"></i>
-        <i class="fas fa-mobile-alt"></i>
-        <i class="fab fa-bitcoin"></i>
-      </div>
-    </div>
+      
+    </main>
   </div>
 </div>
 <!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
