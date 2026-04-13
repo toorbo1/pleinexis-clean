@@ -27,27 +27,37 @@
 
 /* Обертка для центрирования */
 .top-links-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;      /* Уменьшил отступ */
-  margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-top: -15px;  /* Поднимаем выше */
+    position: relative;
+    z-index: 10;
 }
 
-/* Единый блок со ссылками — МЕЛКИЙ ТЕКСТ В ОДНУ СТРОКУ */
 .top-links {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;               /* Немного уменьшил расстояние между ссылками */
-  background: rgba(16, 69, 107, 0);
-  backdrop-filter: blur(8px);
-  padding: 5px 30px;       /* Сделал блок более плоским */
-  border-radius: 60px;
-  border: 1px solid rgba(9, 23, 56, 0);
-  width: auto;
-  min-width: 280px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    background: rgba(16, 69, 107, 0);
+    backdrop-filter: blur(8px);
+    padding: 8px 30px;
+    border-radius: 60px;
+    border: 1px solid rgba(9, 23, 56, 0);
+    width: auto;
+    min-width: 280px;
 }
-
+/* Цветные слова для печатной машинки */
+#typewriterText {
+    color: white !important;
+    background: linear-gradient(135deg, #60a5fa, #c4b5fd, #fbbf24) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: 0 0 30px rgba(96, 165, 250, 0.5) !important;
+    font-weight: 800 !important;
+}
 .top-link {
   display: inline-flex;
   align-items: center;

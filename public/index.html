@@ -78,32 +78,38 @@
     .glass-panel { padding: 32px 48px; }
 }
 
-/* ===== КАРУСЕЛЬ ===== */
+/* ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ ===== */
 .my-carousel {
     width: 100%;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     margin-bottom: 28px;
     position: relative;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    scroll-behavior: smooth;
+}
+
+.my-carousel::-webkit-scrollbar {
+    height: 4px;
+}
+
+.my-carousel::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.my-carousel::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 10px;
 }
 
 .my-carousel-track {
     display: flex;
     gap: 16px;
     width: fit-content;
-    margin: 0 auto;
     padding: 20px 0;
-    animation: scrollCarousel 40s linear infinite;
-    justify-content: center;
-}
-
-/* А для центрирования контейнера */
-.my-carousel {
-    width: 100%;
-    overflow: hidden;
-    margin-bottom: 28px;
-    position: relative;
-    display: flex;
-    justify-content: center;
 }
 
 .my-carousel-slide {
@@ -113,11 +119,11 @@
     border-radius: 24px;
     overflow: hidden;
     transition: all 0.4s ease;
-    opacity: 0.4;
-    transform: scale(0.85);
+    opacity: 0.6;
+    transform: scale(0.9);
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(59, 130, 246, 0.15);
-    pointer-events: none;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    cursor: pointer;
 }
 
 .my-carousel-slide.active {
@@ -136,31 +142,12 @@
     pointer-events: none;
 }
 
-@keyframes scrollCarousel {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(calc(-356px * 15)); }
-}
-
 @media (max-width: 480px) {
-    .my-carousel-track {
-        padding: 20px calc(50% - 150px);
-    }
-    .my-carousel-slide { width: 300px; }
-    @keyframes scrollCarousel {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(calc(-316px * 15)); }
-    }
+    .my-carousel-slide { width: 280px; }
 }
 
 @media (min-width: 769px) {
-    .my-carousel-track {
-        padding: 20px calc(50% - 190px);
-    }
-    .my-carousel-slide { width: 380px; }
-    @keyframes scrollCarousel {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(calc(-396px * 15)); }
-    }
+    .my-carousel-slide { width: 360px; }
 }
 
 /* ===== СЕТКИ ТОВАРОВ ===== */
@@ -244,12 +231,16 @@ body::after {
     z-index: 0 !important;
 }
 
-/* ===== ВОССТАНОВЛЕНИЕ ТЕКСТА ПЕЧАТНОЙ МАШИНКИ ===== */
+/* ===== ЦВЕТНЫЕ ПЕЧАТАЮЩИЕСЯ СЛОВА ===== */
 #typewriterText,
 .hero-logo-text {
     color: white !important;
-    background: none !important;
-    -webkit-text-fill-color: white !important;
+    background: linear-gradient(135deg, #60a5fa, #c4b5fd, #fbbf24) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: 0 0 30px rgba(96, 165, 250, 0.5) !important;
+    font-weight: 800 !important;
 }
 
 /* ===== БЛОК STEAM - ЯРКОЕ СВЕЧЕНИЕ ===== */
@@ -309,6 +300,7 @@ body::after {
     font-weight: 700 !important;
 }
 
+/* STEAM тег - старый дизайн */
 .steam-tag {
     background: rgba(255, 255, 255, 0.08) !important;
     padding: 4px 12px !important;
@@ -384,6 +376,7 @@ body::after {
     color: #4ade80 !important;
 }
 
+/* Промокод кнопка - без hover эффекта */
 .promo-btn {
     background: transparent !important;
     border: none !important;
@@ -395,18 +388,15 @@ body::after {
     gap: 6px !important;
     padding: 6px 12px !important;
     border-radius: 40px !important;
-    /* Убираем transition и hover */
     transition: none !important;
 }
 
-/* Убираем hover эффект полностью */
 .promo-btn:hover {
     background: transparent !important;
     color: #60a5fa !important;
     transform: none !important;
 }
-
-/* ===== КНОПКА ОПЛАТЫ ===== */
+/* ===== КНОПКА ОПЛАТЫ С ПУЗЫРЬКАМИ ===== */
 .payment-section {
     margin-top: 4px !important;
 }
@@ -414,82 +404,129 @@ body::after {
 .pay-btn-blue {
     position: relative !important;
     width: 100% !important;
-    padding: 16px 20px !important;
+    padding: 18px 24px !important;
     border: none !important;
-    background: linear-gradient(135deg, #8b5cf6, #3b82f6, #2563eb, #8b5cf6) !important;
-    background-size: 300% auto !important;
-    border-radius: 50px !important;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6, #2563eb) !important;
+    background-size: 200% auto !important;
+    border-radius: 60px !important;
     color: white !important;
-    font-weight: 800 !important;
+    font-family: 'Source Code Pro', 'Inter', monospace !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
     font-size: 1rem !important;
     letter-spacing: 1px !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
     transition: all 0.3s ease !important;
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+    z-index: 0 !important;
     overflow: hidden !important;
-    z-index: 1 !important;
-    animation: gradientShift 3s ease infinite !important;
 }
 
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+.pay-btn-blue:focus {
+    outline-color: transparent !important;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.7) !important;
 }
 
-/* Пузырьки */
+/* ПУЗЫРЬКИ - основная анимация */
 .pay-btn-blue::before {
     content: '' !important;
-    position: absolute !important;
+    pointer-events: none !important;
+    opacity: 0.7 !important;
+    background: 
+        radial-gradient(circle at 20% 35%, transparent 0, transparent 2px, rgba(255, 255, 255, 0.9) 3px, rgba(255, 255, 255, 0.9) 4px, transparent 4px),
+        radial-gradient(circle at 75% 44%, transparent 0, transparent 2px, rgba(255, 255, 255, 0.8) 3px, rgba(255, 255, 255, 0.8) 4px, transparent 4px),
+        radial-gradient(circle at 46% 52%, transparent 0, transparent 4px, rgba(255, 255, 255, 0.7) 5px, rgba(255, 255, 255, 0.7) 6px, transparent 6px),
+        radial-gradient(circle at 85% 70%, transparent 0, transparent 3px, rgba(255, 255, 255, 0.6) 4px, rgba(255, 255, 255, 0.6) 5px, transparent 5px),
+        radial-gradient(circle at 10% 80%, transparent 0, transparent 2px, rgba(255, 255, 255, 0.7) 3px, rgba(255, 255, 255, 0.7) 4px, transparent 4px),
+        radial-gradient(circle at 30% 15%, transparent 0, transparent 2px, rgba(255, 255, 255, 0.8) 3px, rgba(255, 255, 255, 0.8) 4px, transparent 4px),
+        radial-gradient(circle at 65% 85%, transparent 0, transparent 3px, rgba(255, 255, 255, 0.6) 4px, rgba(255, 255, 255, 0.6) 5px, transparent 5px),
+        radial-gradient(circle at 55% 25%, transparent 0, transparent 2px, rgba(255, 255, 255, 0.7) 3px, rgba(255, 255, 255, 0.7) 4px, transparent 4px) !important;
+    width: 100% !important;
+    height: 300% !important;
     top: 0 !important;
     left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 2px, transparent 2px),
-                radial-gradient(circle at 75% 60%, rgba(255,255,255,0.25) 3px, transparent 3px),
-                radial-gradient(circle at 45% 80%, rgba(255,255,255,0.2) 2px, transparent 2px),
-                radial-gradient(circle at 90% 20%, rgba(255,255,255,0.3) 2px, transparent 2px),
-                radial-gradient(circle at 10% 50%, rgba(255,255,255,0.2) 1px, transparent 1px),
-                radial-gradient(circle at 60% 40%, rgba(255,255,255,0.25) 2px, transparent 2px),
-                radial-gradient(circle at 35% 15%, rgba(255,255,255,0.2) 1px, transparent 1px),
-                radial-gradient(circle at 80% 85%, rgba(255,255,255,0.2) 2px, transparent 2px) !important;
-    background-size: 200px 200px, 180px 180px, 150px 150px, 170px 170px, 120px 120px, 160px 160px, 130px 130px, 140px 140px !important;
-    background-repeat: no-repeat !important;
-    opacity: 0.6 !important;
-    pointer-events: none !important;
-    border-radius: 50px !important;
-    animation: bubblesFloat 4s ease-in-out infinite !important;
+    position: absolute !important;
+    animation: bubblesFloat 5s linear infinite both !important;
+    border-radius: 60px !important;
 }
 
 @keyframes bubblesFloat {
-    0% {
-        background-position: 20% 30%, 75% 60%, 45% 80%, 90% 20%, 10% 50%, 60% 40%, 35% 15%, 80% 85%;
-        opacity: 0.4;
+    from {
+        transform: translateY(0);
     }
-    50% {
-        background-position: 25% 25%, 80% 55%, 50% 75%, 85% 15%, 15% 45%, 65% 35%, 40% 10%, 75% 80%;
-        opacity: 0.8;
-    }
-    100% {
-        background-position: 20% 30%, 75% 60%, 45% 80%, 90% 20%, 10% 50%, 60% 40%, 35% 15%, 80% 85%;
-        opacity: 0.4;
+    to {
+        transform: translateY(-66.666%);
     }
 }
 
+/* Левая и правая части для эффекта при наведении */
+.pay-btn-blue .left-part,
+.pay-btn-blue .right-part {
+    position: absolute !important;
+    width: 50% !important;
+    height: 100% !important;
+    top: 0 !important;
+    z-index: 1 !important;
+}
+
+.pay-btn-blue .right-part {
+    left: 50% !important;
+}
+
+.pay-btn-blue .left-part {
+    right: 50% !important;
+}
+
+/* Эффект скрытого текста */
+.pay-btn-blue::after {
+    content: attr(data-content) !important;
+    display: block !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+    padding: 40px 40px !important;
+    pointer-events: none !important;
+    font-weight: 200 !important;
+    top: -30px !important;
+    left: -20px !important;
+    color: transparent !important;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    z-index: 2 !important;
+    transition: transform 0.4s ease-out !important;
+    transform: translate(0, -90%) rotate(0deg) !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 1px !important;
+}
+
+.pay-btn-blue:hover::after {
+    transform: translate(0, -47%) rotate(0deg) !important;
+}
+
+.pay-btn-blue .right-part:hover ~ .pay-btn-blue::after,
+.pay-btn-blue:hover .right-part ~ .pay-btn-blue::after {
+    transform: translate(0, -50%) rotate(-3deg) !important;
+}
+
+.pay-btn-blue .left-part:hover ~ .pay-btn-blue::after {
+    transform: translate(0, -50%) rotate(3deg) !important;
+}
+
+/* При наведении на кнопку */
 .pay-btn-blue:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-    animation: gradientShift 3s ease infinite !important;
-    opacity: 0.85 !important;  /* Делаем тусклее */
+    transform: translateY(-3px) !important;
+    box-shadow: 0 0 35px rgba(96, 165, 250, 0.7), 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+    background-position: right center !important;
 }
 
 .pay-btn-blue:hover::before {
-    opacity: 0.4 !important;  /* Пузырьки тоже тусклее */
-    animation: bubblesFloat 3s ease-in-out infinite !important;
+    opacity: 1 !important;
+    animation: bubblesFloat 3s linear infinite both !important;
 }
 
 .pay-btn-blue:active {
@@ -499,123 +536,48 @@ body::after {
 .pay-btn-blue i,
 .pay-btn-blue span {
     position: relative !important;
-    z-index: 2 !important;
+    z-index: 3 !important;
 }
 
 .pay-btn-blue i {
     font-size: 1.1rem !important;
+    margin-right: 8px !important;
 }
 
-/* Адаптация */
-@media (max-width: 600px) {
-    .card-modern {
-        padding: 16px 18px !important;
-        max-width: 100% !important;
-    }
-    .steam-fields-row {
-        flex-direction: column !important;
-        gap: 10px !important;
-    }
-    .steam-info-row {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-    }
-    .pay-btn-blue {
-        padding: 14px 16px !important;
-        font-size: 0.9rem !important;
-    }
-    .title-text {
-        font-size: 0.9rem !important;
-    }
-    .steam-tag {
-        font-size: 0.55rem !important;
-        padding: 3px 8px !important;
-    }
+/* Убираем скролл под каруселью */
+.my-carousel {
+    overflow-x: auto !important;
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE и Edge */
 }
 
-@media (max-width: 380px) {
-    .card-modern {
-        padding: 14px 16px !important;
-    }
-    .steam-fields-row .input-modern {
-        padding: 10px 12px !important;
-        font-size: 0.8rem !important;
-    }
-    .pay-btn-blue {
-        padding: 12px 14px !important;
-        font-size: 0.85rem !important;
-    }
-}
-
-/* Скрываем ненужные кнопки */
-.games-header:has(+ #appsScrollContainer) .scroll-btn {
-    display: none;
-}
-
-#appsScrollContainer {
-    overflow-x: visible !important;
-}
-
-#appsScrollWrapper {
-    overflow: visible !important;
-}
-
-/* Убираем стрелки у input number */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-/* ===== ВОССТАНОВЛЕНИЕ СТАРОГО ДИЗАЙНА STEAM ===== */
-.steam-tag {
-    background: rgba(255, 255, 255, 0.08) !important;
-    padding: 4px 12px !important;
-    border-radius: 30px !important;
-    font-size: 0.7rem !important;
-    font-weight: 600 !important;
-    color: #60a5fa !important;
-    border: 1px solid rgba(96, 165, 250, 0.3) !important;
-    letter-spacing: 0.5px !important;
-    text-transform: uppercase !important;
-}
-
-/* Промокод - без hover */
-.promo-btn {
+.my-carousel::-webkit-scrollbar {
+    display: none !important; /* Chrome, Safari, Opera */
+    width: 0 !important;
+    height: 0 !important;
     background: transparent !important;
-    border: none !important;
-    color: #60a5fa !important;
-    font-size: 0.75rem !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 6px 12px !important;
-    border-radius: 40px !important;
-    transition: none !important; 
 }
 
-.promo-btn:hover {
-    background: transparent !important;
-    color: #60a5fa !important;
-    transform: none !important;
+/* Также убираем скролл у контейнеров игр и приложений */
+.games-scroll-container::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
-/* Кнопка оплаты - тусклее при наведении */
-.pay-btn-blue:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-    animation: gradientShift 3s ease infinite !important;
-    opacity: 0.85 !important; 
+.games-scroll-container {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
-.pay-btn-blue:hover::before {
-    opacity: 0.4 !important;
-    animation: bubblesFloat 3s ease-in-out infinite !important;
+/* Если есть другие скроллы, которые нужно скрыть */
+.horizontal-scroll-container::-webkit-scrollbar {
+    display: none !important;
+}
+
+.horizontal-scroll-container {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 </style>
 </head>
@@ -2962,6 +2924,99 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+// ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ =====
+(function() {
+    const carousel = document.querySelector('.my-carousel');
+    const track = document.querySelector('.my-carousel-track');
+    
+    if (!carousel || !track) return;
+    
+    // Копируем слайды для бесконечности
+    const slides = Array.from(document.querySelectorAll('.my-carousel-slide'));
+    const slidesPerView = Math.ceil(carousel.clientWidth / 320);
+    
+    // Добавляем копии слайдов в начало и конец
+    for (let i = 0; i < slidesPerView + 2; i++) {
+        slides.forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.appendChild(clone);
+        });
+    }
+    
+    // Добавляем копии в начало
+    for (let i = 0; i < slidesPerView + 2; i++) {
+        slides.slice().reverse().forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.insertBefore(clone, track.firstChild);
+        });
+    }
+    
+    let scrollPosition = track.scrollWidth / 2;
+    carousel.scrollLeft = scrollPosition;
+    
+    let autoScrollInterval;
+    let isDragging = false;
+    
+    function startAutoScroll() {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+        autoScrollInterval = setInterval(() => {
+            if (!isDragging && carousel) {
+                scrollPosition += 1.5;
+                carousel.scrollLeft = scrollPosition;
+                
+                // Сброс позиции для бесконечности
+                if (scrollPosition >= track.scrollWidth - carousel.clientWidth - 500) {
+                    scrollPosition = 500;
+                    carousel.scrollLeft = scrollPosition;
+                }
+                if (scrollPosition <= 100) {
+                    scrollPosition = track.scrollWidth - carousel.clientWidth - 500;
+                    carousel.scrollLeft = scrollPosition;
+                }
+            }
+        }, 20);
+    }
+    
+    function stopAutoScroll() {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+    }
+    
+    // Ручная прокрутка
+    carousel.addEventListener('mousedown', () => { isDragging = true; stopAutoScroll(); });
+    carousel.addEventListener('mouseup', () => { isDragging = false; startAutoScroll(); });
+    carousel.addEventListener('mouseleave', () => { isDragging = false; startAutoScroll(); });
+    carousel.addEventListener('touchstart', () => { isDragging = true; stopAutoScroll(); });
+    carousel.addEventListener('touchend', () => { isDragging = false; startAutoScroll(); });
+    
+    startAutoScroll();
+    
+    // Подсветка центрального слайда
+    function highlightCenter() {
+        const carouselRect = carousel.getBoundingClientRect();
+        const centerX = carouselRect.left + carouselRect.width / 2;
+        const allSlides = document.querySelectorAll('.my-carousel-slide');
+        
+        let closest = null;
+        let minDist = Infinity;
+        
+        allSlides.forEach(slide => {
+            const rect = slide.getBoundingClientRect();
+            const dist = Math.abs(centerX - (rect.left + rect.width / 2));
+            if (dist < minDist) {
+                minDist = dist;
+                closest = slide;
+            }
+        });
+        
+        if (closest) {
+            allSlides.forEach(s => s.classList.remove('active'));
+            closest.classList.add('active');
+        }
+    }
+    
+    carousel.addEventListener('scroll', highlightCenter);
+    setTimeout(highlightCenter, 100);
+})();
 </script>
 
 </body>
