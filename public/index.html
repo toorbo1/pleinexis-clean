@@ -600,8 +600,8 @@
         </div>
 
         <div class="form-actions">
-          <button class="btn-secondary" onclick="cancelCreateProduct()"><i class="fas fa-times"></i> Отмена</button>
-          <button class="btn-primary" onclick="createNewProduct()"><i class="fas fa-check-circle"></i> Опубликовать товар</button>
+          <button class="btn-secondary" onclick="cancelCreateProduct()"><i class="fas fa-times"></i></button>
+          <button class="btn-primary" onclick="createNewProduct()"><i class="fas fa-check-circle"></i></button>
         </div>
       </div>
     </div>
@@ -707,7 +707,73 @@
     </div>
   </div>
 </div>
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
+<div class="page" id="withdrawPage">
+  <div class="withdraw-header">
+    <button class="back-btn" onclick="showPage('profile')">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+  </div>
+  
+  <div class="withdraw-container">
+    <!-- Баланс -->
+    <div class="balance-card">
+      <div class="balance-label">Доступно для вывода</div>
+      <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+      <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+    </div>
 
+    <!-- Способ вывода -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-wallet"></i> Способ вывода
+      </div>
+      <div class="methods-grid" id="methodsList"></div>
+    </div>
+
+    <!-- Реквизиты -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-address-card"></i> Реквизиты
+      </div>
+      <div class="input-group">
+        <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
+      </div>
+    </div>
+
+    <!-- Сумма -->
+    <div class="section-card">
+      <div class="section-title">
+        <i class="fas fa-coins"></i> Сумма вывода
+      </div>
+      <div class="amount-row">
+        <input type="number" id="withdrawAmount" placeholder="Введите сумму" min="100" step="10">
+        <div class="amount-presets">
+          <button class="preset-btn" data-amount="500">500₽</button>
+          <button class="preset-btn" data-amount="1000">1000₽</button>
+          <button class="preset-btn" data-amount="5000">5000₽</button>
+        </div>
+      </div>
+      <div class="commission-info">
+        <span>Комиссия системы:</span>
+        <span id="commissionValue">0 ₽</span>
+      </div>
+      <div class="commission-info">
+        <span>Итого к списанию:</span>
+        <span id="totalWithdraw">0 ₽</span>
+      </div>
+    </div>
+
+    <button class="withdraw-btn" id="submitWithdrawBtn">
+      <i class="fas fa-paper-plane"></i> Запросить вывод
+    </button>
+    <div class="warning-text">
+      <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов
+    </div>
+  </div>
+</div>
 <!-- ==================== СТРАНИЦА КЛЮЧЕВОГО СЛОВА ==================== -->
 <div class="page" id="keywordPage">
   <div class="keyword-page-header">
@@ -1452,6 +1518,7 @@
         </div>
     </div>
 </div>
+<!-- ==================== КОНЕЦ СТРАНИЦЫ ВЫВОДА ==================== -->
 <!-- ==================== ФУТЕР ==================== -->
 <footer class="site-footer">
   <div class="footer-container">
@@ -1593,6 +1660,7 @@
 <script src="js/typewriter.js"></script>
 <script src="js/blob-new.js"></script>
 <script src="js/profile-avatar-upload.js"></script>
+
 <script src="js/withdraw.js"></script>
 <script src="js/admin.js"></script>
 <script src="js/app.js"></script>
@@ -1603,40 +1671,333 @@
 <script src="js/reviews.js"></script>
 
 <script>
-// ========== ФИНАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ И ФИКСЫ ==========
+  // ========== ФИКС СТРАНИЦЫ ВЫВОДА ==========
 (function() {
-    console.log('🚀 ФИНАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЗАПУЩЕНА');
+    console.log('🔧 ФИКС СТРАНИЦЫ ВЫВОДА ЗАПУЩЕН');
     
-    const APP_VERSION = '2.3.0';
+    // Создаем страницу вывода заново, если её нет или она пустая
+    function fixWithdrawPage() {
+        let withdrawPage = document.getElementById('withdrawPage');
+        
+        // Если страницы нет - создаем
+        if (!withdrawPage) {
+            console.log('📄 Создаем страницу вывода');
+            withdrawPage = document.createElement('div');
+            withdrawPage.id = 'withdrawPage';
+            withdrawPage.className = 'page';
+            document.body.appendChild(withdrawPage);
+        }
+        
+        // Заполняем содержимое
+        withdrawPage.innerHTML = `
+           <div class="withdraw-header">
+    <button class="back-btn" onclick="showPage('profile')">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+</div>
+
+<div class="withdraw-container">
+    <!-- Баланс -->
+    <div class="balance-card">
+        <div class="balance-label">Доступно для вывода</div>
+        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+        <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+    </div>
+
+    <!-- Способ вывода -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-wallet"></i> Способ вывода
+        </div>
+        <div class="methods-grid" id="methodsList"></div>
+    </div>
+
+    <!-- Реквизиты -->
+    <div class="section-card" id="detailsSection">
+        <div class="section-title">
+            <i class="fas fa-address-card"></i> Реквизиты
+        </div>
+        <div class="input-group">
+            <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+        </div>
+    </div>
+
+    <!-- Сумма -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-coins"></i> Сумма вывода
+        </div>
+        <div class="amount-row">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+            <div class="amount-presets">
+                <button class="preset-btn" data-amount="500">500₽</button>
+                <button class="preset-btn" data-amount="1000">1000₽</button>
+                <button class="preset-btn" data-amount="5000">5000₽</button>
+            </div>
+        </div>
+        
+        <div class="commission-info" id="commissionInfo">
+            <span>Комиссия системы:</span>
+            <span id="commissionValue">0 ₽</span>
+        </div>
+        <div class="commission-info">
+            <span>Итого к списанию:</span>
+            <span id="totalWithdraw">0 ₽</span>
+        </div>
+    </div>
+
+    <button class="withdraw-btn" id="submitWithdrawBtn">
+        <i class="fas fa-paper-plane"></i> Запросить вывод
+    </button>
+    <div class="warning-text">
+        <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
+    </div>
+</div>
+        `;
+        
+        console.log('✅ Страница вывода создана');
+        return withdrawPage;
+    }
+    
+    // Инициализация страницы вывода
+    function initWithdrawPage() {
+        console.log('🔄 Инициализация страницы вывода');
+        
+        const balance = document.getElementById('withdrawBalanceAmount');
+        const methodsList = document.getElementById('methodsList');
+        const detailsInput = document.getElementById('withdrawDetails');
+        const amountInput = document.getElementById('withdrawAmount');
+        const commissionSpan = document.getElementById('commissionValue');
+        const totalSpan = document.getElementById('totalWithdraw');
+        const submitBtn = document.getElementById('submitWithdrawBtn');
+        const detailsLabel = document.getElementById('detailsLabel');
+        
+        if (!methodsList) {
+            console.error('❌ Элементы не найдены');
+            return;
+        }
+        
+        // Данные пользователя
+        const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+        const currentBalance = userProfile.balance || 0;
+        if (balance) balance.innerText = currentBalance.toFixed(2) + ' ₽';
+        
+        // Методы вывода
+        const methods = [
+            { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', commission: 0.02, minAmount: 100, placeholder: 'Номер карты (16 цифр)' },
+            { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', commission: 0.01, minAmount: 100, placeholder: 'Номер телефона QIWI' },
+            { id: 'crypto', name: 'Криптовалюта', icon: 'fab fa-bitcoin', commission: 0.03, minAmount: 500, placeholder: 'Адрес USDT' }
+        ];
+        
+        let selectedMethod = methods[0];
+        
+        function renderMethods() {
+            if (!methodsList) return;
+            methodsList.innerHTML = methods.map(m => `
+                <div class="method-item ${selectedMethod.id === m.id ? 'selected' : ''}" data-method="${m.id}">
+                    <div class="method-icon ${m.id}">
+                        <i class="${m.icon}"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">${m.name}</div>
+                        <div class="method-desc">Комиссия: ${(m.commission * 100).toFixed(0)}%</div>
+                    </div>
+                    <div class="method-commission">от ${m.minAmount}₽</div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.method-item').forEach(el => {
+                el.onclick = () => {
+                    const methodId = el.getAttribute('data-method');
+                    selectedMethod = methods.find(m => m.id === methodId);
+                    renderMethods();
+                    if (detailsLabel) detailsLabel.innerText = selectedMethod.id === 'card' ? 'Номер карты' : (selectedMethod.id === 'qiwi' ? 'QIWI номер' : 'USDT адрес');
+                    if (detailsInput) detailsInput.placeholder = selectedMethod.placeholder;
+                    updateCommission();
+                };
+            });
+        }
+        
+        function updateCommission() {
+            const amount = parseFloat(amountInput?.value);
+            if (isNaN(amount) || amount <= 0) {
+                if (commissionSpan) commissionSpan.innerText = '0 ₽';
+                if (totalSpan) totalSpan.innerText = '0 ₽';
+                return;
+            }
+            const commission = amount * selectedMethod.commission;
+            const total = amount + commission;
+            if (commissionSpan) commissionSpan.innerText = commission.toFixed(2) + ' ₽';
+            if (totalSpan) totalSpan.innerText = total.toFixed(2) + ' ₽';
+        }
+        
+        function validate() {
+            const amount = parseFloat(amountInput?.value);
+            const details = detailsInput?.value.trim();
+            const isValid = !isNaN(amount) && amount >= selectedMethod.minAmount && amount <= currentBalance && details && details.length >= 3;
+            if (submitBtn) submitBtn.disabled = !isValid;
+        }
+        
+        function requestWithdraw() {
+            const amount = parseFloat(amountInput?.value);
+            const details = detailsInput?.value.trim();
+            const commission = amount * selectedMethod.commission;
+            const total = amount + commission;
+            
+            if (isNaN(amount) || amount < selectedMethod.minAmount) {
+                alert(`Минимальная сумма: ${selectedMethod.minAmount} ₽`);
+                return;
+            }
+            if (amount > currentBalance) {
+                alert(`Недостаточно средств. Доступно: ${currentBalance.toFixed(2)} ₽`);
+                return;
+            }
+            if (!details) {
+                alert('Введите реквизиты');
+                return;
+            }
+            
+            // Сохраняем заявку
+            const requests = JSON.parse(localStorage.getItem('apex_withdraw_requests') || '[]');
+            requests.push({
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                method: selectedMethod.name,
+                amount: amount,
+                commission: commission,
+                total: total,
+                details: details,
+                status: 'pending'
+            });
+            localStorage.setItem('apex_withdraw_requests', JSON.stringify(requests));
+            
+            // Списываем баланс
+            const newBalance = currentBalance - total;
+            userProfile.balance = newBalance;
+            localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+            
+            alert(`✅ Заявка на вывод ${amount} ₽ создана!`);
+            
+            if (balance) balance.innerText = newBalance.toFixed(2) + ' ₽';
+            if (amountInput) amountInput.value = '';
+            if (detailsInput) detailsInput.value = '';
+            updateCommission();
+            validate();
+        }
+        
+        // Настройка пресетов
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                if (amountInput) amountInput.value = btn.getAttribute('data-amount');
+                updateCommission();
+                validate();
+            };
+        });
+        
+        // Слушатели
+        if (amountInput) amountInput.oninput = () => { updateCommission(); validate(); };
+        if (detailsInput) detailsInput.oninput = validate;
+        if (submitBtn) submitBtn.onclick = requestWithdraw;
+        
+        renderMethods();
+        updateCommission();
+        validate();
+        
+        console.log('✅ Страница вывода инициализирована');
+    }
+    
+    // Переопределяем клик по балансу
+    function fixBalanceClick() {
+        const balanceCard = document.querySelector('.profile-balance-card');
+        if (!balanceCard) return;
+        
+        const newCard = balanceCard.cloneNode(true);
+        balanceCard.parentNode.replaceChild(newCard, balanceCard);
+        
+        newCard.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('💰 Открываем вывод средств');
+            
+            // Скрываем все страницы
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            
+            // Показываем страницу вывода
+            let withdrawPage = document.getElementById('withdrawPage');
+            if (!withdrawPage) {
+                withdrawPage = fixWithdrawPage();
+            }
+            
+            withdrawPage.style.display = 'block';
+            withdrawPage.classList.add('active');
+            
+            // Инициализируем
+            setTimeout(initWithdrawPage, 50);
+        });
+    }
+    
+    // Запускаем фикс после загрузки страницы
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(fixWithdrawPage, 100);
+            setTimeout(fixBalanceClick, 200);
+            setTimeout(initWithdrawPage, 300);
+        });
+    } else {
+        setTimeout(fixWithdrawPage, 100);
+        setTimeout(fixBalanceClick, 200);
+        setTimeout(initWithdrawPage, 300);
+    }
+    
+    window.initWithdrawPage = initWithdrawPage;
+    window.fixWithdrawPage = fixWithdrawPage;
+})();
+// ========== ГЛОБАЛЬНЫЕ ФИКСЫ И ИНИЦИАЛИЗАЦИЯ ==========
+(function() {
+    console.log('🔥 ГЛОБАЛЬНЫЕ ФИКСЫ ЗАПУЩЕНЫ');
+    
+    // ========== ФИКС: ОЧИСТКА КЭША ПРИ НОВОЙ ВЕРСИИ ==========
+    const APP_VERSION = '2.2.0';
     const savedVersion = localStorage.getItem('app_version');
     
-    // Очистка кэша при новой версии
     if (savedVersion !== APP_VERSION) {
-        console.log('🔄 Новая версия, очищаем кэш...');
+        console.log('🔄 Обнаружена новая версия, очищаем кэш...');
+        localStorage.setItem('app_version', APP_VERSION);
+        
+        // Сохраняем важные данные
         const currentUser = localStorage.getItem('apex_user');
         const profile = localStorage.getItem('apex_profile');
         
+        // Очищаем всё
         localStorage.clear();
         
+        // Восстанавливаем важное
         if (currentUser) localStorage.setItem('apex_user', currentUser);
         if (profile) localStorage.setItem('apex_profile', profile);
-        localStorage.setItem('app_version', APP_VERSION);
         
         // Создаем админа по умолчанию
-        localStorage.setItem('apex_admins', JSON.stringify([{
+        let admins = [{
             id: 'admin_1',
             username: 'Admin',
             isOwner: true,
             hiredBy: 'system',
             hiredAt: new Date().toISOString()
-        }]));
+        }];
+        localStorage.setItem('apex_admins', JSON.stringify(admins));
         
-        console.log('✅ Кэш очищен');
+        console.log('✅ Кэш очищен, админ создан');
     }
     
-    // Создаем админа если нет
+    // ========== ФИКС: СОЗДАНИЕ АДМИНА ЕСЛИ НЕТ ==========
     function ensureAdminExists() {
         let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        
         if (admins.length === 0) {
             admins.push({
                 id: 'admin_1',
@@ -1646,11 +2007,102 @@
                 hiredAt: new Date().toISOString()
             });
             localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Создан админ по умолчанию: Admin');
+        }
+        
+        if (currentUser === 'Admin' && !admins.some(a => a.username === 'Admin')) {
+            admins.push({
+                id: 'admin_' + Date.now(),
+                username: 'Admin',
+                isOwner: true,
+                hiredBy: 'system',
+                hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Admin добавлен в список админов');
         }
     }
     ensureAdminExists();
     
-    // Глобальная функция показа уведомлений
+    // ========== ФИКС: ФУНКЦИЯ ВХОДА В АДМИНКУ ==========
+    window.enterAdminPanel = function() {
+        console.log('🔐 enterAdminPanel вызвана');
+        
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        
+        // Проверяем, админ ли пользователь
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            // Уже админ - открываем панель
+            console.log('✅ Пользователь админ, открываем панель');
+            openAdminPage();
+            return true;
+        }
+        
+        // Не админ - запрашиваем пароль
+        const password = prompt('🔐 Введите пароль администратора:');
+        const ADMIN_PASSWORD = 'admin123';
+        
+        if (password === ADMIN_PASSWORD) {
+            // Добавляем в админы
+            if (!admins.some(a => a.username === currentUser)) {
+                admins.push({
+                    id: 'admin_' + Date.now(),
+                    username: currentUser,
+                    isOwner: false,
+                    hiredBy: 'system',
+                    hiredAt: new Date().toISOString()
+                });
+                localStorage.setItem('apex_admins', JSON.stringify(admins));
+                console.log('✅ Пользователь добавлен в админы:', currentUser);
+            }
+            
+            openAdminPage();
+            showToast('✅ Доступ к админ-панели получен!', 'success');
+            return true;
+        } else {
+            showToast('❌ Неверный пароль!', 'error');
+            return false;
+        }
+    };
+    
+    // Функция открытия админ-страницы
+    function openAdminPage() {
+        // Скрываем все страницы
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        
+        // Показываем админку
+        const adminPage = document.getElementById('admin');
+        if (adminPage) {
+            adminPage.style.display = 'block';
+            adminPage.classList.add('active');
+        }
+        
+        // Инициализируем админку
+        setTimeout(() => {
+            if (typeof window.initAdmin === 'function') {
+                window.initAdmin();
+                console.log('✅ initAdmin вызвана');
+            }
+            
+            // Показываем главную секцию админки
+            if (typeof window.showAdminSection === 'function') {
+                window.showAdminSection('adminMainSection');
+            }
+        }, 100);
+        
+        // Обновляем активные кнопки навигации
+        document.querySelectorAll('.nav-item, .nav-link').forEach(btn => {
+            btn.classList.remove('active');
+        });
+    }
+    
+    // ========== ФИКС: ФУНКЦИЯ ПОКАЗА УВЕДОМЛЕНИЙ ==========
     window.showToast = function(message, type = 'success') {
         let toast = document.querySelector('.toast-notification');
         if (!toast) {
@@ -1666,125 +2118,57 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     };
     
-    // Вход в админ-панель
-    window.enterAdminPanel = function() {
-        const currentUser = localStorage.getItem('apex_user') || 'Гость';
-        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
-        
-        if (admins.some(a => a.username === currentUser)) {
-            openAdminPage();
-            return true;
-        }
-        
-        const password = prompt('🔐 Введите пароль администратора:');
-        if (password === 'admin123') {
-            if (!admins.some(a => a.username === currentUser)) {
-                admins.push({
-                    id: 'admin_' + Date.now(),
-                    username: currentUser,
-                    isOwner: false,
-                    hiredBy: 'system',
-                    hiredAt: new Date().toISOString()
-                });
-                localStorage.setItem('apex_admins', JSON.stringify(admins));
-            }
-            openAdminPage();
-            showToast('✅ Доступ к админ-панели получен!', 'success');
-            return true;
-        } else {
-            showToast('❌ Неверный пароль!', 'error');
-            return false;
-        }
-    };
-    
-    function openAdminPage() {
-        document.querySelectorAll('.page').forEach(p => {
-            p.classList.remove('active');
-            p.style.display = 'none';
-        });
-        
-        const adminPage = document.getElementById('admin');
-        if (adminPage) {
-            adminPage.style.display = 'block';
-            adminPage.classList.add('active');
-        }
-        
-        setTimeout(() => {
-            if (typeof window.initAdmin === 'function') window.initAdmin();
-            if (typeof window.showAdminSection === 'function') window.showAdminSection('adminMainSection');
-        }, 100);
-    }
-    
-    // Исправление клика по балансу
-    function fixBalanceClick() {
-        const balanceCard = document.querySelector('.profile-balance-card');
-        if (!balanceCard) {
-            setTimeout(fixBalanceClick, 200);
-            return;
-        }
-        
-        const newCard = balanceCard.cloneNode(true);
-        balanceCard.parentNode.replaceChild(newCard, balanceCard);
-        
-        newCard.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('💰 Открываем страницу вывода');
-            
-            if (typeof window.showPage === 'function') {
-                window.showPage('withdrawPage');
-                
-                setTimeout(() => {
-                    if (typeof window.initWithdrawPage === 'function') {
-                        window.initWithdrawPage();
-                        console.log('✅ withdrawPage инициализирована');
-                    } else {
-                        console.error('❌ window.initWithdrawPage не найдена');
-                    }
-                }, 150);
-            }
-        });
-        
-        console.log('✅ Клик по балансу настроен');
-    }
-    
-    // Исправление кнопки админки в профиле
+    // ========== ФИКС: КНОПКА АДМИНКИ В ПРОФИЛЕ ==========
     function fixAdminButton() {
         const adminBtn = document.getElementById('adminProfileBtn');
         if (!adminBtn) {
+            console.log('⏳ Кнопка админки не найдена, ждем...');
             setTimeout(fixAdminButton, 200);
             return;
         }
         
+        console.log('✅ Кнопка админки найдена, применяем фикс');
+        
+        // Полностью пересоздаем кнопку
         const newBtn = document.createElement('button');
         newBtn.id = 'adminProfileBtn';
         newBtn.className = 'shop-window-btn';
+        newBtn.style.cssText = adminBtn.style.cssText;
         newBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
         newBtn.style.marginBottom = '16px';
-        newBtn.style.width = '100%';
         
         const currentUser = localStorage.getItem('apex_user') || 'Гость';
         const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
         const isAdmin = admins.some(a => a.username === currentUser);
         
-        newBtn.innerHTML = isAdmin 
-            ? '<i class="fas fa-user-shield"></i> Админ-панель'
-            : '<i class="fas fa-lock"></i> Войти в админ-панель';
+        if (isAdmin) {
+            newBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+        } else {
+            newBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
+            newBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
+        }
         
+        // Заменяем старую кнопку
         adminBtn.parentNode.replaceChild(newBtn, adminBtn);
         
+        // Вешаем обработчик
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🖱️ КЛИК ПО КНОПКЕ АДМИНКИ');
             window.enterAdminPanel();
         });
+        
+        console.log('✅ Фикс для кнопки админки применен, isAdmin:', isAdmin);
     }
     
-    // Исправление кнопки витрины
+    // ========== ФИКС: КНОПКА ВИТРИНЫ ==========
     function fixShopButton() {
         const shopBtn = document.querySelector('#connectShopBtn');
         if (!shopBtn) return;
+        
+        console.log('✅ Кнопка витрины найдена, применяем фикс');
         
         const newBtn = shopBtn.cloneNode(true);
         shopBtn.parentNode.replaceChild(newBtn, shopBtn);
@@ -1792,37 +2176,92 @@
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('🛒 КЛИК ПО КНОПКЕ ВИТРИНЫ');
             
             const user = localStorage.getItem('apex_user') || 'Гость';
             const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
             const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
             
             if (sellers.includes(user)) {
-                window.showPage('products-manage');
+                if (typeof window.showPage === 'function') window.showPage('products-manage');
                 return;
             }
             
             if (application && application.status === 'pending') {
+                if (typeof window.showPage === 'function') {
+                    window.showPage('shopConnectPage');
+                    setTimeout(() => {
+                        if (typeof window.initShopConnectPage === 'function') {
+                            window.initShopConnectPage();
+                        }
+                    }, 50);
+                }
+                return;
+            }
+            
+            if (typeof window.showPage === 'function') {
                 window.showPage('shopConnectPage');
                 setTimeout(() => {
                     if (typeof window.initShopConnectPage === 'function') {
                         window.initShopConnectPage();
                     }
                 }, 50);
-                return;
             }
-            
-            window.showPage('shopConnectPage');
-            setTimeout(() => {
-                if (typeof window.initShopConnectPage === 'function') {
-                    window.initShopConnectPage();
-                }
-            }, 50);
+        });
+        
+        console.log('✅ Фикс для кнопки витрины применен');
+    }
+    
+    // ========== ФИКС: КНОПКА АДМИНКИ В ХЕДЕРЕ ==========
+    function fixHeaderAdminButton() {
+        const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+        if (!adminToggleBtn) return;
+        
+        console.log('✅ Кнопка админки в хедере найдена');
+        
+        const newBtn = adminToggleBtn.cloneNode(true);
+        adminToggleBtn.parentNode.replaceChild(newBtn, adminToggleBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ КЛИК ПО АДМИН-КНОПКЕ В ХЕДЕРЕ');
+            window.enterAdminPanel();
         });
     }
     
-    // Карусель
+    // ========== ФИКС: КНОПКА СБРОСА КЭША ==========
+    function addCacheResetButton() {
+        const container = document.querySelector('.profile-new-container');
+        if (!container) return;
+        
+        if (document.getElementById('cacheResetBtn')) return;
+        
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'cacheResetBtn';
+        resetBtn.className = 'shop-window-btn';
+        resetBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Сбросить кэш';
+        resetBtn.style.background = 'linear-gradient(105deg, #6b7280, #4b5563)';
+        resetBtn.style.marginTop = '12px';
+        resetBtn.style.fontSize = '0.8rem';
+        
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Сбросить кэш и обновить интерфейс?')) {
+                localStorage.setItem('app_version', APP_VERSION);
+                window.location.reload();
+            }
+        });
+        
+        const paymentMethods = document.querySelector('.profile-payment-methods');
+        if (paymentMethods) {
+            paymentMethods.insertAdjacentElement('afterend', resetBtn);
+        }
+    }
+    
+    // ========== КАРУСЕЛЬ ==========
     function initCarousel() {
+        console.log('🔥 Инициализация карусели');
+        
         const track = document.getElementById('myCarouselTrack');
         if (!track) return;
         
@@ -1840,11 +2279,38 @@
         const slidesPerSet = 5;
         const speed = 0.5;
         
+        function waitForImages() {
+            return new Promise((resolve) => {
+                const images = document.querySelectorAll('.my-carousel-slide img');
+                let loaded = 0;
+                if (images.length === 0) { resolve(); return; }
+                
+                images.forEach(img => {
+                    if (img.complete) {
+                        loaded++;
+                        if (loaded === images.length) resolve();
+                    } else {
+                        img.addEventListener('load', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                        img.addEventListener('error', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                    }
+                });
+            });
+        }
+        
         async function recalculateDimensions() {
+            await waitForImages();
+            
             const firstSlide = slides[0];
             slideWidth = firstSlide.offsetWidth;
             slideFull = slideWidth + gap;
             setWidth = slidesPerSet * slideFull;
+            
             position = setWidth;
             track.style.transform = `translateX(${-position}px)`;
         }
@@ -1909,6 +2375,7 @@
         
         (async function init() {
             await recalculateDimensions();
+            
             if (animFrame) cancelAnimationFrame(animFrame);
             animFrame = requestAnimationFrame(animate);
             
@@ -1920,43 +2387,60 @@
                     highlightCenterSlide();
                 }, 150);
             });
+            
+            console.log('✅ Карусель готова');
         })();
     }
     
-    // Запуск после загрузки DOM
+    // ========== ЗАПУСК ВСЕХ ФИКСОВ ПОСЛЕ ЗАГРУЗКИ ==========
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOM загружен, запускаем фиксы');
+        console.log('🚀 DOM ЗАГРУЖЕН, ЗАПУСКАЕМ ФИКСЫ');
         
         // Загружаем данные
         if (typeof window.loadGameBlocks === 'function') window.loadGameBlocks();
         if (typeof window.loadAppBlocks === 'function') window.loadAppBlocks();
         if (typeof window.loadProducts === 'function') window.loadProducts();
         
-        // Показываем главную
-        if (typeof window.showPage === 'function') window.showPage('home');
+        // Показываем главную страницу
+        if (typeof window.showPage === 'function') {
+            window.showPage('home');
+        }
         
-        // Применяем фиксы
+        // Применяем фиксы с задержкой
         setTimeout(() => {
-            fixBalanceClick();
             fixAdminButton();
             fixShopButton();
+            fixHeaderAdminButton();
+            addCacheResetButton();
             initCarousel();
             
-            // Проверяем, что страница вывода правильно сверстана
-            const withdrawPage = document.getElementById('withdrawPage');
-            if (withdrawPage) {
-                console.log('✅ withdrawPage найден в DOM');
-                if (!withdrawPage.classList.contains('page')) {
-                    withdrawPage.classList.add('page');
-                    console.log('✅ Добавлен класс page для withdrawPage');
-                }
+            // Дополнительная проверка кнопки админки
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                console.log('✅ Кнопка админки присутствует в DOM');
             } else {
-                console.error('❌ withdrawPage НЕ НАЙДЕН в DOM');
+                console.warn('⚠️ Кнопка админки НЕ НАЙДЕНА в DOM');
+                // Пробуем найти позже
+                setTimeout(fixAdminButton, 500);
             }
         }, 300);
+        
+        // Еще одна проверка через секунду
+        setTimeout(() => {
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                // Проверяем, есть ли обработчик
+                const hasClick = adminBtn.onclick !== null || adminBtn._listeners;
+                console.log('🔍 Кнопка админки, есть обработчик:', hasClick);
+            }
+        }, 1000);
     });
     
-    console.log('✅ ФИНАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА');
+    // Экспорт функций
+    window.fixAdminButton = fixAdminButton;
+    window.fixShopButton = fixShopButton;
+    
+    console.log('✅ ВСЕ ГЛОБАЛЬНЫЕ ФИКСЫ ЗАГРУЖЕНЫ');
 })();
 </script>
 
