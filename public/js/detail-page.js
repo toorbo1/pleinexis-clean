@@ -23,7 +23,7 @@ window.openProductDetailById = async function(productId) {
     }
 };
 
-// Закрытие страницы деталей (по клику на фон или кнопку назад)
+// Закрытие страницы деталей
 window.closeDetail = function() {
     const detailPage = document.getElementById('detailPage');
     if (detailPage) {
@@ -32,7 +32,7 @@ window.closeDetail = function() {
     }
 };
 
-// Загрузка похожих товаров
+// ========== ПОХОЖИЕ ТОВАРЫ ==========
 async function loadSimilarProducts(keyword, currentProductId) {
     try {
         const response = await fetch('/api/products?_=' + Date.now());
@@ -41,9 +41,9 @@ async function loadSimilarProducts(keyword, currentProductId) {
         
         // Фильтруем товары с таким же ключевым словом, исключая текущий
         const similar = products.filter(p => 
-            p.keyword === keyword && 
+            p.keyword && p.keyword === keyword && 
             p.id !== currentProductId
-        ).slice(0, 4);
+        ).slice(0, 6); // Показываем до 6 товаров
         
         return similar;
     } catch (error) {
@@ -119,7 +119,7 @@ async function renderDetailPage(product) {
         }
     }
     
-    // Рендеринг (без верхней панели с крестиком)
+    // Рендеринг
     container.innerHTML = `
         <!-- Кнопка назад -->
         <div style="margin-bottom: 20px;">
@@ -176,12 +176,12 @@ async function renderDetailPage(product) {
         </div>
         ` : ''}
         
-        <!-- ОПИСАНИЕ ТОВАРА (без фона) -->
+        <!-- ОПИСАНИЕ ТОВАРА -->
         <div class="seller-description-block">
             <div class="block-title">
                 <i class="fas fa-align-left"></i> Описание товара
             </div>
-            <div class="seller-contact-text" style="white-space: pre-wrap; word-wrap: break-word;">${formatDescription(description)}</div>
+            <div class="seller-contact-text">${formatDescription(description)}</div>
         </div>
         
         <!-- ГАРАНТИИ -->
@@ -208,28 +208,45 @@ async function renderDetailPage(product) {
             </div>
         </div>
         
-        <!-- ПОХОЖИЕ ТОВАРЫ -->
+        <!-- ===== ПОХОЖИЕ ТОВАРЫ (В САМОМ КОНЦЕ) ===== -->
         ${similarProducts.length > 0 ? `
         <div class="similar-products-section">
             <div class="similar-products-header">
                 <h3><i class="fas fa-tag"></i> Похожие товары</h3>
-                <span class="reviews-count-badge">с ключевым словом "${escapeHtml(product.keyword || '')}"</span>
+                <span class="similar-products-badge">по категории "${escapeHtml(product.keyword || 'Без категории')}"</span>
             </div>
             <div class="similar-products-grid">
                 ${similarProducts.map(p => `
                     <div class="similar-product-card" onclick="window.openProductDetailById('${p.id}')">
-                        <img class="similar-product-image" src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
-                             alt="${escapeHtml(p.title)}"
-                             onerror="this.src='https://picsum.photos/id/42/400/300'">
+                        <div class="similar-product-image-wrapper">
+                            <img class="similar-product-image" src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
+                                 alt="${escapeHtml(p.title)}"
+                                 onerror="this.src='https://picsum.photos/id/42/400/300'">
+                            ${p.discount ? `<span class="similar-product-discount">🔥</span>` : ''}
+                        </div>
                         <div class="similar-product-body">
-                            <div class="similar-product-title">${escapeHtml(p.title.substring(0, 40))}</div>
+                            <div class="similar-product-title">${escapeHtml(p.title.substring(0, 50))}</div>
                             <div class="similar-product-price">${escapeHtml(p.price)}</div>
+                            <div class="similar-product-seller">${escapeHtml(p.seller || 'Продавец')}</div>
                         </div>
                     </div>
                 `).join('')}
             </div>
+            <div class="similar-products-footer">
+                <button class="view-all-similar-btn" onclick="openKeywordPage('${escapeHtml(product.keyword || '')}')">
+                    <i class="fas fa-eye"></i> Смотреть все товары в категории
+                </button>
+            </div>
         </div>
-        ` : ''}
+        ` : `
+        <div class="similar-products-empty">
+            <i class="fas fa-box-open"></i>
+            <p>Нет похожих товаров в категории "${escapeHtml(product.keyword || 'Без категории')}"</p>
+            <button class="view-all-similar-btn" onclick="openKeywordPage('${escapeHtml(product.keyword || '')}')">
+                <i class="fas fa-search"></i> Посмотреть все товары
+            </button>
+        </div>
+        `}
         
         <!-- Футер ссылки -->
         <div class="footer-links">
@@ -354,6 +371,21 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
+// Открытие страницы с ключевым словом
+window.openKeywordPage = function(keyword) {
+    closeDetail();
+    setTimeout(() => {
+        if (typeof window.showPage === 'function') {
+            window.showPage('home');
+            setTimeout(() => {
+                if (typeof window.openKeywordPage === 'function') {
+                    window.openKeywordPage(keyword);
+                }
+            }, 100);
+        }
+    }, 100);
+};
+
 // Экранирование HTML
 function escapeHtml(str) {
     if (!str) return '';
@@ -383,4 +415,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('✅ detail-page.js загружен (обновленная версия)');
+console.log('✅ detail-page.js загружен (обновленная версия с похожими товарами)');
