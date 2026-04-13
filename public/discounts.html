@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Скидки и акции — Плейнексис</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/bottom-nav.css">
+  <link rel="stylesheet" href="css/about.css">
+  <style>
+    body { background: radial-gradient(circle at 20% 30%, #0b0e1e, #04060a); min-height: 100vh; }
+    .page { display: block; padding: 85px 0 90px; }
+    .promo-code {
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px dashed #3b82f6;
+    }
+    .promo-code span {
+      font-family: monospace;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #60a5fa;
+      letter-spacing: 2px;
+    }
+    .copy-btn {
+      background: #3b82f6;
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
+  </div>
+  <div class="header-center">
+    <div class="header-search" onclick="window.location.href='index.html'">
+      <i class="fas fa-search"></i>
+      <input placeholder="Поиск товаров..." class="global-search-input" readonly>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Главная</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#chat'"><i class="fas fa-comments"></i><span>Чаты</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#profile'"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
+  </div>
+</div>
+
+<div class="page active">
+  <div class="info-page-container">
+    <div class="info-header">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-tags"></i> Скидки и акции</h1>
+    </div>
+    
+    <div class="discount-banner">
+      <div>
+        <h3>🔥 ЛЕТНЯЯ РАСПРОДАЖА</h3>
+        <p>Скидки до 30% на все подписки и игры до 31 августа!</p>
+      </div>
+      <div style="font-size: 2rem; font-weight: 800;">-30%</div>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-gift"></i> Действующие промокоды</h2>
+      
+      <div class="promo-code">
+        <div>
+          <h4>Приветственный бонус</h4>
+          <p style="color: #94a3b8; margin: 4px 0;">Скидка 100₽ на первый заказ от 500₽</p>
+          <span>HELLO2026</span>
+        </div>
+        <button class="copy-btn" onclick="copyPromo('HELLO2026')"><i class="far fa-copy"></i> Копировать</button>
+      </div>
+      
+      <div class="promo-code">
+        <div>
+          <h4>Скидка на Nitro</h4>
+          <p style="color: #94a3b8; margin: 4px 0;">15% скидка на Discord Nitro</p>
+          <span>NITRO15</span>
+        </div>
+        <button class="copy-btn" onclick="copyPromo('NITRO15')"><i class="far fa-copy"></i> Копировать</button>
+      </div>
+      
+      <div class="promo-code">
+        <div>
+          <h4>Для своих</h4>
+          <p style="color: #94a3b8; margin: 4px 0;">200₽ скидка при заказе от 2000₽</p>
+          <span>FRIEND200</span>
+        </div>
+        <button class="copy-btn" onclick="copyPromo('FRIEND200')"><i class="far fa-copy"></i> Копировать</button>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-calendar-alt"></i> Календарь акций</h2>
+      <ul>
+        <li><i class="fas fa-gamepad"></i> <strong>Август 2026:</strong> Сезонные скидки на игры (Steam, EGS).</li>
+        <li><i class="fas fa-backpack"></i> <strong>Сентябрь 2026:</strong> Акция "Снова в школу" — скидки на ПО и курсы.</li>
+        <li><i class="fas fa-ghost"></i> <strong>Октябрь 2026:</strong> Хеллоуинская распродажа скинов и ключей.</li>
+      </ul>
+    </div>
+    
+    <div class="highlight-box">
+      <h3><i class="fas fa-users"></i> Партнерская программа</h3>
+      <p>Приглашайте друзей и получайте <strong>5% от их покупок</strong> на свой баланс!</p>
+      <button class="contact-btn" style="margin-top: 16px;" onclick="window.location.href='index.html#profile'">
+        <i class="fas fa-link"></i> Получить ссылку
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyPromo(code) {
+  navigator.clipboard?.writeText(code).then(() => {
+    alert('Промокод ' + code + ' скопирован!');
+  }).catch(() => {
+    prompt('Скопируйте промокод вручную:', code);
+  });
+}
+</script>
+
+<div class="bottom-nav">
+  <div class="nav-container">
+    <button class="nav-item active" onclick="window.location.href='index.html'"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#chat'"><div class="nav-icon">💬</div><div class="nav-label">Чаты</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#profile'"><div class="nav-icon">👤</div><div class="nav-label">Профиль</div></button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-copyright">
+    <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
+  </div>
+</footer>
+
+</body>
+</html>

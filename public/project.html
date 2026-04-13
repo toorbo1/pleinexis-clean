@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>О проекте — Плейнексис</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/bottom-nav.css">
+  <link rel="stylesheet" href="css/about.css">
+  <style>
+    body { background: radial-gradient(circle at 20% 30%, #0b0e1e, #04060a); min-height: 100vh; }
+    .page { display: block; padding: 85px 0 90px; }
+    .roadmap-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .roadmap-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .roadmap-marker {
+      width: 12px;
+      height: 12px;
+      background: #3b82f6;
+      border-radius: 50%;
+      margin-top: 8px;
+      box-shadow: 0 0 15px #3b82f6;
+    }
+    .roadmap-content h4 {
+      color: white;
+      margin-bottom: 4px;
+    }
+    .roadmap-content p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
+  </div>
+  <div class="header-center">
+    <div class="header-search" onclick="window.location.href='index.html'">
+      <i class="fas fa-search"></i>
+      <input placeholder="Поиск товаров..." class="global-search-input" readonly>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Главная</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#chat'"><i class="fas fa-comments"></i><span>Чаты</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#profile'"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
+  </div>
+</div>
+
+<div class="page active">
+  <div class="info-page-container">
+    <div class="info-header">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-cube"></i> О проекте</h1>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-code-branch"></i> Техническая информация</h2>
+      <p><strong>Версия платформы:</strong> 2.0.0 (Pleinexis Core)</p>
+      <p><strong>Стек технологий:</strong> Node.js, Express, PostgreSQL, Vanilla JS, CSS3/HTML5.</p>
+      <p><strong>Архитектура:</strong> SPA (Single Page Application) с серверным API и клиентским рендерингом.</p>
+      <p><strong>Хостинг:</strong> Облачная инфраструктура с автоматическим масштабированием.</p>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-road"></i> Roadmap развития</h2>
+      <div class="roadmap-timeline">
+        <div class="roadmap-item">
+          <div class="roadmap-marker" style="background: #22c55e;"></div>
+          <div class="roadmap-content">
+            <h4>Q1 2026 — Релиз платформы</h4>
+            <p>Базовая функциональность: регистрация, товары, чат, админ-панель, вывод средств.</p>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-marker" style="background: #f59e0b;"></div>
+          <div class="roadmap-content">
+            <h4>Q2 2026 — Система заданий и фриланс</h4>
+            <p>Внедрение раздела для исполнителей, создание и выполнение заданий, безопасная сделка.</p>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-marker"></div>
+          <div class="roadmap-content">
+            <h4>Q3 2026 — Партнерская программа</h4>
+            <p>Реферальные ссылки, кешбэк и многоуровневая система вознаграждений.</p>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-marker"></div>
+          <div class="roadmap-content">
+            <h4>Q4 2026 — Мобильное приложение</h4>
+            <p>Нативные приложения для iOS и Android с push-уведомлениями.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-award"></i> Команда проекта</h2>
+      <ul>
+        <li><i class="fas fa-user-tie"></i> <strong>Администратор проекта</strong> — Владелец платформы, развитие стратегии.</li>
+        <li><i class="fas fa-laptop-code"></i> <strong>Ведущий разработчик</strong> — Full-stack разработка, архитектура БД.</li>
+        <li><i class="fas fa-paint-brush"></i> <strong>UX/UI Дизайнер</strong> — Создание уникального темного интерфейса и анимаций.</li>
+        <li><i class="fas fa-headset"></i> <strong>Служба поддержки</strong> — Круглосуточная помощь пользователям.</li>
+      </ul>
+    </div>
+    
+    <div class="highlight-box">
+      <h3><i class="fas fa-gem"></i> Планы на будущее</h3>
+      <p>Мы стремимся стать универсальным маркетплейсом для цифровых товаров и фриланс-услуг в рунете. Присоединяйтесь к нам на этом пути!</p>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-container">
+    <button class="nav-item active" onclick="window.location.href='index.html'"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#chat'"><div class="nav-icon">💬</div><div class="nav-label">Чаты</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#profile'"><div class="nav-icon">👤</div><div class="nav-label">Профиль</div></button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-copyright">
+    <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
+  </div>
+</footer>
+
+</body>
+</html>

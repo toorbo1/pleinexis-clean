@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Интересное — Плейнексис</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/bottom-nav.css">
+  <link rel="stylesheet" href="css/about.css">
+  <style>
+    body { background: radial-gradient(circle at 20% 30%, #0b0e1e, #04060a); min-height: 100vh; }
+    .page { display: block; padding: 85px 0 90px; }
+    .blog-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(59,130,246,0.1);
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .blog-icon {
+      width: 60px;
+      height: 60px;
+      background: #3b82f6;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    .blog-content {
+      flex: 1;
+    }
+    .blog-content h4 {
+      color: white;
+      margin-bottom: 4px;
+    }
+    .blog-date {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    @media (max-width: 600px) {
+      .blog-card { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
+  </div>
+  <div class="header-center">
+    <div class="header-search" onclick="window.location.href='index.html'">
+      <i class="fas fa-search"></i>
+      <input placeholder="Поиск товаров..." class="global-search-input" readonly>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Главная</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#chat'"><i class="fas fa-comments"></i><span>Чаты</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#profile'"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
+  </div>
+</div>
+
+<div class="page active">
+  <div class="info-page-container">
+    <div class="info-header">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-newspaper"></i> Интересное</h1>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-blog"></i> Блог и новости</h2>
+      
+      <div class="blog-card">
+        <div class="blog-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="blog-content">
+          <h4>Тренды цифровых товаров 2026</h4>
+          <p>Какие подписки и игры будут самыми популярными в этом году? Читайте в нашем обзоре.</p>
+          <span class="blog-date"><i class="far fa-calendar"></i> 5 января 2026</span>
+        </div>
+      </div>
+      
+      <div class="blog-card">
+        <div class="blog-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="blog-content">
+          <h4>Как не попасть на мошенников при покупке ключей?</h4>
+          <p>Советы от службы безопасности Плейнексис: проверяйте рейтинг продавца и читайте отзывы.</p>
+          <span class="blog-date"><i class="far fa-calendar"></i> 28 декабря 2025</span>
+        </div>
+      </div>
+      
+      <div class="blog-card">
+        <div class="blog-icon"><i class="fas fa-coins"></i></div>
+        <div class="blog-content">
+          <h4>Заработок на маркетплейсе: история успеха</h4>
+          <p>Как наш пользователь "GameMaster" вышел на доход 150 000 ₽ в месяц на перепродаже подписок.</p>
+          <span class="blog-date"><i class="far fa-calendar"></i> 15 декабря 2025</span>
+        </div>
+      </div>
+      
+      <div class="blog-card">
+        <div class="blog-icon"><i class="fas fa-code"></i></div>
+        <div class="blog-content">
+          <h4>Обновление платформы v2.0.0</h4>
+          <p>Мы полностью переработали систему авторизации, добавили вход через Google/VK и улучшили чат поддержки.</p>
+          <span class="blog-date"><i class="far fa-calendar"></i> 1 декабря 2025</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="highlight-box">
+      <h3><i class="fas fa-telegram-plane"></i> Подписывайтесь на наш Telegram</h3>
+      <p>Самые свежие новости, эксклюзивные промокоды и закрытые распродажи только для подписчиков канала!</p>
+      <button class="contact-btn" style="margin-top: 16px;" onclick="window.open('https://t.me/pleinexis', '_blank')">
+        <i class="fab fa-telegram"></i> Перейти в Telegram
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-container">
+    <button class="nav-item active" onclick="window.location.href='index.html'"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#chat'"><div class="nav-icon">💬</div><div class="nav-label">Чаты</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#profile'"><div class="nav-icon">👤</div><div class="nav-label">Профиль</div></button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-copyright">
+    <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -2491,7 +2491,33 @@
     window.fixShopButton = fixShopButton;
     
     console.log('✅ ВСЕ ГЛОБАЛЬНЫЕ ФИКСЫ ЗАГРУЖЕНЫ');
+
+    // ========== ПЕРЕОПРЕДЕЛЕНИЕ ФУНКЦИИ ПОКАЗА ИНФОРМАЦИОННЫХ СТРАНИЦ ==========
+window.showInfo = function(type) {
+    // Карта соответствия ключей и URL страниц
+    const pages = {
+        'about': 'about.html',
+        'privacy': 'privacy.html',
+        'info': 'project.html',      // "О проекте" -> project.html
+        'discounts': 'discounts.html',
+        'interesting': 'interesting.html',
+        'contacts': 'about.html'     // Контакты ведут на "О нас", там есть кнопка поддержки
+    };
+    
+    const url = pages[type];
+    
+    // Если страница есть в карте, переходим на неё
+    if (url) {
+        window.location.href = url;
+    } else {
+        // Fallback на случай неизвестного типа
+        alert('Информация: ' + type + '\n\nСтраница находится в разработке.');
+    }
+};
+
+console.log('✅ Функция showInfo переопределена для работы с отдельными страницами');
 })();
+
 </script>
 
 </body>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>О нас — Плейнексис</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/bottom-nav.css">
+  <link rel="stylesheet" href="css/about.css">
+  <style>
+    body {
+      background: radial-gradient(circle at 20% 30%, #0b0e1e, #04060a);
+      min-height: 100vh;
+    }
+    .page { display: block; padding: 85px 0 90px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="https://sun9-16.userapi.com/s/v1/ig2/ifNNaXl-0n-3JuVmmdbnOuVHptkXbJ_zbxNkdb8Ate3hHjS1vFiWml7cCIwALPKc0eVnmtjBw0z8pmsOB9LEgSNU.jpg?quality=95&as=32x10,48x15,72x22,108x34,160x50,240x74,360x112,480x149,540x168,640x199,720x224,1080x335,1092x339&from=bu&u=KkR5CfXhpV-G9UyZx2QtDMP3Sb8VsMXHHSBA1Dhxw2c&cs=1080x0" alt="Плейнексис" class="header-logo">
+  </div>
+  <div class="header-center">
+    <div class="header-search" onclick="window.location.href='index.html'">
+      <i class="fas fa-search"></i>
+      <input placeholder="Поиск товаров..." class="global-search-input" readonly>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='index.html'"><i class="fas fa-home"></i><span>Главная</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#chat'"><i class="fas fa-comments"></i><span>Чаты</span></button>
+    <button class="nav-link" onclick="window.location.href='index.html#profile'"><i class="fas fa-user-circle"></i><span>Профиль</span></button>
+  </div>
+</div>
+
+<div class="page active">
+  <div class="info-page-container">
+    <div class="info-header">
+      <button class="back-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-users"></i> О нас</h1>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-rocket"></i> Плейнексис — маркетплейс нового поколения</h2>
+      <p>Мы создали платформу, где каждый может безопасно покупать и продавать цифровые товары: подписки, ключи активации, игровую валюту и многое другое. Наша миссия — сделать процесс покупки цифровых товаров быстрым, удобным и максимально безопасным.</p>
+      <p>Проект основан в 2024 году командой энтузиастов, которые устали от неудобных и ненадежных площадок. Мы стремимся создать экосистему, где продавцы получают честную репутацию, а покупатели — гарантию получения товара.</p>
+    </div>
+    
+    <div class="feature-grid">
+      <div class="feature-item">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Безопасность</h3>
+        <p>Все сделки защищены, а продавцы проходят верификацию.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-bolt"></i>
+        <h3>Мгновенная выдача</h3>
+        <p>Автоматическая выдача ключей сразу после оплаты.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-headset"></i>
+        <h3>Поддержка 24/7</h3>
+        <p>Наша команда всегда на связи, чтобы помочь вам.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-chart-line"></i>
+        <h3>Аналитика</h3>
+        <p>Прозрачная статистика и рейтинг для продавцов.</p>
+      </div>
+    </div>
+    
+    <div class="highlight-box">
+      <h3>Нас уже выбрали</h3>
+      <div class="highlight-number">12,500+</div>
+      <p>пользователей доверяют Плейнексис</p>
+    </div>
+    
+    <div class="info-card">
+      <h2><i class="fas fa-handshake"></i> Почему выбирают нас?</h2>
+      <ul>
+        <li><i class="fas fa-check-circle"></i> Низкие комиссии для продавцов (всего 5%).</li>
+        <li><i class="fas fa-check-circle"></i> Мгновенные выплаты на карты и электронные кошельки.</li>
+        <li><i class="fas fa-check-circle"></i> Программа защиты покупателей: возврат средств при проблемах.</li>
+        <li><i class="fas fa-check-circle"></i> Удобное мобильное приложение и веб-версия.</li>
+      </ul>
+    </div>
+    
+    <div class="contact-block">
+      <button class="contact-btn" onclick="window.location.href='index.html#chat'">
+        <i class="fab fa-telegram"></i> Написать в поддержку
+      </button>
+      <button class="contact-btn" onclick="window.location.href='index.html#profile'">
+        <i class="fas fa-user-plus"></i> Присоединиться
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-container">
+    <button class="nav-item active" onclick="window.location.href='index.html'"><div class="nav-icon">🏠</div><div class="nav-label">Главная</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#chat'"><div class="nav-icon">💬</div><div class="nav-label">Чаты</div></button>
+    <button class="nav-item" onclick="window.location.href='index.html#profile'"><div class="nav-icon">👤</div><div class="nav-label">Профиль</div></button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-copyright">
+    <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
+  </div>
+</footer>
+
+</body>
+</html>
