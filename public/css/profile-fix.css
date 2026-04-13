@@ -1,0 +1,432 @@
+/* ===== profile-fix.css - ГАРАНТИРОВАННОЕ ИСПРАВЛЕНИЕ ПРОФИЛЯ ===== */
+
+/* Сбрасываем все возможные переопределения */
+#profile .profile-page-container,
+.page#profile .profile-page-container {
+  display: grid !important;
+  grid-template-columns: 1fr 2.2fr !important;
+  gap: 28px !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 24px !important;
+  min-height: 100vh !important;
+  align-items: start !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Сайдбар профиля */
+#profile .profile-sidebar {
+  position: sticky !important;
+  top: 24px !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#profile .profile-card {
+  border-radius: 40px !important;
+  padding: 40px 32px !important;
+  text-align: center !important;
+  background: rgba(8, 8, 18, 0.75) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Аватар */
+#profile .avatar-wrapper {
+  position: relative !important;
+  width: 150px !important;
+  height: 150px !important;
+  margin: 0 auto 28px !important;
+  display: block !important;
+}
+
+#profile .avatar-ring {
+  position: absolute !important;
+  inset: -5px !important;
+  border-radius: 50% !important;
+  background: conic-gradient(from 0deg, #8b5cf6, #10b981, #3b82f6, #f59e0b, #8b5cf6) !important;
+  animation: spinRing 10s linear infinite !important;
+  display: block !important;
+}
+
+#profile .avatar-inner {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  padding: 4px !important;
+  background: rgba(20, 20, 35, 0.9) !important;
+  border: 2px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  z-index: 2 !important;
+}
+
+#profile .avatar-initial {
+  font-size: 56px !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #ffffff, #c4b5fd) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Имя пользователя */
+#profile .profile-username {
+  font-size: 2.4rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  background: linear-gradient(135deg, #ffffff, #c4b5fd, #ffffff) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  margin-bottom: 10px !important;
+  line-height: 1.2 !important;
+  display: block !important;
+}
+
+/* Верифицированный бейдж */
+#profile .verified-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  padding: 6px 18px !important;
+  border-radius: 60px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #6ee7b7 !important;
+  margin-bottom: 18px !important;
+}
+
+/* Рейтинг */
+#profile .profile-rating {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+#profile .stars {
+  display: flex !important;
+  gap: 3px !important;
+  color: #fbbf24 !important;
+}
+
+#profile .rating-value {
+  font-weight: 700 !important;
+  color: #e5e5e5 !important;
+  font-size: 0.95rem !important;
+}
+
+/* Кнопки */
+#profile .profile-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+#profile .btn-gradient,
+#profile .btn-glass,
+#profile .btn-logout {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 16px 24px !important;
+  border-radius: 60px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+#profile .btn-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+  color: white !important;
+  border: none !important;
+}
+
+#profile .btn-glass {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1.5px solid rgba(139, 92, 246, 0.4) !important;
+  color: #c4b5fd !important;
+}
+
+#profile .btn-logout {
+  background: transparent !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #f87171 !important;
+}
+
+/* Основная область */
+#profile .profile-main {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 28px !important;
+}
+
+/* Карточка баланса */
+#profile .balance-card {
+  border-radius: 28px !important;
+  padding: 28px 32px !important;
+  background: rgba(8, 8, 18, 0.5) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer !important;
+}
+
+#profile .balance-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 20px !important;
+}
+
+#profile .balance-icon {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+#profile .balance-icon i {
+  font-size: 28px !important;
+  color: #10b981 !important;
+}
+
+#profile .balance-amount {
+  font-size: 2.8rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #ffffff, #6ee7b7) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  line-height: 1.1 !important;
+}
+
+/* Сетка статистики */
+#profile .stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 18px !important;
+}
+
+#profile .stat-card {
+  border-radius: 24px !important;
+  padding: 24px 20px !important;
+  background: rgba(10, 10, 22, 0.45) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+#profile .stat-value {
+  font-size: 2.4rem !important;
+  font-weight: 800 !important;
+  color: white !important;
+  line-height: 1.1 !important;
+}
+
+#profile .stat-label {
+  font-size: 0.75rem !important;
+  color: #a1a1aa !important;
+  text-transform: uppercase !important;
+  margin-top: 8px !important;
+}
+
+/* Табы */
+#profile .profile-tabs {
+  display: flex !important;
+  gap: 8px !important;
+  background: rgba(20, 20, 35, 0.5) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  padding: 6px !important;
+  border-radius: 60px !important;
+  width: fit-content !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+#profile .profile-tab-btn {
+  padding: 12px 28px !important;
+  border-radius: 50px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #a1a1aa !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+}
+
+#profile .profile-tab-btn.active {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+  color: white !important;
+}
+
+/* Список товаров */
+#profile .products-list-container {
+  border-radius: 28px !important;
+  padding: 28px !important;
+  background: rgba(10, 10, 22, 0.45) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  min-height: 400px !important;
+}
+
+/* Анимация кольца */
+@keyframes spinRing {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+@media (max-width: 1024px) {
+  #profile .profile-page-container,
+  .page#profile .profile-page-container {
+    grid-template-columns: 1fr !important;
+    padding: 20px !important;
+  }
+  
+  #profile .profile-sidebar {
+    position: static !important;
+    max-width: 500px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  
+  #profile .stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #profile .profile-page-container,
+  .page#profile .profile-page-container {
+    padding: 16px !important;
+    gap: 20px !important;
+  }
+  
+  #profile .profile-card {
+    padding: 28px 20px !important;
+    border-radius: 32px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 12, 20, 0.9) !important;
+  }
+  
+  #profile .avatar-wrapper {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  
+  #profile .avatar-initial {
+    font-size: 44px !important;
+  }
+  
+  #profile .profile-username {
+    font-size: 1.8rem !important;
+  }
+  
+  #profile .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  #profile .stat-card {
+    padding: 18px 20px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 12, 20, 0.7) !important;
+  }
+  
+  #profile .balance-card {
+    padding: 20px 20px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 12, 20, 0.7) !important;
+  }
+  
+  #profile .balance-amount {
+    font-size: 2rem !important;
+  }
+  
+  #profile .balance-icon {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  
+  #profile .profile-tabs {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  #profile .profile-tab-btn {
+    padding: 10px 16px !important;
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #profile .profile-page-container,
+  .page#profile .profile-page-container {
+    padding: 8px !important;
+    gap: 10px !important;
+  }
+  
+  #profile .profile-card {
+    padding: 16px 12px !important;
+  }
+  
+  #profile .avatar-wrapper {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  #profile .avatar-initial {
+    font-size: 38px !important;
+  }
+  
+  #profile .profile-username {
+    font-size: 1.5rem !important;
+  }
+  
+  #profile .balance-amount {
+    font-size: 1.6rem !important;
+  }
+  
+  #profile .stat-value {
+    font-size: 1.6rem !important;
+  }
+  
+  #profile .btn-gradient,
+  #profile .btn-glass,
+  #profile .btn-logout {
+    padding: 12px 18px !important;
+    font-size: 0.8rem !important;
+  }
+}

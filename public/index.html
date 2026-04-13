@@ -37,6 +37,7 @@
 <!-- 5. Адаптивность (ВСЕГДА ПОСЛЕДНИМИ) -->
 <link rel="stylesheet" href="css/responsive.css?v=2">
 <link rel="stylesheet" href="premium-mobile.css?v=2">
+<link rel="stylesheet" href="profile-fix.css?v=2">
 
   <style>
   /* дополнительные стили именно для страницы (демо) */
@@ -635,11 +636,9 @@
 <div class="page" id="profile">
   <div class="profile-page-container">
     
-    <!-- САЙДБАР (КАРТОЧКА ПРОФИЛЯ) -->
+    <!-- САЙДБАР -->
     <aside class="profile-sidebar">
       <div class="profile-card">
-        
-        <!-- Аватар с вращающимся кольцом -->
         <div class="avatar-wrapper">
           <div class="avatar-ring"></div>
           <div class="avatar-inner" id="profileAvatarCircle">
@@ -648,27 +647,22 @@
           <div class="avatar-status"></div>
         </div>
         
-        <!-- Никнейм -->
         <h2 class="profile-username" id="profileUsername">Гость</h2>
         
-        <!-- Verified бейдж -->
         <span class="verified-badge" id="verifiedBadge">
           <i class="fas fa-check-circle"></i> Verified Seller
         </span>
         
-        <!-- Рейтинг -->
         <div class="profile-rating">
           <span class="stars" id="profileStars">★★★★★</span>
           <span class="rating-value" id="profileRatingValue">5.0</span>
         </div>
         <a href="#" class="reviews-link" id="profileReviewsLink">0 отзывов</a>
         
-        <!-- Дата регистрации -->
         <p class="profile-joined" id="profileJoined">
           <i class="far fa-calendar"></i> на платформе с янв 2024
         </p>
         
-        <!-- Кнопки действий -->
         <div class="profile-actions">
           <button class="btn-gradient" id="adminProfileBtn">
             <i class="fas fa-user-shield"></i> Админ-панель
@@ -709,25 +703,16 @@
           <div class="stat-icon"><i class="fas fa-box"></i></div>
           <div class="stat-value" id="profileProductsCount">0</div>
           <div class="stat-label">Мои товары</div>
-          <svg class="stat-sparkline" viewBox="0 0 80 25">
-            <path d="M0 20 L10 10 L20 15 L30 5 L40 18 L50 8 L60 22 L70 12 L80 15" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
-          </svg>
         </div>
         <div class="stat-card purchases">
           <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
           <div class="stat-value" id="profilePurchasesCount">0</div>
           <div class="stat-label">Покупки</div>
-          <svg class="stat-sparkline" viewBox="0 0 80 25">
-            <path d="M0 15 L10 8 L20 18 L30 12 L40 5 L50 20 L60 10 L70 18 L80 8" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
-          </svg>
         </div>
         <div class="stat-card sales">
           <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
           <div class="stat-value" id="profileSalesCount">0</div>
           <div class="stat-label">Продажи</div>
-          <svg class="stat-sparkline" viewBox="0 0 80 25">
-            <path d="M0 18 L10 22 L20 10 L30 8 L40 20 L50 15 L60 5 L70 12 L80 8" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/>
-          </svg>
         </div>
       </div>
       

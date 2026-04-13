@@ -493,3 +493,16 @@
   }
   
 })();
+// Принудительная инициализация при загрузке страницы
+(function forceInit() {
+  const profilePage = document.getElementById('profile');
+  if (profilePage) {
+    // Ждём 500мс после загрузки DOM и принудительно запускаем
+    setTimeout(() => {
+      console.log('🔥 FORCE INIT PROFILE');
+      if (typeof window.initProfilePage === 'function') {
+        window.initProfilePage();
+      }
+    }, 500);
+  }
+})();
