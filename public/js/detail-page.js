@@ -241,10 +241,8 @@ async function renderDetailPage(product) {
         ` : `
         <div class="similar-products-empty">
             <i class="fas fa-box-open"></i>
-            <p>Нет похожих товаров в категории "${escapeHtml(product.keyword || 'Без категории')}"</p>
-            <button class="view-all-similar-btn" onclick="openKeywordPage('${escapeHtml(product.keyword || '')}')">
-                <i class="fas fa-search"></i> Посмотреть все товары
-            </button>
+            <p>Нет похожих товаров в категории </p>
+            
         </div>
         `}
         
