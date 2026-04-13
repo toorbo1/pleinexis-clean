@@ -23,7 +23,7 @@ window.openProductDetailById = async function(productId) {
     }
 };
 
-// Закрытие страницы деталей
+// Закрытие страницы деталей (по клику на фон или кнопку назад)
 window.closeDetail = function() {
     const detailPage = document.getElementById('detailPage');
     if (detailPage) {
@@ -36,8 +36,10 @@ window.closeDetail = function() {
 async function loadSimilarProducts(keyword, currentProductId) {
     try {
         const response = await fetch('/api/products?_=' + Date.now());
+        if (!response.ok) return [];
         const products = await response.json();
         
+        // Фильтруем товары с таким же ключевым словом, исключая текущий
         const similar = products.filter(p => 
             p.keyword === keyword && 
             p.id !== currentProductId
@@ -117,7 +119,7 @@ async function renderDetailPage(product) {
         }
     }
     
-    // Рендеринг
+    // Рендеринг (без верхней панели с крестиком)
     container.innerHTML = `
         <!-- Кнопка назад -->
         <div style="margin-bottom: 20px;">
@@ -151,9 +153,6 @@ async function renderDetailPage(product) {
                 <div class="detail-buttons-row">
                     <button class="buy-button-inline" onclick="buyProduct('${id}')">
                         <i class="fas fa-shopping-cart"></i> Купить
-                    </button>
-                    <button class="chat-button-inline" onclick="contactSeller('${escapeHtml(seller)}')">
-                        <i class="fas fa-comment"></i> Связаться
                     </button>
                 </div>
                 
@@ -335,39 +334,6 @@ function sendPurchaseNotification(sellerName, productTitle, buyerName) {
     
     showToast(`✅ Уведомление отправлено продавцу ${sellerName}`, 'success');
 }
-
-// Связь с продавцом
-window.contactSeller = function(sellerName) {
-    let dialogs = JSON.parse(localStorage.getItem('apex_dialogs') || '[]');
-    let existingDialog = dialogs.find(d => d.name === sellerName);
-    
-    if (!existingDialog) {
-        existingDialog = {
-            id: Date.now().toString(),
-            name: sellerName,
-            avatar: '👤',
-            messages: []
-        };
-        dialogs.push(existingDialog);
-        localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
-    }
-    
-    closeDetail();
-    
-    setTimeout(() => {
-        if (typeof navigate === 'function') {
-            navigate('chat');
-        } else if (typeof showPage === 'function') {
-            showPage('chat');
-        }
-        
-        setTimeout(() => {
-            if (typeof openChatWithDialog === 'function') {
-                openChatWithDialog(existingDialog.id);
-            }
-        }, 150);
-    }, 100);
-};
 
 // Показать уведомление
 function showToast(message, type = 'success') {

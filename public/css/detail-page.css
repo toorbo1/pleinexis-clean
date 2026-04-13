@@ -46,33 +46,6 @@
   to { opacity: 1; transform: translateY(0);}
 }
 
-/* Хедер детальной страницы */
-.detail-header {
-  position: sticky;
-  top: 0;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(20px);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-light);
-  z-index: 10;
-}
-
-.detail-header h2 {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.close-detail {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.3rem;
-  cursor: pointer;
-}
-
 /* Общие отступы как на всех страницах */
 .detail-page #detailContent {
   max-width: 1400px;
@@ -114,9 +87,9 @@
 
 /* Фото товара - БОЛЬШОЕ */
 .detail-image-col {
-  flex: 1.2;
-  min-width: 320px;
-  max-width: 500px;
+  flex: 1.5;
+  min-width: 380px;
+  max-width: 600px;
 }
 
 .product-detail-image {
@@ -131,7 +104,7 @@
 
 /* Информация справа */
 .detail-info-col {
-  flex: 1.5;
+  flex: 1;
   min-width: 280px;
 }
 
@@ -207,16 +180,13 @@
   font-weight: 700;
 }
 
-/* Кнопки */
+/* Кнопка Купить */
 .detail-buttons-row {
-  display: flex;
-  gap: 16px;
   margin-bottom: 28px;
-  flex-wrap: wrap;
 }
 
 .buy-button-inline {
-  flex: 1;
+  width: 100%;
   padding: 16px 24px;
   background: linear-gradient(105deg, #3b82f6, #2563eb);
   border: none;
@@ -236,28 +206,6 @@
 .buy-button-inline:hover {
   transform: translateY(-3px);
   box-shadow: 0 0 35px rgba(59, 130, 246, 0.6);
-}
-
-.chat-button-inline {
-  flex: 1;
-  padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  border-radius: 60px;
-  color: #c4b5fd;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.chat-button-inline:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: #a78bfa;
-  transform: translateY(-3px);
 }
 
 /* Информация о продавце */
@@ -493,16 +441,10 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
-}
-
-@media (max-width: 480px) {
-  .similar-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
   
   .detail-image-col {
     min-width: 100%;
+    max-width: 100%;
   }
   
   .product-detail-name {
@@ -511,6 +453,13 @@
   
   .product-detail-price .current-price {
     font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .similar-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
 }
 
