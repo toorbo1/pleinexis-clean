@@ -5,12 +5,13 @@ const compression = require('compression');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-
+const WebSocket = require('ws');
 const app = express();
 
 // JWT секрет (в продакшене должен быть в переменных окружения)
 const JWT_SECRET = process.env.JWT_SECRET || 'pleinexis_super_secret_key_2024';
 const SALT_ROUNDS = 12;
+
 
 // ========== НАСТРОЙКИ ==========
 app.use(compression({ level: 6, threshold: 1024 }));
@@ -1168,17 +1169,128 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ========== ЗАПУСК ==========
+
+// 2. Оборачиваем app.listen, чтобы WebSocket работал на том же сервере
 const PORT = process.env.PORT || 3000;
+let server; // объявим переменную заранее
 
 async function startServer() {
     console.log('🚀 Запуск сервера Плейнексис...');
     await ensureTables();
-    app.listen(PORT, () => {
-        console.log(`✅ HTTP сервер запущен на порту ${PORT}`);
+    
+    // Создаем HTTP сервер
+    server = app.listen(PORT, () => {
+        console.log(`✅ HTTP и WebSocket сервер запущен на порту ${PORT}`);
         console.log(`⚡ Сжатие включено, кэш статики: 1 год, кэш API: ${CACHE_TTL/1000}с`);
         console.log(`🔐 JWT авторизация включена`);
+        console.log(`🔄 Live Reload активен. Команда для обновления: /api/reload-all`);
+    });
+
+    // 3. Инициализация WebSocket сервера
+    const wss = new WebSocket.Server({ server });
+    const connectedClients = new Set();
+
+    wss.on('connection', (ws) => {
+        console.log('🔌 Клиент подключился к Live Reload. Всего клиентов:', connectedClients.size + 1);
+        connectedClients.add(ws);
+
+        ws.on('close', () => {
+            console.log('🔌 Клиент отключился. Осталось клиентов:', connectedClients.size - 1);
+            connectedClients.delete(ws);
+        });
+
+        ws.on('error', (err) => {
+            console.error('WebSocket error:', err);
+            connectedClients.delete(ws);
+        });
+    });
+
+    // 4. API для принудительного обновления всех клиентов
+    app.post('/api/reload-all', (req, res) => {
+        const SECRET_KEY = process.env.RELOAD_SECRET || 'admin123'; // Тот же пароль, что и в админку
+        
+        // Простая проверка пароля (можно передавать в теле запроса или заголовке)
+        const password = req.body.password || req.headers['x-reload-key'];
+        
+        if (password !== SECRET_KEY) {
+            return res.status(401).json({ error: 'Неверный ключ авторизации' });
+        }
+
+        if (connectedClients.size === 0) {
+            return res.json({ success: true, message: 'Нет активных клиентов для обновления', clients: 0 });
+        }
+
+        let count = 0;
+        connectedClients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({ type: 'RELOAD' }));
+                count++;
+            }
+        });
+
+        console.log(`🔄 Отправлена команда RELOAD на ${count} клиентов`);
+        res.json({ success: true, message: `Команда обновления отправлена ${count} клиентам`, clients: count });
+    });
+
+    // Простая HTML-форма для удобного вызова (можно открыть в браузере)
+    app.get('/reload-dashboard', (req, res) => {
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Плейнексис — Панель управления</title>
+                <style>
+                    body { font-family: system-ui; background: #0a0c16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+                    .panel { background: #151a2d; padding: 30px 40px; border-radius: 24px; text-align: center; box-shadow: 0 10px 30px #00000080; border: 1px solid #2a3650; }
+                    h2 { margin-top: 0; color: #60a5fa; }
+                    input { padding: 12px 16px; border-radius: 40px; border: none; background: #0a0c16; color: white; width: 200px; text-align: center; font-size: 18px; letter-spacing: 2px; border: 1px solid #2a3650; }
+                    button { padding: 12px 28px; border-radius: 40px; border: none; background: #ef4444; color: white; font-weight: bold; cursor: pointer; margin-left: 10px; }
+                    button:hover { background: #dc2626; }
+                    #status { margin-top: 20px; color: #9ca3af; }
+                    .hint { margin-top: 30px; font-size: 14px; color: #4a5568; border-top: 1px solid #2a3650; padding-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="panel">
+                    <h2>🔄 Плейнексис — Live Reload</h2>
+                    <p>Отправка сигнала на обновление всем пользователям</p>
+                    <input type="password" id="passwordInput" placeholder="Ключ доступа" value="admin123">
+                    <button onclick="sendReload()">Обновить у всех</button>
+                    <div id="status"></div>
+                    <div class="hint">
+                        Ключ по умолчанию: <code>admin123</code><br>
+                        (тот же, что и для входа в админку)
+                    </div>
+                </div>
+                <script>
+                    async function sendReload() {
+                        const status = document.getElementById('status');
+                        const password = document.getElementById('passwordInput').value;
+                        status.textContent = '⏳ Отправка...';
+                        try {
+                            const res = await fetch('/api/reload-all', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ password: password })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                                status.textContent = '✅ ' + data.message;
+                            } else {
+                                status.textContent = '❌ ' + (data.error || 'Ошибка');
+                            }
+                        } catch (e) {
+                            status.textContent = '❌ Ошибка соединения';
+                        }
+                    }
+                </script>
+            </body>
+            </html>
+        `);
     });
 }
 
+// Вместо app.listen используем startServer
 startServer();
