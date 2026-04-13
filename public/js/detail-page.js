@@ -51,7 +51,6 @@ async function loadSimilarProducts(keyword, currentProductId) {
         return [];
     }
 }
-
 // Основная функция рендеринга
 async function renderDetailPage(product) {
     const container = document.getElementById('detailContent');
@@ -89,17 +88,10 @@ async function renderDetailPage(product) {
     } else if (discount) {
         if (String(discount).includes('%')) {
             discountPercent = String(discount).replace('%', '');
-            if (!isNaN(priceNum) && discountPercent > 0) {
-                const oldPrice = priceNum / (1 - discountPercent / 100);
-                formattedOriginalPrice = Math.round(oldPrice) + ' ₽';
-                formattedCurrentPrice = price;
-            }
         } else {
             const discountNum = parseFloat(String(discount).replace(/[^0-9.-]/g, ''));
             if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
                 const oldPrice = priceNum + discountNum;
-                formattedOriginalPrice = Math.round(oldPrice) + ' ₽';
-                formattedCurrentPrice = price;
                 discountPercent = Math.round((discountNum / oldPrice) * 100);
             }
         }
@@ -131,6 +123,7 @@ async function renderDetailPage(product) {
         <!-- Блок: Фото + информация -->
         <div class="detail-top-row">
             <div class="detail-image-col">
+                ${discountPercent ? `<div class="detail-discount-badge">🔥 -${discountPercent}%</div>` : ''}
                 <img class="product-detail-image" 
                      src="${escapeHtml(imageUrl)}" 
                      alt="${title}"
@@ -147,7 +140,6 @@ async function renderDetailPage(product) {
                 <div class="product-detail-price">
                     ${formattedOriginalPrice ? `<span class="old-price">${formattedOriginalPrice}</span>` : ''}
                     <span class="current-price">${formattedCurrentPrice}</span>
-                    ${discountPercent ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
                 </div>
                 
                 <div class="detail-buttons-row">
@@ -208,7 +200,7 @@ async function renderDetailPage(product) {
             </div>
         </div>
         
-        <!-- ===== ПОХОЖИЕ ТОВАРЫ (В САМОМ КОНЦЕ) ===== -->
+        <!-- ПОХОЖИЕ ТОВАРЫ -->
         ${similarProducts.length > 0 ? `
         <div class="similar-products-section">
             <div class="similar-products-header">
@@ -216,13 +208,26 @@ async function renderDetailPage(product) {
                 <span class="similar-products-badge">по категории "${escapeHtml(product.keyword || 'Без категории')}"</span>
             </div>
             <div class="similar-products-grid">
-                ${similarProducts.map(p => `
+                ${similarProducts.map(p => {
+                    let similarDiscountPercent = '';
+                    const pPriceNum = parseFloat(String(p.price).replace(/[^0-9.-]/g, ''));
+                    if (p.discount) {
+                        if (String(p.discount).includes('%')) {
+                            similarDiscountPercent = String(p.discount).replace('%', '');
+                        } else {
+                            const discountNum = parseFloat(String(p.discount).replace(/[^0-9.-]/g, ''));
+                            if (!isNaN(pPriceNum) && !isNaN(discountNum) && discountNum > 0) {
+                                similarDiscountPercent = Math.round((discountNum / (pPriceNum + discountNum)) * 100);
+                            }
+                        }
+                    }
+                    return `
                     <div class="similar-product-card" onclick="window.openProductDetailById('${p.id}')">
                         <div class="similar-product-image-wrapper">
                             <img class="similar-product-image" src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
                                  alt="${escapeHtml(p.title)}"
                                  onerror="this.src='https://picsum.photos/id/42/400/300'">
-                            ${p.discount ? `<span class="similar-product-discount">🔥</span>` : ''}
+                            ${similarDiscountPercent ? `<span class="similar-product-discount">-${similarDiscountPercent}%</span>` : ''}
                         </div>
                         <div class="similar-product-body">
                             <div class="similar-product-title">${escapeHtml(p.title.substring(0, 50))}</div>
@@ -230,7 +235,7 @@ async function renderDetailPage(product) {
                             <div class="similar-product-seller">${escapeHtml(p.seller || 'Продавец')}</div>
                         </div>
                     </div>
-                `).join('')}
+                `}).join('')}
             </div>
             <div class="similar-products-footer">
                 <button class="view-all-similar-btn" onclick="openKeywordPage('${escapeHtml(product.keyword || '')}')">
@@ -241,8 +246,10 @@ async function renderDetailPage(product) {
         ` : `
         <div class="similar-products-empty">
             <i class="fas fa-box-open"></i>
-            <p>Нет похожих товаров в категории </p>
-            
+            <p>Нет похожих товаров в категории "${escapeHtml(product.keyword || 'Без категории')}"</p>
+            <button class="view-all-similar-btn" onclick="openKeywordPage('${escapeHtml(product.keyword || '')}')">
+                <i class="fas fa-search"></i> Посмотреть все товары
+            </button>
         </div>
         `}
         
