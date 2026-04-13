@@ -123,7 +123,7 @@ async function renderDetailPage(product) {
         <!-- Блок: Фото + информация -->
         <div class="detail-top-row">
             <div class="detail-image-col">
-                ${discountPercent ? `<div class="detail-discount-badge">🔥 -${discountPercent}%</div>` : ''}
+                ${discountPercent ? `<div class="detail-discount-badge"> -${discountPercent}%</div>` : ''}
                 <img class="product-detail-image" 
                      src="${escapeHtml(imageUrl)}" 
                      alt="${title}"
