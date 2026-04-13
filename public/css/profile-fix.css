@@ -1,6 +1,6 @@
-/* ===== profile-fix.css - ГАРАНТИРОВАННОЕ ИСПРАВЛЕНИЕ ПРОФИЛЯ ===== */
+/* ===== profile-fix.css - ТОЛЬКО ДЛЯ СТРАНИЦЫ ПРОФИЛЯ ===== */
 
-/* Сбрасываем все возможные переопределения */
+/* Все стили применяются ТОЛЬКО внутри #profile */
 #profile .profile-page-container,
 .page#profile .profile-page-container {
   display: grid !important;
@@ -15,7 +15,6 @@
   z-index: 5 !important;
 }
 
-/* Сайдбар профиля */
 #profile .profile-sidebar {
   position: sticky !important;
   top: 24px !important;
@@ -37,7 +36,6 @@
   opacity: 1 !important;
 }
 
-/* Аватар */
 #profile .avatar-wrapper {
   position: relative !important;
   width: 150px !important;
@@ -53,6 +51,11 @@
   background: conic-gradient(from 0deg, #8b5cf6, #10b981, #3b82f6, #f59e0b, #8b5cf6) !important;
   animation: spinRing 10s linear infinite !important;
   display: block !important;
+}
+
+@keyframes spinRing {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 #profile .avatar-inner {
@@ -79,7 +82,19 @@
   color: transparent !important;
 }
 
-/* Имя пользователя */
+#profile .avatar-status {
+  position: absolute !important;
+  bottom: 6px !important;
+  right: 6px !important;
+  width: 24px !important;
+  height: 24px !important;
+  background: #10b981 !important;
+  border-radius: 50% !important;
+  border: 3px solid #0a0a14 !important;
+  box-shadow: 0 0 25px #10b981 !important;
+  z-index: 3 !important;
+}
+
 #profile .profile-username {
   font-size: 2.4rem !important;
   font-weight: 800 !important;
@@ -92,9 +107,9 @@
   margin-bottom: 10px !important;
   line-height: 1.2 !important;
   display: block !important;
+  word-break: break-word !important;
 }
 
-/* Верифицированный бейдж */
 #profile .verified-badge {
   display: inline-flex !important;
   align-items: center !important;
@@ -109,7 +124,6 @@
   margin-bottom: 18px !important;
 }
 
-/* Рейтинг */
 #profile .profile-rating {
   display: flex !important;
   align-items: center !important;
@@ -130,7 +144,25 @@
   font-size: 0.95rem !important;
 }
 
-/* Кнопки */
+#profile .reviews-link {
+  font-size: 0.7rem !important;
+  color: #8b5cf6 !important;
+  text-decoration: none !important;
+  margin-left: 6px !important;
+  display: inline-block !important;
+  margin-bottom: 16px !important;
+}
+
+#profile .profile-joined {
+  font-size: 0.75rem !important;
+  color: #71717a !important;
+  margin-bottom: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
 #profile .profile-actions {
   display: flex !important;
   flex-direction: column !important;
@@ -170,14 +202,12 @@
   color: #f87171 !important;
 }
 
-/* Основная область */
 #profile .profile-main {
   display: flex !important;
   flex-direction: column !important;
   gap: 28px !important;
 }
 
-/* Карточка баланса */
 #profile .balance-card {
   border-radius: 28px !important;
   padding: 28px 32px !important;
@@ -213,6 +243,19 @@
   color: #10b981 !important;
 }
 
+#profile .balance-info {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#profile .balance-label {
+  font-size: 0.8rem !important;
+  color: #71717a !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  margin-bottom: 6px !important;
+}
+
 #profile .balance-amount {
   font-size: 2.8rem !important;
   font-weight: 800 !important;
@@ -223,7 +266,18 @@
   line-height: 1.1 !important;
 }
 
-/* Сетка статистики */
+#profile .balance-trend {
+  font-size: 0.7rem !important;
+  color: #34d399 !important;
+  margin-top: 6px !important;
+}
+
+#profile .balance-chevron {
+  font-size: 32px !important;
+  color: #71717a !important;
+  opacity: 0.5 !important;
+}
+
 #profile .stats-grid {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
@@ -239,6 +293,15 @@
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
+#profile .stat-icon {
+  font-size: 1.8rem !important;
+  margin-bottom: 18px !important;
+}
+
+#profile .stat-card.products .stat-icon { color: #8b5cf6 !important; }
+#profile .stat-card.purchases .stat-icon { color: #3b82f6 !important; }
+#profile .stat-card.sales .stat-icon { color: #f59e0b !important; }
+
 #profile .stat-value {
   font-size: 2.4rem !important;
   font-weight: 800 !important;
@@ -253,7 +316,6 @@
   margin-top: 8px !important;
 }
 
-/* Табы */
 #profile .profile-tabs {
   display: flex !important;
   gap: 8px !important;
@@ -285,7 +347,13 @@
   color: white !important;
 }
 
-/* Список товаров */
+#profile .tab-badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  padding: 3px 10px !important;
+  border-radius: 40px !important;
+  font-size: 0.7rem !important;
+}
+
 #profile .products-list-container {
   border-radius: 28px !important;
   padding: 28px !important;
@@ -296,13 +364,118 @@
   min-height: 400px !important;
 }
 
-/* Анимация кольца */
-@keyframes spinRing {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Empty state */
+#profile .empty-state {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 60px 30px !important;
+  text-align: center !important;
+  height: 100% !important;
+  min-height: 400px !important;
 }
 
-/* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+#profile .empty-icon {
+  width: 200px !important;
+  height: 200px !important;
+  margin-bottom: 28px !important;
+}
+
+#profile .empty-title {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin-bottom: 14px !important;
+}
+
+#profile .empty-desc {
+  font-size: 1rem !important;
+  color: #a1a1aa !important;
+  max-width: 420px !important;
+  margin-bottom: 36px !important;
+  line-height: 1.7 !important;
+}
+
+#profile .btn-primary {
+  padding: 18px 40px !important;
+  border-radius: 60px !important;
+  background: linear-gradient(135deg, #8b5cf6, #4f46e5) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  cursor: pointer !important;
+}
+
+/* Карточки товаров */
+#profile .product-item {
+  display: flex !important;
+  align-items: center !important;
+  padding: 18px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-radius: 20px !important;
+  margin-bottom: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  cursor: pointer !important;
+}
+
+#profile .product-img {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 18px !important;
+  object-fit: cover !important;
+  margin-right: 18px !important;
+  background: #1a1a2e !important;
+}
+
+#profile .product-info {
+  flex: 1 !important;
+}
+
+#profile .product-title {
+  font-weight: 700 !important;
+  color: white !important;
+  margin-bottom: 6px !important;
+}
+
+#profile .product-price {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #10b981 !important;
+}
+
+#profile .product-status {
+  font-size: 0.7rem !important;
+  padding: 4px 12px !important;
+  border-radius: 30px !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  display: inline-block !important;
+}
+
+#profile .product-actions {
+  display: flex !important;
+  gap: 8px !important;
+}
+
+#profile .product-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #a1a1aa !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+/* ===== МОБИЛЬНАЯ АДАПТАЦИЯ (ТОЛЬКО ДЛЯ ПРОФИЛЯ) ===== */
 @media (max-width: 1024px) {
   #profile .profile-page-container,
   .page#profile .profile-page-container {
@@ -389,6 +562,12 @@
     justify-content: center !important;
     font-size: 0.8rem !important;
   }
+  
+  #profile .products-list-container {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10, 12, 20, 0.7) !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -428,5 +607,15 @@
   #profile .btn-logout {
     padding: 12px 18px !important;
     font-size: 0.8rem !important;
+  }
+  
+  #profile .product-item {
+    flex-wrap: wrap !important;
+  }
+  
+  #profile .product-actions {
+    width: 100% !important;
+    justify-content: flex-end !important;
+    margin-top: 12px !important;
   }
 }
