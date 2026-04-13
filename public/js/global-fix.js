@@ -5,42 +5,110 @@
 
     window.productsArray = [];
 
-    window.loadProducts = async function() {
-        console.log('🔄 loadProducts: запрос к API...');
-        try {
-            const response = await fetch('/api/products?_=' + Date.now());
-            if (!response.ok) throw new Error('Ошибка загрузки товаров');
-            const products = await response.json();
-            window.productsArray = products;
-            console.log(`✅ Загружено ${products.length} товаров`);
-            
-            const grid = document.getElementById('productsGrid');
-            if (grid) {
-                if (!products.length) {
-                    grid.innerHTML = '<div class="empty-state">Нет товаров</div>';
-                } else {
-                    grid.innerHTML = products.map(p => `
+// Замените функцию loadProducts в global-fix.js на эту:
+
+window.loadProducts = async function() {
+    console.log('🔄 loadProducts: запрос к API...');
+    try {
+        const response = await fetch('/api/products?_=' + Date.now());
+        if (!response.ok) throw new Error('Ошибка загрузки товаров');
+        const products = await response.json();
+        window.productsArray = products;
+        console.log(`✅ Загружено ${products.length} товаров`);
+        
+        const grid = document.getElementById('productsGrid');
+        if (grid) {
+            if (!products.length) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Нет товаров</p></div>';
+            } else {
+                grid.innerHTML = products.map(p => {
+                    // Обработка скидки
+                    let discountPercent = '';
+                    let oldPriceHtml = '';
+                    let currentPriceHtml = '';
+                    let priceValue = p.price || '0 ₽';
+                    
+                    // Извлекаем числовое значение цены
+                    const priceNum = parseFloat(String(priceValue).replace(/[^0-9.-]/g, ''));
+                    
+                    if (p.discount) {
+                        if (String(p.discount).includes('%')) {
+                            discountPercent = String(p.discount).replace('%', '');
+                            // Вычисляем старую цену
+                            const discountVal = parseFloat(discountPercent);
+                            if (!isNaN(priceNum) && !isNaN(discountVal) && discountVal > 0) {
+                                const oldPrice = priceNum / (1 - discountVal / 100);
+                                oldPriceHtml = `<span class="old-price">${Math.round(oldPrice)} ₽</span>`;
+                                currentPriceHtml = `<span class="current-price">${priceNum} ₽</span>`;
+                            } else {
+                                currentPriceHtml = `<span class="current-price">${priceValue}</span>`;
+                            }
+                        } else {
+                            // Скидка в рублях
+                            const discountNum = parseFloat(String(p.discount).replace(/[^0-9.-]/g, ''));
+                            if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
+                                const oldPrice = priceNum + discountNum;
+                                oldPriceHtml = `<span class="old-price">${Math.round(oldPrice)} ₽</span>`;
+                                currentPriceHtml = `<span class="current-price">${priceNum} ₽</span>`;
+                                discountPercent = Math.round((discountNum / oldPrice) * 100);
+                            } else {
+                                currentPriceHtml = `<span class="current-price">${priceValue}</span>`;
+                            }
+                        }
+                    } else {
+                        currentPriceHtml = `<span class="current-price no-discount">${priceValue}</span>`;
+                    }
+                    
+                    // Рейтинг (случайный для демо, потом замените на реальный)
+                    const rating = (p.rating || (3 + Math.random() * 2)).toFixed(1);
+                    const reviewsCount = p.sales || Math.floor(Math.random() * 500) + 10;
+                    
+                    // Звёзды
+                    const fullStars = Math.floor(rating);
+                    const hasHalfStar = rating % 1 >= 0.5;
+                    let starsHtml = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (i < fullStars) {
+                            starsHtml += '<i class="fas fa-star"></i>';
+                        } else if (i === fullStars && hasHalfStar) {
+                            starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                        } else {
+                            starsHtml += '<i class="far fa-star"></i>';
+                        }
+                    }
+                    
+                    return `
                         <div class="product-card" onclick="window.openProductDetailById('${p.id}')">
                             <div class="card-image">
                                 <img src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
                                      onerror="this.src='https://picsum.photos/id/42/400/300'"
-                                     loading="lazy">
-                                ${p.discount ? `<span class="discount-badge">🔥 ${escapeHtml(p.discount)}</span>` : ''}
+                                     loading="lazy"
+                                     alt="${escapeHtml(p.title)}">
+                                ${discountPercent ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
                             </div>
                             <div class="card-body">
-                                <div class="current-price">${escapeHtml(p.price)}</div>
-                                <h3 class="product-title">${escapeHtml(p.title.substring(0, 50))}</h3>
+                                <div class="price-wrapper">
+                                    ${oldPriceHtml}
+                                    ${currentPriceHtml}
+                                </div>
+                                <h3 class="product-title">${escapeHtml(p.title.substring(0, 60))}</h3>
+                                <div class="rating">
+                                    <div class="stars">${starsHtml}</div>
+                                    <span class="rating-value">${rating}</span>
+                                    <span class="reviews-count">(${reviewsCount} отзывов)</span>
+                                </div>
                             </div>
                         </div>
-                    `).join('');
-                }
+                    `;
+                }).join('');
             }
-            return products;
-        } catch(e) { 
-            console.error('❌ loadProducts error:', e);
-            return []; 
         }
-    };
+        return products;
+    } catch(e) { 
+        console.error('❌ loadProducts error:', e);
+        return []; 
+    }
+};
 
 window.renderHomeGameBlocks = async function() {
     const wrapper = document.getElementById('gamesScrollWrapper');
@@ -167,42 +235,104 @@ window.renderHomeAppBlocks = async function() {
         }
     };
 
-    window.openKeywordPage = async function(keyword) {
-        console.log('🔍 Открываем категорию:', keyword);
-        try {
-            const response = await fetch('/api/products?_=' + Date.now());
-            const products = await response.json();
-            const filtered = products.filter(p => p.keyword && p.keyword.toLowerCase().includes(keyword.toLowerCase()));
-            
-            const container = document.getElementById("keywordProductsGrid");
-            const title = document.getElementById("keywordPageTitle");
-            if (title) title.innerText = keyword;
-            
-            if (container) {
-                if (!filtered.length) {
-                    container.innerHTML = '<div class="empty-state">Нет товаров</div>';
-                } else {
-                    container.innerHTML = filtered.map(p => `
+window.openKeywordPage = async function(keyword) {
+    console.log('🔍 Открываем категорию:', keyword);
+    try {
+        const response = await fetch('/api/products?_=' + Date.now());
+        const products = await response.json();
+        const filtered = products.filter(p => p.keyword && p.keyword.toLowerCase().includes(keyword.toLowerCase()));
+        
+        const container = document.getElementById("keywordProductsGrid");
+        const title = document.getElementById("keywordPageTitle");
+        if (title) title.innerText = keyword;
+        
+        if (container) {
+            if (!filtered.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><p>Нет товаров в этой категории</p></div>';
+            } else {
+                container.innerHTML = filtered.map(p => {
+                    // Обработка скидки (та же логика)
+                    let discountPercent = '';
+                    let oldPriceHtml = '';
+                    let currentPriceHtml = '';
+                    let priceValue = p.price || '0 ₽';
+                    const priceNum = parseFloat(String(priceValue).replace(/[^0-9.-]/g, ''));
+                    
+                    if (p.discount) {
+                        if (String(p.discount).includes('%')) {
+                            discountPercent = String(p.discount).replace('%', '');
+                            const discountVal = parseFloat(discountPercent);
+                            if (!isNaN(priceNum) && !isNaN(discountVal) && discountVal > 0) {
+                                const oldPrice = priceNum / (1 - discountVal / 100);
+                                oldPriceHtml = `<span class="old-price">${Math.round(oldPrice)} ₽</span>`;
+                                currentPriceHtml = `<span class="current-price">${priceNum} ₽</span>`;
+                            } else {
+                                currentPriceHtml = `<span class="current-price">${priceValue}</span>`;
+                            }
+                        } else {
+                            const discountNum = parseFloat(String(p.discount).replace(/[^0-9.-]/g, ''));
+                            if (!isNaN(priceNum) && !isNaN(discountNum) && discountNum > 0) {
+                                const oldPrice = priceNum + discountNum;
+                                oldPriceHtml = `<span class="old-price">${Math.round(oldPrice)} ₽</span>`;
+                                currentPriceHtml = `<span class="current-price">${priceNum} ₽</span>`;
+                                discountPercent = Math.round((discountNum / oldPrice) * 100);
+                            } else {
+                                currentPriceHtml = `<span class="current-price">${priceValue}</span>`;
+                            }
+                        }
+                    } else {
+                        currentPriceHtml = `<span class="current-price no-discount">${priceValue}</span>`;
+                    }
+                    
+                    const rating = (p.rating || (3 + Math.random() * 2)).toFixed(1);
+                    const reviewsCount = p.sales || Math.floor(Math.random() * 500) + 10;
+                    
+                    const fullStars = Math.floor(rating);
+                    const hasHalfStar = rating % 1 >= 0.5;
+                    let starsHtml = '';
+                    for (let i = 0; i < 5; i++) {
+                        if (i < fullStars) {
+                            starsHtml += '<i class="fas fa-star"></i>';
+                        } else if (i === fullStars && hasHalfStar) {
+                            starsHtml += '<i class="fas fa-star-half-alt"></i>';
+                        } else {
+                            starsHtml += '<i class="far fa-star"></i>';
+                        }
+                    }
+                    
+                    return `
                         <div class="product-card" onclick="window.openProductDetailById('${p.id}')">
                             <div class="card-image">
                                 <img src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
-                                     onerror="this.src='https://picsum.photos/id/42/400/300'">
+                                     onerror="this.src='https://picsum.photos/id/42/400/300'"
+                                     loading="lazy"
+                                     alt="${escapeHtml(p.title)}">
+                                ${discountPercent ? `<span class="discount-badge">-${discountPercent}%</span>` : ''}
                             </div>
                             <div class="card-body">
-                                <div class="current-price">${escapeHtml(p.price)}</div>
-                                <h3 class="product-title">${escapeHtml(p.title.substring(0, 50))}</h3>
+                                <div class="price-wrapper">
+                                    ${oldPriceHtml}
+                                    ${currentPriceHtml}
+                                </div>
+                                <h3 class="product-title">${escapeHtml(p.title.substring(0, 60))}</h3>
+                                <div class="rating">
+                                    <div class="stars">${starsHtml}</div>
+                                    <span class="rating-value">${rating}</span>
+                                    <span class="reviews-count">(${reviewsCount} отзывов)</span>
+                                </div>
                             </div>
                         </div>
-                    `).join('');
-                }
+                    `;
+                }).join('');
             }
-            
-            if (typeof showPage === 'function') showPage("keywordPage");
-            else if (typeof window.showPage === 'function') window.showPage("keywordPage");
-        } catch(e) {
-            console.error('openKeywordPage error:', e);
         }
-    };
+        
+        if (typeof showPage === 'function') showPage("keywordPage");
+        else if (typeof window.showPage === 'function') window.showPage("keywordPage");
+    } catch(e) {
+        console.error('openKeywordPage error:', e);
+    }
+};
 
     function escapeHtml(str) {
         if (!str) return '';
