@@ -929,3 +929,193 @@
   color: #f87171;
   font-size: 0.85rem;
 }
+
+/* Стили для заявок на вывод */
+.withdraw-requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.withdraw-request-item {
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(59,130,246,0.1);
+    transition: all 0.2s;
+}
+
+.withdraw-request-item:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(59,130,246,0.3);
+}
+
+.withdraw-request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.withdraw-request-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.withdraw-request-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.withdraw-request-user-info .user-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+}
+
+.withdraw-request-user-info .request-date {
+    font-size: 0.7rem;
+    color: #6b7a9e;
+}
+
+.withdraw-request-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.withdraw-request-status.pending {
+    background: rgba(245,158,11,0.2);
+    color: #f59e0b;
+}
+
+.withdraw-request-status.approved {
+    background: rgba(34,197,94,0.2);
+    color: #22c55e;
+}
+
+.withdraw-request-status.rejected {
+    background: rgba(239,68,68,0.2);
+    color: #ef4444;
+}
+
+.withdraw-request-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 16px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+}
+
+.withdraw-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.withdraw-detail-item .detail-label {
+    font-size: 0.7rem;
+    color: #6b7a9e;
+    text-transform: uppercase;
+}
+
+.withdraw-detail-item .detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.withdraw-detail-item .detail-value.amount {
+    color: #22c55e;
+    font-size: 1.2rem;
+}
+
+.withdraw-request-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.withdraw-approve-btn {
+    background: rgba(34,197,94,0.2);
+    border: 1px solid rgba(34,197,94,0.3);
+    color: #22c55e;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.withdraw-approve-btn:hover {
+    background: #22c55e;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.withdraw-reject-btn {
+    background: rgba(239,68,68,0.2);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #ef4444;
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.withdraw-reject-btn:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.empty-withdraw-requests {
+    text-align: center;
+    padding: 40px;
+    color: #6b7a9e;
+}
+
+.empty-withdraw-requests i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.4;
+}
+
+@media (max-width: 768px) {
+    .withdraw-request-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .withdraw-request-actions {
+        flex-direction: column;
+    }
+    
+    .withdraw-approve-btn,
+    .withdraw-reject-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

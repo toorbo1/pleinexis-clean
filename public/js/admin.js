@@ -27,6 +27,10 @@ async function initAdmin() {
     renderAdminNavButtons();
     updateAdminStats();
     renderShopApplicationsInAdmin(); // <-- ДОБАВЬТЕ ЭТУ СТРОКУ
+    // В конце initAdmin() добавить:
+if (typeof initAdminWithdrawSection === 'function') {
+    initAdminWithdrawSection();
+}
 }
 function updateAdminStats() {
   const products = JSON.parse(localStorage.getItem("apex_products") || "[]");
@@ -815,7 +819,9 @@ function renderAdminNavButtons() {
     { id: "adminProductsSection", name: "📦 Товары", icon: "fa-box" },
     { id: "adminGamesSection", name: "🎮 Игры", icon: "fa-gamepad" },
     { id: "adminAppsSection", name: "📱 Приложения", icon: "fa-mobile-alt" },
-    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" }  // <-- ЭТА СТРОЧКА ДОЛЖНА БЫТЬ
+    { id: "adminShopSection", name: "🏪 Витрины", icon: "fa-store" },
+    // В renderAdminNavButtons добавить:
+{ id: "adminWithdrawSection", name: "💰 Вывод средств", icon: "fa-money-bill-wave" },
   ];
   
   container.innerHTML = sections.map(section => `
@@ -831,7 +837,10 @@ function showAdminSection(sectionId) {
     "adminModerationSection", "adminSlidersSection", "adminChatSection", 
     "adminProductsSection", "adminGamesSection", "adminAppsSection", "adminShopSection"
   ];
-  
+  // В showAdminSection добавить:
+if (sectionId === 'adminWithdrawSection' && typeof renderAdminWithdrawRequests === 'function') {
+    renderAdminWithdrawRequests();
+}
   sections.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
