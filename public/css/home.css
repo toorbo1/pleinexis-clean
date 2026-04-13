@@ -230,11 +230,12 @@ body {
 
 /* ========== БЛОК ПОПОЛНЕНИЯ STEAM ========== */
 .card-modern {
-  border-radius: 24px;
-  padding: 20px;
-  margin-bottom: 24px;
-  background: linear-gradient(135deg, #2f60bcb8, #2f10a0b1);
-  border: 1px solid rgba(0, 0, 0, 0.759);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(47, 96, 188, 0.72), rgba(47, 16, 160, 0.694));
+    border: 1px solid rgba(0, 0, 0, 0.759);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 10px 25px rgba(0, 0, 0, 0.4); /* ДОБАВИТЬ ЭТУ СТРОКУ */
 }
 
 .card-modern h3 {

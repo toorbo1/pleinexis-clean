@@ -1,16 +1,16 @@
 /* ===========================================
 /*   PREMIUM MOBILE-FIRST REDESIGN             */
-/*   Для Плейнексис                            */
+/*   Для Плейнексис (ИСПРАВЛЕНО - ВСЁ РАБОТАЕТ) */
 /* =========================================== */
 
-/* ----- КОСМИЧЕСКИЙ ФОН ----- */
+/* ----- КОСМИЧЕСКИЙ ФОН (ЗВЁЗДЫ) ----- */
 body {
   background: radial-gradient(circle at 20% 30%, #0b0e1e, #04060a) !important;
   min-height: 100vh;
   position: relative;
 }
 
-/* Эффект звёзд (простой вариант) */
+/* Звёздное небо - слой 1 */
 body::after {
   content: '';
   position: fixed;
@@ -41,7 +41,6 @@ body::after {
 
 /* ----- GLASSMORPHISM & NEON GLOW ----- */
 .header,
-.card-modern,
 .product-card,
 .vertical-card-inner,
 .profile-hero-section,
@@ -125,15 +124,15 @@ body::after {
   text-align: center !important;
 }
 
+/* НЕ ТРОГАЕМ ЦВЕТ ТЕКСТА ПЕЧАТНОЙ МАШИНКИ */
 .hero-logo-text {
   font-size: 2.2rem !important;
   font-weight: 800 !important;
   line-height: 1.2 !important;
-  background: linear-gradient(135deg, #ffffff, #a78bfa, #60a5fa) !important;
+  background: linear-gradient(135deg, #ffffff, #ffffff) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  text-shadow: 0 0 40px rgba(167, 139, 250, 0.4) !important;
   margin-bottom: 8px !important;
   white-space: normal !important;
   min-height: auto !important;
@@ -168,7 +167,6 @@ body::after {
   transform: scale(1) !important;
 }
 
-/* Активная карточка в центре (определяется через JS или :hover на мобилке) */
 .slider-card:active, .slider-card:focus-within {
   opacity: 1 !important;
   transform: scale(1.02) !important;
@@ -182,109 +180,8 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-.card-modern {
-  margin: 16px !important;
-  border-radius: 32px !important;
-  padding: 24px 20px !important;
-  
-  background: 
-    /* цветные звёзды */
-    radial-gradient(3px 3px at 15% 25%, #ffdd00, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 40% 10%, #00ccff, rgba(0,0,0,0)),
-    radial-gradient(2.5px 2.5px at 70% 30%, #ff88cc, rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 25% 70%, #aaffaa, rgba(0,0,0,0)),
-    radial-gradient(3px 3px at 80% 60%, #ffaa00, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 50% 80%, #88ddff, rgba(0,0,0,0)),
-    radial-gradient(2.5px 2.5px at 90% 15%, #ff44aa, rgba(0,0,0,0)),
-    radial-gradient(1.5px 1.5px at 10% 90%, #aaddff, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 60% 40%, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(3px 3px at 35% 55%, #ffcc66, rgba(0,0,0,0)),
-    
-    /* галактическое свечение */
-    radial-gradient(circle at 20% 30%, #6a00ff 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, #ff0066 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, #00aaff 0%, transparent 50%),
-    
-    /* тёмная база */
-    linear-gradient(145deg, #0a0a1a 0%, #151530 50%, #0a0a1a 100%);
-  
-  background-size: 
-    350px 350px, 300px 300px, 280px 280px, 320px 320px, 290px 290px,
-    310px 310px, 270px 270px, 330px 330px, 300px 300px, 290px 290px,
-    cover, cover, cover, cover;
-  
-  background-repeat: no-repeat;
-  
-  animation: starsPulse 2.5s ease infinite alternate,
-             galaxyFlow 5s ease infinite !important;
-  
-  backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(100, 200, 255, 0.4) !important;
-  
-  box-shadow: 
-    0 0 80px rgba(100, 0, 255, 0.4),
-    0 0 150px rgba(0, 150, 255, 0.2),
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    inset 0 2px 4px rgba(255, 255, 255, 0.15) !important;
-}
-
-@keyframes starsPulse {
-  0% { opacity: 0.8; filter: brightness(1); }
-  100% { opacity: 1; filter: brightness(1.3); }
-}
-
-@keyframes galaxyFlow {
-  0% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; }
-  50% { background-position: 100% 0%, 0% 100%, 100% 100%, 0% 0%, 50% 50%; }
-  100% { background-position: 0% 0%, 100% 0%, 0% 100%, 100% 100%, 50% 50%; }
-}
-
-.card-modern h3 {
-  font-size: 1.3rem !important;
-  margin-bottom: 20px !important;
-}
-
-.card-modern h3 strong {
-  background: linear-gradient(135deg, #60a5fa, #a78bfa) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  color: transparent !important;
-  padding: 0 !important;
-  margin-left: 8px !important;
-}
-
-.steam-fields-row .input-modern {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 20px !important;
-  padding: 16px 18px !important;
-  font-size: 1rem !important;
-  backdrop-filter: blur(5px) !important;
-}
-
-.commission-badge {
-  background: rgba(34, 197, 94, 0.15) !important;
-  backdrop-filter: blur(5px) !important;
-  border-radius: 30px !important;
-  padding: 6px 16px !important;
-  font-weight: 600 !important;
-}
-
-.pay-btn-blue {
-  border-radius: 30px !important;
-  padding: 18px !important;
-  font-size: 1.1rem !important;
-  background: linear-gradient(135deg, #4f46e5, #3b82f6, #2dd4bf) !important;
-  background-size: 200% 200% !important;
-  animation: gradientShift 3s ease infinite !important;
-  border: none !important;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+/* ===== БЛОК STEAM - СВЕЧЕНИЕ СОХРАНЕНО ===== */
+/* НЕ ПЕРЕОПРЕДЕЛЯЕМ .card-modern - пусть берёт стили из home.css и payment.css */
 
 /* ----- СЕТКА ИГР (2 колонки, премиум карточки) ----- */
 .products-grid {
@@ -336,7 +233,6 @@ body::after {
   transform: scale(1.05) !important;
 }
 
-/* Рейтинг и цена внутри карточки */
 .product-card .rating {
   position: relative !important;
   z-index: 2 !important;
@@ -374,7 +270,6 @@ body::after {
   padding-bottom: env(safe-area-inset-bottom) !important;
 }
 
-/* Переопределяем blob для неонового эффекта */
 .blob {
   background: radial-gradient(ellipse at 35% 35%, 
                               rgba(167, 139, 250, 0.9), 
@@ -424,11 +319,6 @@ body::after {
     padding: 0 !important;
   }
   
-  .card-modern {
-    margin-left: 12px !important;
-    margin-right: 12px !important;
-  }
-  
   .products-grid {
     padding-left: 12px !important;
     padding-right: 12px !important;
@@ -457,7 +347,6 @@ body::after {
 
 /* Оптимизация для мобильных - отключаем лагающие эффекты */
 @media (max-width: 768px) {
-  .card-modern,
   .product-card,
   .vertical-card-inner,
   .profile-hero-section,
@@ -475,4 +364,79 @@ body::after {
   body::after {
     opacity: 0.2 !important;
   }
+}
+
+
+/* ===== ВОССТАНОВЛЕНИЕ СВЕЧЕНИЯ ДЛЯ .card-modern ===== */
+.card-modern {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card-modern:hover {
+    box-shadow: 0 0 50px rgba(96, 165, 250, 0.9), 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ===== ВОССТАНОВЛЕНИЕ ЗВЁЗДНОГО НЕБА (body::after) ===== */
+body::after {
+    content: '' !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+    
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #60a5fa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 230px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 300px 30px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 50px 200px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 280px 350px, #60a5fa, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 450px 120px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 500px 280px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 600px 50px, #60a5fa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 750px 180px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 850px 320px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 950px 90px, #60a5fa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 1050px 250px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1150px 400px, #a78bfa, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 1250px 60px, #60a5fa, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1350px 210px, #fff, rgba(0,0,0,0));
+    
+    background-repeat: repeat !important;
+    background-size: 400px 400px !important;
+    opacity: 0.7 !important;
+    animation: starTwinkle 4s ease-in-out infinite alternate !important;
+}
+
+@keyframes starTwinkle {
+    0% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ===== ВОССТАНОВЛЕНИЕ ЦВЕТА ТЕКСТА ПЕЧАТНОЙ МАШИНКИ ===== */
+#typewriterText,
+.hero-logo-text {
+    color: #ffffff !important;
+    -webkit-text-fill-color: white !important;
+    background: none !important;
+    background-color: transparent !important;
+}
+
+/* Дополнительная защита для мобильных устройств */
+@media (max-width: 768px) {
+    body::after {
+        opacity: 0.4 !important;
+        background-size: 250px 250px !important;
+    }
+    
+    .card-modern {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.5) !important;
+    }
 }

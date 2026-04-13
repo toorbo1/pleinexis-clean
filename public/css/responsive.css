@@ -904,3 +904,20 @@
     transform: translateX(-100%);
   }
 }
+
+/* ===== ФИКС: НЕ ПЕРЕОПРЕДЕЛЯТЬ СВЕЧЕНИЕ .card-modern ===== */
+.card-modern {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6), 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* ===== ФИКС: НЕ ПЕРЕОПРЕДЕЛЯТЬ ЗВЁЗДНОЕ НЕБО ===== */
+body::after {
+    display: block !important;
+}
+
+/* ===== ФИКС: БЕЛЫЙ ЦВЕТ ТЕКСТА ПЕЧАТНОЙ МАШИНКИ ===== */
+#typewriterText {
+    color: white !important;
+    background: none !important;
+    -webkit-text-fill-color: white !important;
+}
