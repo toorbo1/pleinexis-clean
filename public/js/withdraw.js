@@ -14,7 +14,7 @@ const withdrawMethods = [
 
 let selectedMethod = withdrawMethods[0];
 
-// Функция инициализации (ГЛОБАЛЬНАЯ)
+// Глобальная функция инициализации
 window.initWithdrawPage = function() {
     console.log('🔄 Инициализация страницы вывода');
     
@@ -158,13 +158,13 @@ window.initWithdrawPage = function() {
     console.log('✅ Страница вывода инициализирована');
 };
 
-// Принудительно вызываем, если страница уже видна
+// Автоматически вызываем, если страница уже видна
 setTimeout(() => {
     const withdrawPage = document.getElementById('withdrawPage');
     if (withdrawPage && (withdrawPage.classList.contains('active') || withdrawPage.style.display === 'block')) {
-        console.log('📄 Страница вывода уже видна, инициализируем');
+        console.log('📄 withdrawPage видна, запускаем инициализацию');
         window.initWithdrawPage();
     }
-}, 200);
+}, 100);
 
-console.log('✅ withdraw.js загружен');
+console.log('✅ withdraw.js загружен (глобальная версия)');

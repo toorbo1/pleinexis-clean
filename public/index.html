@@ -1384,72 +1384,70 @@
 </div>
 
 <!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
-<div class="page" id="withdrawPage">
-  <div class="withdraw-header">
+<div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
-      <i class="fas fa-arrow-left"></i>
+        <i class="fas fa-arrow-left"></i>
     </button>
     <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
-  </div>
-  
-  <div class="withdraw-container">
+</div>
+
+<div class="withdraw-container">
     <!-- Баланс -->
     <div class="balance-card">
-      <div class="balance-label">Доступно для вывода</div>
-      <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-      <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+        <div class="balance-label">Доступно для вывода</div>
+        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+        <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
     <!-- Способ вывода -->
     <div class="section-card">
-      <div class="section-title">
-        <i class="fas fa-wallet"></i> Способ вывода
-      </div>
-      <div class="methods-grid" id="methodsList"></div>
+        <div class="section-title">
+            <i class="fas fa-wallet"></i> Способ вывода
+        </div>
+        <div class="methods-grid" id="methodsList"></div>
     </div>
 
     <!-- Реквизиты -->
     <div class="section-card" id="detailsSection">
-      <div class="section-title">
-        <i class="fas fa-address-card"></i> Реквизиты
-      </div>
-      <div class="input-group">
-        <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
-        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
-      </div>
+        <div class="section-title">
+            <i class="fas fa-address-card"></i> Реквизиты
+        </div>
+        <div class="input-group">
+            <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+        </div>
     </div>
 
     <!-- Сумма -->
     <div class="section-card">
-      <div class="section-title">
-        <i class="fas fa-coins"></i> Сумма вывода
-      </div>
-      <div class="amount-row">
-        <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
-        <div class="amount-presets">
-          <button class="preset-btn" data-amount="500">500₽</button>
-          <button class="preset-btn" data-amount="1000">1000₽</button>
-          <button class="preset-btn" data-amount="5000">5000₽</button>
+        <div class="section-title">
+            <i class="fas fa-coins"></i> Сумма вывода
         </div>
-      </div>
-      
-      <div class="commission-info" id="commissionInfo">
-        <span>Комиссия системы:</span>
-        <span id="commissionValue">0 ₽</span>
-      </div>
-      <div class="commission-info">
-        <span>Итого к списанию:</span>
-        <span id="totalWithdraw">0 ₽</span>
-      </div>
+        <div class="amount-row">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+            <div class="amount-presets">
+                <button class="preset-btn" data-amount="500">500₽</button>
+                <button class="preset-btn" data-amount="1000">1000₽</button>
+                <button class="preset-btn" data-amount="5000">5000₽</button>
+            </div>
+        </div>
+        
+        <div class="commission-info" id="commissionInfo">
+            <span>Комиссия системы:</span>
+            <span id="commissionValue">0 ₽</span>
+        </div>
+        <div class="commission-info">
+            <span>Итого к списанию:</span>
+            <span id="totalWithdraw">0 ₽</span>
+        </div>
     </div>
 
     <button class="withdraw-btn" id="submitWithdrawBtn">
-      <i class="fas fa-paper-plane"></i> Запросить вывод
+        <i class="fas fa-paper-plane"></i> Запросить вывод
     </button>
     <div class="warning-text">
-      <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
+        <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
     </div>
-  </div>
 </div>
 <!-- ==================== ФУТЕР ==================== -->
 <footer class="site-footer">
@@ -1622,66 +1620,71 @@
         
         // Заполняем содержимое
         withdrawPage.innerHTML = `
-            <div class="withdraw-header">
-                <button class="back-btn" onclick="showPage('profile')">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+           <div class="withdraw-header">
+    <button class="back-btn" onclick="showPage('profile')">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+</div>
+
+<div class="withdraw-container">
+    <!-- Баланс -->
+    <div class="balance-card">
+        <div class="balance-label">Доступно для вывода</div>
+        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+        <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+    </div>
+
+    <!-- Способ вывода -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-wallet"></i> Способ вывода
+        </div>
+        <div class="methods-grid" id="methodsList"></div>
+    </div>
+
+    <!-- Реквизиты -->
+    <div class="section-card" id="detailsSection">
+        <div class="section-title">
+            <i class="fas fa-address-card"></i> Реквизиты
+        </div>
+        <div class="input-group">
+            <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+        </div>
+    </div>
+
+    <!-- Сумма -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-coins"></i> Сумма вывода
+        </div>
+        <div class="amount-row">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+            <div class="amount-presets">
+                <button class="preset-btn" data-amount="500">500₽</button>
+                <button class="preset-btn" data-amount="1000">1000₽</button>
+                <button class="preset-btn" data-amount="5000">5000₽</button>
             </div>
-            
-            <div class="withdraw-container">
-                <div class="balance-card">
-                    <div class="balance-label">Доступно для вывода</div>
-                    <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-                    <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
-                </div>
+        </div>
+        
+        <div class="commission-info" id="commissionInfo">
+            <span>Комиссия системы:</span>
+            <span id="commissionValue">0 ₽</span>
+        </div>
+        <div class="commission-info">
+            <span>Итого к списанию:</span>
+            <span id="totalWithdraw">0 ₽</span>
+        </div>
+    </div>
 
-                <div class="section-card">
-                    <div class="section-title">
-                        <i class="fas fa-wallet"></i> Способ вывода
-                    </div>
-                    <div class="methods-grid" id="methodsList"></div>
-                </div>
-
-                <div class="section-card">
-                    <div class="section-title">
-                        <i class="fas fa-address-card"></i> Реквизиты
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label" id="detailsLabel">Номер карты</label>
-                        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
-                    </div>
-                </div>
-
-                <div class="section-card">
-                    <div class="section-title">
-                        <i class="fas fa-coins"></i> Сумма вывода
-                    </div>
-                    <div class="amount-row">
-                        <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
-                        <div class="amount-presets">
-                            <button class="preset-btn" data-amount="500">500₽</button>
-                            <button class="preset-btn" data-amount="1000">1000₽</button>
-                            <button class="preset-btn" data-amount="5000">5000₽</button>
-                        </div>
-                    </div>
-                    <div class="commission-info">
-                        <span>Комиссия системы:</span>
-                        <span id="commissionValue">0 ₽</span>
-                    </div>
-                    <div class="commission-info">
-                        <span>Итого к списанию:</span>
-                        <span id="totalWithdraw">0 ₽</span>
-                    </div>
-                </div>
-
-                <button class="withdraw-btn" id="submitWithdrawBtn">
-                    <i class="fas fa-paper-plane"></i> Запросить вывод
-                </button>
-                <div class="warning-text">
-                    <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов
-                </div>
-            </div>
+    <button class="withdraw-btn" id="submitWithdrawBtn">
+        <i class="fas fa-paper-plane"></i> Запросить вывод
+    </button>
+    <div class="warning-text">
+        <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
+    </div>
+</div>
         `;
         
         console.log('✅ Страница вывода создана');
