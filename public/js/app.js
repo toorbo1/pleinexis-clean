@@ -160,7 +160,7 @@ window.filterProducts = function() {
                     <img src="${p.image_url || 'https://picsum.photos/id/42/400/300'}" 
                          onerror="this.src='https://picsum.photos/id/42/400/300'"
                          loading="lazy">
-                    ${p.discount ? `<span class="discount-badge">🔥 ${p.discount}</span>` : ''}
+                    ${p.discount ? `<span class="discount-badge"> ${p.discount}</span>` : ''}
                 </div>
                 <div class="card-body">
                     <div class="current-price">${escapeHtml(p.price)}</div>

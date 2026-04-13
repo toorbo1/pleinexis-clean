@@ -1832,7 +1832,7 @@ function openKeywordPage(keyword) {
                    alt="${escapeHtml(prod.title)}"
                    loading="lazy"
                    onerror="this.src='https://picsum.photos/id/42/400/300'">
-              ${prod.discount ? `<span class="discount-badge">🔥 ${prod.discount}</span>` : ''}
+              ${prod.discount ? `<span class="discount-badge"> ${prod.discount}</span>` : ''}
             </div>
             <div class="card-body">
               <div class="price-wrapper">
