@@ -1,11 +1,11 @@
-/* ===== TOAST NOTIFICATIONS ===== */
+/* ===== TOAST NOTIFICATIONS - С АДАПТАЦИЕЙ ===== */
 
 .toast-notification {
   position: fixed;
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%) translateY(100px);
-  background: rgba(20, 20, 35, 0.95);
+  background: rgba(20, 20, 35, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   padding: 14px 28px;
@@ -20,6 +20,8 @@
   font-size: 0.95rem;
   font-weight: 500;
   color: white;
+  max-width: 90vw;
+  white-space: nowrap;
 }
 
 .toast-notification.show {
@@ -28,6 +30,12 @@
 
 .toast-notification i {
   font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.toast-notification span {
+  white-space: normal;
+  word-break: break-word;
 }
 
 .toast-notification.success {
@@ -62,11 +70,40 @@
   color: #3b82f6;
 }
 
+/* ===== АДАПТИВНОСТЬ ===== */
 @media (max-width: 480px) {
   .toast-notification {
     width: calc(100% - 32px);
     max-width: 400px;
     padding: 12px 20px;
     font-size: 0.85rem;
+    gap: 10px;
+    bottom: 20px;
+  }
+  
+  .toast-notification i {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .toast-notification {
+    width: calc(100% - 24px);
+    padding: 10px 16px;
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 320px) {
+  .toast-notification {
+    width: calc(100% - 16px);
+    padding: 8px 14px;
+    font-size: 0.75rem;
+    border-radius: 40px;
+  }
+  
+  .toast-notification i {
+    font-size: 0.9rem;
   }
 }

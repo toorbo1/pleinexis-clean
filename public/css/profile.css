@@ -1,4 +1,5 @@
 /* ===== PROFILE PAGE - CYBER PREMIUM GAMING DASHBOARD ===== */
+/* ===== С АДАПТАЦИЕЙ ДЛЯ МЕЛКИХ ТЕЛЕФОНОВ ===== */
 
 :root {
   --bg-deep: #050505;
@@ -738,7 +739,9 @@
   border-color: transparent;
 }
 
-/* ===== АДАПТИВНОСТЬ ===== */
+/* ============================================ */
+/* ===== АДАПТИВНОСТЬ ДЛЯ ПЛАНШЕТОВ ===== */
+/* ============================================ */
 @media (max-width: 1024px) {
   .profile-page-container {
     grid-template-columns: 1fr;
@@ -757,80 +760,17 @@
   }
 }
 
+/* ============================================ */
+/* ===== АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ (ДО 768px) ===== */
+/* ============================================ */
 @media (max-width: 768px) {
-  .profile-card {
-    padding: 32px 24px;
-  }
-  
-  .profile-username {
-    font-size: 2rem;
-  }
-  
-  .avatar-wrapper {
-    width: 130px;
-    height: 130px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  
-  .balance-card {
-    padding: 22px 24px;
-  }
-  
-  .balance-amount {
-    font-size: 2.2rem;
-  }
-  
-  .balance-icon {
-    width: 54px;
-    height: 54px;
-  }
-  
-  .balance-icon i {
-    font-size: 24px;
-  }
-  
-  .profile-tabs {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .profile-tab-btn {
-    padding: 10px 18px;
-    flex: 1;
-    justify-content: center;
-  }
-  
-  .empty-title {
-    font-size: 1.6rem;
-  }
-  
-  .empty-icon {
-    width: 160px;
-    height: 160px;
-  }
-  
-  .product-item {
-    flex-wrap: wrap;
-  }
-  
-  .product-actions {
-    width: 100%;
-    justify-content: flex-end;
-    margin-top: 16px;
-  }
-}
-
-@media (max-width: 480px) {
   .profile-page-container {
-    padding: 12px;
+    padding: 16px;
+    gap: 20px;
   }
   
   .profile-card {
-    padding: 24px 18px;
+    padding: 28px 20px;
     border-radius: 32px;
   }
   
@@ -839,35 +779,642 @@
   }
   
   .avatar-wrapper {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
   }
   
+  .avatar-initial {
+    font-size: 44px;
+  }
+  
+  .avatar-status {
+    width: 20px;
+    height: 20px;
+    bottom: 4px;
+    right: 4px;
+  }
+  
+  .verified-badge {
+    padding: 5px 14px;
+    font-size: 0.7rem;
+    margin-bottom: 14px;
+  }
+  
+  .profile-joined {
+    margin-bottom: 24px;
+  }
+  
+  /* Статистика */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 18px 20px;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+  }
+  
+  .stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  /* Баланс */
   .balance-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
+    padding: 20px 20px;
   }
   
-  .balance-chevron {
-    align-self: flex-end;
+  .balance-amount {
+    font-size: 2rem;
   }
   
-  .btn-gradient, .btn-glass {
-    padding: 14px 20px;
-    font-size: 0.9rem;
+  .balance-icon {
+    width: 52px;
+    height: 52px;
+  }
+  
+  .balance-icon i {
+    font-size: 22px;
+  }
+  
+  /* Табы */
+  .profile-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .profile-tab-btn {
+    padding: 10px 16px;
+    flex: 1;
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+  
+  .tab-badge {
+    padding: 2px 8px;
+    font-size: 0.65rem;
+  }
+  
+  /* Список товаров */
+  .products-list-container {
+    padding: 20px;
+    border-radius: 24px;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    padding: 40px 20px;
+    min-height: 350px;
+  }
+  
+  .empty-icon {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
   }
   
   .empty-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
   
   .empty-desc {
     font-size: 0.9rem;
+    margin-bottom: 28px;
   }
   
   .btn-primary {
-    padding: 14px 28px;
+    padding: 14px 32px;
     font-size: 0.9rem;
+  }
+  
+  /* Карточки товаров */
+  .product-item {
+    padding: 14px;
+  }
+  
+  .product-img {
+    width: 56px;
+    height: 56px;
+    margin-right: 14px;
+  }
+  
+  .product-title {
+    font-size: 0.9rem;
+  }
+  
+  .product-price {
+    font-size: 1rem;
+  }
+  
+  /* Кнопки */
+  .btn-gradient, .btn-glass {
+    padding: 14px 20px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-logout {
+    padding: 12px 20px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================ */
+/* ===== АДАПТИВНОСТЬ ДЛЯ МАЛЕНЬКИХ ТЕЛЕФОНОВ (ДО 480px) ===== */
+/* ============================================ */
+@media (max-width: 480px) {
+  .profile-page-container {
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .profile-card {
+    padding: 22px 16px;
+    border-radius: 28px;
+  }
+  
+  .avatar-wrapper {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 16px;
+  }
+  
+  .avatar-initial {
+    font-size: 38px;
+  }
+  
+  .avatar-ring {
+    inset: -3px;
+  }
+  
+  .avatar-status {
+    width: 18px;
+    height: 18px;
+    border-width: 2px;
+  }
+  
+  .profile-username {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+  
+  .verified-badge {
+    padding: 4px 12px;
+    font-size: 0.6rem;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+  
+  .verified-badge i {
+    font-size: 9px;
+  }
+  
+  .stars i {
+    font-size: 0.8rem;
+  }
+  
+  .rating-value {
+    font-size: 0.85rem;
+  }
+  
+  .reviews-link {
+    font-size: 0.6rem;
+  }
+  
+  .profile-joined {
+    font-size: 0.65rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Баланс */
+  .balance-card {
+    padding: 16px 18px;
+    border-radius: 24px;
+  }
+  
+  .balance-left {
+    gap: 14px;
+  }
+  
+  .balance-icon {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .balance-icon i {
+    font-size: 18px;
+  }
+  
+  .balance-label {
+    font-size: 0.65rem;
+  }
+  
+  .balance-amount {
+    font-size: 1.6rem;
+  }
+  
+  .balance-trend {
+    font-size: 0.6rem;
+  }
+  
+  .balance-chevron {
+    font-size: 24px;
+  }
+  
+  /* Статистика */
+  .stat-card {
+    padding: 14px 16px;
+    border-radius: 20px;
+  }
+  
+  .stat-icon {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 1.6rem;
+  }
+  
+  .stat-label {
+    font-size: 0.65rem;
+  }
+  
+  .stat-sparkline {
+    width: 60px;
+    height: 22px;
+    bottom: 10px;
+    right: 10px;
+  }
+  
+  /* Табы */
+  .profile-tabs {
+    padding: 4px;
+    border-radius: 50px;
+  }
+  
+  .profile-tab-btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+  
+  .tab-badge {
+    padding: 2px 6px;
+    font-size: 0.6rem;
+  }
+  
+  /* Список товаров */
+  .products-list-container {
+    padding: 16px;
+    border-radius: 20px;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    padding: 30px 15px;
+    min-height: 300px;
+  }
+  
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 16px;
+  }
+  
+  .empty-title {
+    font-size: 1.3rem;
+  }
+  
+  .empty-desc {
+    font-size: 0.8rem;
+    margin-bottom: 24px;
+    max-width: 280px;
+  }
+  
+  .btn-primary {
+    padding: 12px 24px;
+    font-size: 0.85rem;
+    gap: 10px;
+  }
+  
+  /* Карточки товаров */
+  .product-item {
+    padding: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .product-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+  
+  .product-info {
+    min-width: 180px;
+  }
+  
+  .product-title {
+    font-size: 0.85rem;
+  }
+  
+  .product-price {
+    font-size: 0.9rem;
+  }
+  
+  .product-status {
+    font-size: 0.6rem;
+    padding: 3px 10px;
+  }
+  
+  .product-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  
+  .product-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  /* Кнопки действий */
+  .profile-actions {
+    gap: 10px;
+  }
+  
+  .btn-gradient, .btn-glass {
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  
+  .btn-logout {
+    padding: 10px 18px;
+    font-size: 0.75rem;
+    margin-top: 4px;
+  }
+}
+
+/* ============================================ */
+/* ===== АДАПТИВНОСТЬ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ТЕЛЕФОНОВ (ДО 380px) ===== */
+/* ============================================ */
+@media (max-width: 380px) {
+  .profile-page-container {
+    padding: 8px;
+    gap: 12px;
+  }
+  
+  .profile-card {
+    padding: 18px 12px;
+    border-radius: 24px;
+  }
+  
+  .avatar-wrapper {
+    width: 85px;
+    height: 85px;
+    margin-bottom: 14px;
+  }
+  
+  .avatar-initial {
+    font-size: 32px;
+  }
+  
+  .avatar-status {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .profile-username {
+    font-size: 1.3rem;
+  }
+  
+  .verified-badge {
+    padding: 3px 10px;
+    font-size: 0.55rem;
+  }
+  
+  .stars i {
+    font-size: 0.7rem;
+  }
+  
+  .rating-value {
+    font-size: 0.8rem;
+  }
+  
+  .profile-joined {
+    font-size: 0.6rem;
+    margin-bottom: 16px;
+  }
+  
+  /* Баланс */
+  .balance-card {
+    padding: 14px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  
+  .balance-left {
+    width: 100%;
+  }
+  
+  .balance-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .balance-icon i {
+    font-size: 16px;
+  }
+  
+  .balance-amount {
+    font-size: 1.4rem;
+  }
+  
+  .balance-chevron {
+    align-self: flex-end;
+    font-size: 20px;
+  }
+  
+  /* Статистика */
+  .stat-card {
+    padding: 12px 14px;
+  }
+  
+  .stat-value {
+    font-size: 1.4rem;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+  }
+  
+  /* Табы */
+  .profile-tab-btn {
+    padding: 7px 10px;
+    font-size: 0.7rem;
+  }
+  
+  .profile-tab-btn i {
+    font-size: 0.8rem;
+  }
+  
+  .tab-badge {
+    padding: 1px 5px;
+    font-size: 0.55rem;
+  }
+  
+  /* Empty State */
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .empty-title {
+    font-size: 1.1rem;
+  }
+  
+  .empty-desc {
+    font-size: 0.75rem;
+    margin-bottom: 20px;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
+  
+  /* Карточки товаров */
+  .product-item {
+    padding: 10px;
+  }
+  
+  .product-img {
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+  }
+  
+  .product-title {
+    font-size: 0.8rem;
+  }
+  
+  .product-price {
+    font-size: 0.85rem;
+  }
+  
+  .product-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Кнопки */
+  .btn-gradient, .btn-glass {
+    padding: 10px 14px;
+    font-size: 0.75rem;
+  }
+  
+  .btn-logout {
+    padding: 8px 14px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ============================================ */
+/* ===== АДАПТИВНОСТЬ ДЛЯ САМЫХ МАЛЕНЬКИХ (ДО 320px) ===== */
+/* ============================================ */
+@media (max-width: 320px) {
+  .profile-page-container {
+    padding: 6px;
+    gap: 10px;
+  }
+  
+  .profile-card {
+    padding: 16px 10px;
+  }
+  
+  .avatar-wrapper {
+    width: 75px;
+    height: 75px;
+  }
+  
+  .avatar-initial {
+    font-size: 28px;
+  }
+  
+  .profile-username {
+    font-size: 1.2rem;
+  }
+  
+  .verified-badge {
+    padding: 2px 8px;
+    font-size: 0.5rem;
+  }
+  
+  .balance-amount {
+    font-size: 1.2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .profile-tab-btn {
+    padding: 6px 8px;
+    font-size: 0.65rem;
+  }
+  
+  .profile-tab-btn i {
+    display: none;
+  }
+  
+  .empty-title {
+    font-size: 1rem;
+  }
+  
+  .empty-desc {
+    font-size: 0.7rem;
+  }
+  
+  .btn-primary {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+  }
+  
+  .product-info {
+    min-width: 140px;
+  }
+  
+  .product-title {
+    font-size: 0.75rem;
+  }
+  
+  .btn-gradient, .btn-glass {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+}
+
+/* ===== ФИКС ДЛЯ ОЧЕНЬ ДЛИННЫХ ИМЕН ===== */
+.profile-username {
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* ===== ФИКС ДЛЯ ТОВАРОВ НА МАЛЕНЬКИХ ЭКРАНАХ ===== */
+@media (max-width: 400px) {
+  .product-info {
+    max-width: calc(100% - 60px);
+  }
+  
+  .product-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
