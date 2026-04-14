@@ -43,6 +43,84 @@
 <link rel="stylesheet" href="profile-fix.css?v=2">
 
 <style>
+  .guest-banner {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+    padding: 0 16px;
+    pointer-events: none;
+}
+
+.guest-banner-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(30, 40, 70, 0.95), rgba(15, 20, 40, 0.95));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 40px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+}
+
+.guest-banner-content i {
+    color: #60a5fa;
+    font-size: 1.4rem;
+}
+
+.guest-banner-content span {
+    flex: 1;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.guest-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.banner-login-btn {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.banner-close-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 6px;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .guest-banner-content {
+        flex-wrap: wrap;
+    }
+    .guest-banner-content span {
+        font-size: 0.8rem;
+    }
+}
 /* ===== ОСНОВНЫЕ СТИЛИ ===== */
 .demo-content {
     text-align: center;

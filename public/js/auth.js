@@ -244,6 +244,19 @@ class AuthManager {
         const userAvatar = document.getElementById('userAvatar');
         const profileUsername = document.getElementById('profileUsername');
         const avatarCircle = document.getElementById('profileAvatarCircle');
+            // Управление гостевым баннером
+    const guestBanner = document.getElementById('guestBanner');
+    if (guestBanner) {
+        guestBanner.style.display = isLoggedIn ? 'none' : 'block';
+    }
+        // Показываем уведомление если пользователь гость
+    if (!isLoggedIn && !sessionStorage.getItem('toast_shown')) {
+        sessionStorage.setItem('toast_shown', 'true');
+        setTimeout(() => {
+            this.showToast('👋 Войдите или зарегистрируйтесь, чтобы использовать все возможности!', 'info');
+        }, 1000);
+    }
+
 
         if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : 'flex';
         if (userMenu) userMenu.style.display = isLoggedIn ? 'flex' : 'none';
