@@ -35,517 +35,113 @@ class AuthManager {
         console.log('✅ AuthManager инициализирован');
     }
 
-    injectAuthModal() {
-        if (document.getElementById('authModal')) return;
-        
-        const modal = document.createElement('div');
-        modal.id = 'authModal';
-        modal.className = 'modal-glass';
-        modal.innerHTML = `
-            <div class="auth-modal-content">
-                <div class="auth-modal-header">
-                    <div class="auth-logo">
-                        <i class="fas fa-crown"></i>
-                        <span>Плейнексис</span>
-                    </div>
-                    <button class="auth-close-btn" id="authModalCloseBtn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <div class="auth-tabs">
-                    <button class="auth-tab" id="loginTab">
-                        <i class="fas fa-sign-in-alt"></i> Вход
-                    </button>
-                    <button class="auth-tab active" id="registerTab">
-                        <i class="fas fa-user-plus"></i> Регистрация
-                    </button>
-                </div>
-                
-                <!-- Форма входа -->
-                <div id="loginForm" class="auth-form">
-                    <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleLoginBtn2">
-                            <i class="fab fa-google"></i>
-                            <span>Google</span>
-                        </button>
-                        <button class="auth-social-btn vk" id="vkLoginBtn2">
-                            <i class="fab fa-vk"></i>
-                            <span>VK</span>
-                        </button>
-                    </div>
-                    
-                    <div class="auth-divider">
-                        <span>или</span>
-                    </div>
-                    
-                    <form id="loginFormElement">
-                        <div class="auth-input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="loginEmail" placeholder="Email" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="loginPassword" placeholder="Пароль" required>
-                        </div>
-                        <button type="submit" class="auth-submit-btn">
-                            <i class="fas fa-sign-in-alt"></i> Войти
-                        </button>
-                    </form>
-                    
-                    <p class="auth-footer-text">
-                        Нет аккаунта? 
-                        <a href="#" id="switchToRegister">Зарегистрироваться</a>
-                    </p>
-                </div>
-                
-                <!-- Форма регистрации -->
-                <div id="registerForm" class="auth-form active">
-                    <div class="auth-welcome-text">
-                        <i class="fas fa-hand-wave"></i>
-                        <span>Присоединяйся к нам!</span>
-                    </div>
-                    
-                    <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleRegisterBtn2">
-                            <i class="fab fa-google"></i>
-                            <span>Google</span>
-                        </button>
-                        <button class="auth-social-btn vk" id="vkRegisterBtn2">
-                            <i class="fab fa-vk"></i>
-                            <span>VK</span>
-                        </button>
-                    </div>
-                    
-                    <div class="auth-divider">
-                        <span>или</span>
-                    </div>
-                    
-                    <form id="registerFormElement">
-                        <div class="auth-input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="registerEmail" placeholder="Email" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
-                        </div>
-                        <button type="submit" class="auth-submit-btn">
-                            <i class="fas fa-user-plus"></i> Зарегистрироваться
-                        </button>
-                    </form>
-                    
-                    <p class="auth-footer-text">
-                        Уже есть аккаунт? 
-                        <a href="#" id="switchToLogin">Войти</a>
-                    </p>
-                </div>
+injectAuthModal() {
+    if (document.getElementById('authModal')) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'authModal';
+    modal.className = 'modal-glass';
+    modal.innerHTML = `
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <span class="auth-logo-text">Плейнексис</span>
+                <button class="auth-close-btn" id="authModalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        if (!document.getElementById('auth-modal-styles')) {
-            const styles = document.createElement('style');
-            styles.id = 'auth-modal-styles';
-            styles.textContent = `
-                .modal-glass {
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(0, 0, 0, 0.85);
-                    backdrop-filter: blur(12px);
-                    display: none;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 9999;
-                    padding: 16px;
-                }
-                
-                .modal-glass.active {
-                    display: flex;
-                    animation: modalFadeIn 0.2s ease;
-                }
-                
-                @keyframes modalFadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                
-                .auth-modal-content {
-                    background: linear-gradient(145deg, #0f1322, #0a0d18);
-                    border-radius: 32px;
-                    padding: 28px;
-                    width: 100%;
-                    max-width: 420px;
-                    border: 1px solid rgba(59, 130, 246, 0.3);
-                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-                }
-                
-                .auth-modal-header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 24px;
-                }
-                
-                .auth-logo {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    font-size: 1.3rem;
-                    font-weight: 700;
-                }
-                
-                .auth-logo i {
-                    color: #fbbf24;
-                    font-size: 1.5rem;
-                }
-                
-                .auth-logo span {
-                    background: linear-gradient(135deg, #fff, #a78bfa);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                }
-                
-                .auth-close-btn {
-                    background: rgba(255, 255, 255, 0.05);
-                    border: none;
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 50%;
-                    color: #94a3b8;
-                    font-size: 1.1rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.2s ease;
-                }
-                
-                .auth-close-btn:hover {
-                    background: rgba(239, 68, 68, 0.2);
-                    color: #f87171;
-                }
-                
-                .auth-welcome-text {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    margin-bottom: 20px;
-                    padding: 12px;
-                    background: rgba(59, 130, 246, 0.1);
-                    border-radius: 40px;
-                    color: white;
-                    font-weight: 600;
-                    border: 1px solid rgba(59, 130, 246, 0.2);
-                }
-                
-                .auth-welcome-text i {
-                    color: #fbbf24;
-                    font-size: 1.2rem;
-                    animation: wave 1s ease infinite;
-                }
-                
-                @keyframes wave {
-                    0%, 100% { transform: rotate(0deg); }
-                    25% { transform: rotate(-15deg); }
-                    75% { transform: rotate(15deg); }
-                }
-                
-                .auth-tabs {
-                    display: flex;
-                    gap: 10px;
-                    margin-bottom: 24px;
-                    background: rgba(255, 255, 255, 0.03);
-                    padding: 4px;
-                    border-radius: 40px;
-                }
-                
-                .auth-tab {
-                    flex: 1;
-                    padding: 12px;
-                    background: transparent;
-                    border: none;
-                    border-radius: 40px;
-                    color: #94a3b8;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    transition: all 0.2s ease;
-                }
-                
-                .auth-tab:hover {
-                    color: #cbd5e1;
-                    background: rgba(255, 255, 255, 0.05);
-                }
-                
-                .auth-tab.active {
-                    background: linear-gradient(135deg, #3b82f6, #2563eb);
-                    color: white;
-                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-                }
-                
-                .auth-form {
-                    display: none;
-                }
-                
-                .auth-form.active {
-                    display: block;
-                }
-                
-                .auth-social-buttons {
-                    display: flex;
-                    gap: 12px;
-                    margin-bottom: 20px;
-                }
-                
-                .auth-social-btn {
-                    flex: 1;
-                    padding: 12px;
-                    border: none;
-                    border-radius: 40px;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    transition: all 0.2s ease;
-                }
-                
-                .auth-social-btn.google {
-                    background: #fff;
-                    color: #1a1a2e;
-                }
-                
-                .auth-social-btn.google:hover {
-                    background: #f0f0f0;
-                    transform: translateY(-2px);
-                }
-                
-                .auth-social-btn.vk {
-                    background: #0077ff;
-                    color: white;
-                }
-                
-                .auth-social-btn.vk:hover {
-                    background: #0066dd;
-                    transform: translateY(-2px);
-                }
-                
-                .auth-divider {
-                    display: flex;
-                    align-items: center;
-                    text-align: center;
-                    color: #4a5568;
-                    font-size: 0.8rem;
-                    margin: 20px 0;
-                }
-                
-                .auth-divider::before,
-                .auth-divider::after {
-                    content: '';
-                    flex: 1;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                }
-                
-                .auth-divider span {
-                    padding: 0 12px;
-                }
-                
-                .auth-input-group {
-                    display: flex;
-                    align-items: center;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 40px;
-                    padding: 4px 4px 4px 16px;
-                    margin-bottom: 12px;
-                    transition: all 0.2s ease;
-                }
-                
-                .auth-input-group:focus-within {
-                    border-color: #3b82f6;
-                    background: rgba(59, 130, 246, 0.05);
-                }
-                
-                .auth-input-group i {
-                    color: #5f6b8a;
-                    font-size: 0.9rem;
-                    width: 20px;
-                }
-                
-                .auth-input-group input {
-                    flex: 1;
-                    background: transparent;
-                    border: none;
-                    padding: 12px 8px;
-                    color: white;
-                    font-size: 0.9rem;
-                    outline: none;
-                }
-                
-                .auth-input-group input::placeholder {
-                    color: #4a5568;
-                }
-                
-                .auth-submit-btn {
-                    width: 100%;
-                    padding: 14px;
-                    background: linear-gradient(135deg, #3b82f6, #2563eb);
-                    border: none;
-                    border-radius: 40px;
-                    color: white;
-                    font-weight: 700;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    margin-top: 20px;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-                }
-                
-                .auth-submit-btn:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-                }
-                
-                .auth-footer-text {
-                    text-align: center;
-                    margin-top: 20px;
-                    color: #6b7a9e;
-                    font-size: 0.85rem;
-                }
-                
-                .auth-footer-text a {
-                    color: #60a5fa;
-                    text-decoration: none;
-                    font-weight: 600;
-                    cursor: pointer;
-                }
-                
-                .auth-footer-text a:hover {
-                    color: #93c5fd;
-                    text-decoration: underline;
-                }
-                
-                /* Гостевые экраны */
-                .guest-screen {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 40px 20px;
-                    text-align: center;
-                    background: radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.08), transparent 70%);
-                    z-index: 100;
-                    min-height: 70vh;
-                }
-                
-                .guest-screen-icon {
-                    width: 100px;
-                    height: 100px;
-                    margin-bottom: 24px;
-                }
-                
-                .guest-screen-icon i {
-                    font-size: 70px;
-                    background: linear-gradient(135deg, #60a5fa, #a78bfa);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                    filter: drop-shadow(0 0 30px rgba(96, 165, 250, 0.4));
-                    animation: iconFloat 3s ease-in-out infinite;
-                }
-                
-                @keyframes iconFloat {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-8px); }
-                }
-                
-                .guest-screen h3 {
-                    font-size: 1.6rem;
-                    font-weight: 700;
-                    margin-bottom: 12px;
-                    background: linear-gradient(135deg, #fff, #c4b5fd);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                }
-                
-                .guest-screen p {
-                    color: #94a3b8;
-                    font-size: 0.95rem;
-                    max-width: 380px;
-                    margin-bottom: 24px;
-                    line-height: 1.5;
-                }
-                
-                .guest-login-btn {
-                    padding: 14px 32px;
-                    border-radius: 40px;
-                    font-weight: 600;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 10px;
-                    background: linear-gradient(135deg, #3b82f6, #2563eb);
-                    color: white;
-                    border: none;
-                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-                    transition: all 0.3s ease;
-                }
-                
-                .guest-login-btn:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-                }
-                
-                @media (max-width: 480px) {
-                    .auth-modal-content {
-                        padding: 20px;
-                        border-radius: 24px;
-                    }
-                    
-                    .auth-social-buttons {
-                        flex-direction: column;
-                    }
-                    
-                    .guest-screen h3 {
-                        font-size: 1.3rem;
-                    }
-                }
-            `;
-            document.head.appendChild(styles);
-        }
-        
-        // Перепривязываем обработчики после создания модалки
-        setTimeout(() => this.setupEventListeners(), 50);
-    }
+            
+            <div class="auth-tabs">
+                <button class="auth-tab" id="loginTab">Вход</button>
+                <button class="auth-tab active" id="registerTab">Регистрация</button>
+            </div>
+            
+            <!-- Форма входа -->
+            <div id="loginForm" class="auth-form">
+                <div class="auth-social-buttons">
+                    <button class="auth-social-btn google" id="googleLoginBtn2">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button class="auth-social-btn vk" id="vkLoginBtn2">
+                        <i class="fab fa-vk"></i> VK
+                    </button>
+                </div>
+                <div class="auth-divider"><span>или</span></div>
+                <form id="loginFormElement">
+                    <div class="auth-input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Email" required>
+                    </div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Пароль" required>
+                        <i class="far fa-eye toggle-password" data-target="loginPassword"></i>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Войти</button>
+                </form>
+                <p class="auth-footer-text">
+                    Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a>
+                </p>
+            </div>
+            
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="auth-form active">
+                <div class="auth-social-buttons">
+                    <button class="auth-social-btn google" id="googleRegisterBtn2">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button class="auth-social-btn vk" id="vkRegisterBtn2">
+                        <i class="fab fa-vk"></i> VK
+                    </button>
+                </div>
+                <div class="auth-divider"><span>или</span></div>
+                <form id="registerFormElement">
+                    <div class="auth-input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
+                    </div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
+                        <i class="far fa-eye toggle-password" data-target="registerPassword"></i>
+                    </div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
+                        <i class="far fa-eye toggle-password" data-target="registerConfirmPassword"></i>
+                    </div>
+                    <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
+                </form>
+                <p class="auth-footer-text">
+                    Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a>
+                </p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Добавляем обработчики переключения видимости пароля
+    modal.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            if (input) {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            }
+        });
+    });
+    
+    // ВАЖНО: вызываем setupEventListeners() ПОСЛЕ вставки модалки,
+    // чтобы привязать остальные обработчики (табы, отправка форм и т.д.)
+    setTimeout(() => this.setupEventListeners(), 50);
+}
 
     async loadExternalScripts() {
         if (!document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {

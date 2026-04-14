@@ -115,3 +115,58 @@
 .close-modal:hover {
     color: #ef4444;
 }
+
+
+/* Прозрачный чёрный фон модалки */
+.modal-glass {
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+.auth-modal-content {
+    background: rgba(10, 10, 20, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 32px !important;
+    padding: 28px !important;
+}
+
+.auth-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.auth-logo-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Группа поля с паролем (иконка глаза справа) */
+.auth-input-group.password-group {
+    position: relative;
+}
+.auth-input-group.password-group .toggle-password {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.auth-input-group.password-group input {
+    padding-right: 45px;
+}
+
+/* Убираем старые приветственные тексты */
+.auth-welcome-text {
+    display: none !important;
+}
