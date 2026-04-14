@@ -3486,7 +3486,202 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ ФИНАЛЬНЫЙ ФИКС ЗАВЕРШЁН');
 })();
+(function() {
+  console.log('✅ ЗАПУСК ИСПРАВЛЕННОЙ АВТОРИЗАЦИИ');
 
+  // 1. Создаём модальное окно, если его ещё нет
+  function ensureAuthModalExists() {
+    if (document.getElementById('authModal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'authModal';
+    modal.className = 'modal-glass';
+    modal.innerHTML = `
+      <div class="auth-modal-content" style="
+        background: linear-gradient(145deg, #0f1322, #0a0d18);
+        border-radius: 32px;
+        padding: 28px;
+        width: 100%;
+        max-width: 420px;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        max-height: 90vh;
+        overflow-y: auto;
+      ">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 700;">
+            <i class="fas fa-crown" style="color: #fbbf24;"></i>
+            <span style="background: linear-gradient(135deg, #fff, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent;">Плейнексис</span>
+          </div>
+          <button id="authModalCloseBtn" style="background: rgba(255,255,255,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; color: #94a3b8; cursor: pointer; font-size: 1.2rem;">✕</button>
+        </div>
+        
+        <!-- Табы -->
+        <div style="display: flex; gap: 10px; margin-bottom: 24px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 40px;">
+          <button id="authLoginTab" style="flex: 1; padding: 12px; background: transparent; border: none; border-radius: 40px; color: #94a3b8; font-weight: 600; cursor: pointer;">Вход</button>
+          <button id="authRegisterTab" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer;">Регистрация</button>
+        </div>
+        
+        <!-- Форма входа -->
+        <div id="authLoginForm" style="display: none;">
+          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <button id="googleLoginBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #fff; color: #1a1a2e; font-weight: 600; cursor: pointer;"><i class="fab fa-google"></i> Google</button>
+            <button id="vkLoginBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #0077ff; color: white; font-weight: 600; cursor: pointer;"><i class="fab fa-vk"></i> VK</button>
+          </div>
+          <div style="text-align: center; color: #4a5568; font-size: 0.8rem; margin: 20px 0;">или</div>
+          <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+          <input type="password" id="loginPassword" placeholder="Пароль" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 20px; outline: none;">
+          <button id="submitLoginBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 700; cursor: pointer;">Войти</button>
+        </div>
+        
+        <!-- Форма регистрации -->
+        <div id="authRegisterForm" style="display: block;">
+          <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <button id="googleRegisterBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #fff; color: #1a1a2e; font-weight: 600; cursor: pointer;"><i class="fab fa-google"></i> Google</button>
+            <button id="vkRegisterBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #0077ff; color: white; font-weight: 600; cursor: pointer;"><i class="fab fa-vk"></i> VK</button>
+          </div>
+          <div style="text-align: center; color: #4a5568; font-size: 0.8rem; margin: 20px 0;">или</div>
+          <input type="email" id="registerEmail" placeholder="Email" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+          <input type="text" id="registerUsername" placeholder="Имя пользователя" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+          <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+          <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 20px; outline: none;">
+          <button id="submitRegisterBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 700; cursor: pointer;">Зарегистрироваться</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Настройка табов
+    const loginTab = document.getElementById('authLoginTab');
+    const registerTab = document.getElementById('authRegisterTab');
+    const loginForm = document.getElementById('authLoginForm');
+    const registerForm = document.getElementById('authRegisterForm');
+    
+    function setActiveTab(tab) {
+      if (tab === 'login') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        loginTab.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        loginTab.style.color = 'white';
+        registerTab.style.background = 'transparent';
+        registerTab.style.color = '#94a3b8';
+      } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        registerTab.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        registerTab.style.color = 'white';
+        loginTab.style.background = 'transparent';
+        loginTab.style.color = '#94a3b8';
+      }
+    }
+    
+    loginTab.addEventListener('click', () => setActiveTab('login'));
+    registerTab.addEventListener('click', () => setActiveTab('register'));
+    
+    // Закрытие модалки
+    const closeBtn = document.getElementById('authModalCloseBtn');
+    closeBtn.addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    
+    // Регистрация (простая демо)
+    document.getElementById('submitRegisterBtn').addEventListener('click', () => {
+      const email = document.getElementById('registerEmail').value.trim();
+      const username = document.getElementById('registerUsername').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      const confirm = document.getElementById('registerConfirmPassword').value;
+      
+      if (!email || !username || !password) return alert('Заполните все поля');
+      if (password !== confirm) return alert('Пароли не совпадают');
+      if (password.length < 6) return alert('Пароль должен быть не менее 6 символов');
+      
+      // Сохраняем пользователя в localStorage (демо)
+      const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+      if (users.find(u => u.email === email)) return alert('Пользователь с таким email уже существует');
+      
+      const newUser = { id: 'user_' + Date.now(), email, username, password: btoa(password), balance: 0, joinedDate: new Date().toISOString() };
+      users.push(newUser);
+      localStorage.setItem('apex_users', JSON.stringify(users));
+      localStorage.setItem('apex_user', username);
+      localStorage.setItem('apex_user_id', newUser.id);
+      localStorage.setItem('apex_user_email', email);
+      
+      alert('Регистрация успешна!');
+      modal.style.display = 'none';
+      window.location.reload();
+    });
+    
+    // Вход (демо)
+    document.getElementById('submitLoginBtn').addEventListener('click', () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+      const user = users.find(u => u.email === email && u.password === btoa(password));
+      
+      if (user) {
+        localStorage.setItem('apex_user', user.username);
+        localStorage.setItem('apex_user_id', user.id);
+        localStorage.setItem('apex_user_email', user.email);
+        alert('Вход выполнен!');
+        modal.style.display = 'none';
+        window.location.reload();
+      } else {
+        alert('Неверный email или пароль');
+      }
+    });
+    
+    // Соцсети (заглушки)
+    const googleBtns = modal.querySelectorAll('[id^="google"]');
+    const vkBtns = modal.querySelectorAll('[id^="vk"]');
+    googleBtns.forEach(btn => btn.addEventListener('click', () => alert('Вход через Google (демо)')));
+    vkBtns.forEach(btn => btn.addEventListener('click', () => alert('Вход через VK (демо)')));
+    
+    console.log('✅ Модальное окно авторизации создано');
+  }
+
+  // 2. Функция открытия модалки
+  function openAuthModal(tab = 'register') {
+    ensureAuthModalExists();
+    const modal = document.getElementById('authModal');
+    modal.style.display = 'flex';
+    
+    // Переключаем на нужную вкладку
+    const loginTab = document.getElementById('authLoginTab');
+    const registerTab = document.getElementById('authRegisterTab');
+    if (tab === 'login') {
+      loginTab.click();
+    } else {
+      registerTab.click();
+    }
+  }
+
+  // 3. Привязываем обработчики ко всем кнопкам входа/регистрации
+  function bindAuthButtons() {
+    // Используем делегирование событий на document, чтобы ловить даже динамически добавленные кнопки
+    document.body.addEventListener('click', (e) => {
+      const target = e.target.closest('.guest-login-btn, .guest-register-btn, #loginBtn');
+      if (!target) return;
+      
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log('🖱️ Клик по кнопке авторизации:', target.className || target.id);
+      openAuthModal('register'); // Всегда открываем вкладку регистрации
+    });
+    
+    console.log('✅ Обработчики авторизации привязаны через делегирование');
+  }
+
+  // 4. Запускаем привязку сразу и после загрузки DOM
+  bindAuthButtons();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindAuthButtons);
+  }
+
+  // 5. Экспортируем функцию в глобальную область
+  window.openAuthModal = openAuthModal;
+  
+  console.log('🎉 ИСПРАВЛЕННАЯ АВТОРИЗАЦИЯ ПОЛНОСТЬЮ ГОТОВА');
+})();
 </script>
 
 </body>
