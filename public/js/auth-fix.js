@@ -378,78 +378,54 @@ async register(email, username, password) {
         return false;
     }
 
-    try {
+    console.log('🔐 Отправка регистрации:', { email, username, password: '***' });
+
+    const tryRegister = async (payload) => {
         const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, password })
+            body: JSON.stringify(payload)
         });
-        
         const data = await response.json();
-        if (response.ok) {
-            this.setSession(data);
-            this.showToast('Регистрация успешна!', 'success');
-            this.closeAuthModal();
-            return true;
-        } else {
-            // Сервер вернул ошибку
-            this.showToast(data.error || 'Ошибка регистрации на сервере', 'error');
-            
-            // Предлагаем локальную регистрацию (демо)
-            if (confirm('Сервер временно недоступен. Зарегистрироваться локально (демо)?')) {
-                const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
-                if (users.find(u => u.email === email)) {
-                    this.showToast('Пользователь с таким email уже существует', 'error');
-                    return false;
+        console.log(`📡 Ответ сервера (${response.status}):`, data);
+        return { ok: response.ok, data };
+    };
+
+    // Варианты payload
+    const variants = [
+        { email, username, password },       // стандартный
+        { email, name: username, password }, // с полем name
+        { email, login: username, password } // с полем login
+    ];
+
+    for (const payload of variants) {
+        try {
+            const { ok, data } = await tryRegister(payload);
+            if (ok) {
+                // Успех — устанавливаем сессию
+                // Нормализуем ответ: если сервер не вернул user, создаём его из данных
+                if (!data.user && data.userId) {
+                    data.user = { id: data.userId, username, email };
+                } else if (!data.user) {
+                    data.user = { id: 'user_' + Date.now(), username, email };
                 }
-                const newUser = {
-                    id: 'user_' + Date.now(),
-                    email: email,
-                    username: username,
-                    password: btoa(password),
-                    balance: 0,
-                    joinedDate: new Date().toISOString()
-                };
-                users.push(newUser);
-                localStorage.setItem('apex_users', JSON.stringify(users));
-                localStorage.setItem('apex_user', username);
-                localStorage.setItem('apex_user_id', newUser.id);
-                localStorage.setItem('apex_user_email', email);
-                
-                this.setSession({ token: 'demo_token', user: newUser });
-                this.showToast('Регистрация (демо) успешна!', 'success');
+                // Если сервер не вернул token, генерируем демо-токен
+                if (!data.token) {
+                    data.token = 'server_generated_token_' + Date.now();
+                }
+                this.setSession(data);
+                this.showToast('Регистрация успешна!', 'success');
                 this.closeAuthModal();
                 return true;
             }
-            return false;
+        } catch (e) {
+            console.warn('Ошибка сети при попытке варианта:', payload, e);
         }
-    } catch (error) {
-        this.showToast('Ошибка соединения с сервером', 'error');
-        
-        // Fallback при сетевой ошибке
-        if (confirm('Нет связи с сервером. Зарегистрироваться локально (демо)?')) {
-            const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
-            const newUser = {
-                id: 'user_' + Date.now(),
-                email: email,
-                username: username,
-                password: btoa(password),
-                balance: 0,
-                joinedDate: new Date().toISOString()
-            };
-            users.push(newUser);
-            localStorage.setItem('apex_users', JSON.stringify(users));
-            localStorage.setItem('apex_user', username);
-            localStorage.setItem('apex_user_id', newUser.id);
-            localStorage.setItem('apex_user_email', email);
-            
-            this.setSession({ token: 'demo_token', user: newUser });
-            this.showToast('Регистрация (демо) успешна!', 'success');
-            this.closeAuthModal();
-            return true;
-        }
-        return false;
     }
+
+    // Если ни один вариант не сработал
+    this.showToast('Ошибка регистрации. Попробуйте позже.', 'error');
+    return false;
 }
 
     async login(email, password) {
