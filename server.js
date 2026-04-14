@@ -214,7 +214,27 @@ async function ensureTables() {
                 updated_at TIMESTAMP DEFAULT NOW()
             )
         `);
-        
+        // В server.js, внутри ensureTables() после создания других таблиц
+await client.query(`
+    CREATE TABLE IF NOT EXISTS deals (
+        id TEXT PRIMARY KEY,
+        product_id TEXT REFERENCES products(id) ON DELETE SET NULL,
+        buyer_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+        seller_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+        amount INTEGER NOT NULL,
+        escrow_amount INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP,
+        cancelled_at TIMESTAMP,
+        chat_id TEXT,
+        buyer_confirmed BOOLEAN DEFAULT FALSE,
+        seller_confirmed BOOLEAN DEFAULT FALSE
+    );
+    
+    CREATE INDEX IF NOT EXISTS idx_deals_buyer ON deals(buyer_id);
+    CREATE INDEX IF NOT EXISTS idx_deals_seller ON deals(seller_id);
+`);
         await client.query(`
             CREATE TABLE IF NOT EXISTS sellers (
                 user_id TEXT PRIMARY KEY,
@@ -1294,3 +1314,174 @@ async function startServer() {
 
 // Вместо app.listen используем startServer
 startServer();
+
+app.post('/api/deals', authenticateToken, async (req, res) => {
+    const { productId } = req.body;
+    const buyerId = req.userId;
+    const client = await pool.connect();
+    
+    try {
+        await client.query('BEGIN');
+        
+        // Получаем товар и продавца
+        const productRes = await client.query(
+            'SELECT * FROM products WHERE id = $1',
+            [productId]
+        );
+        if (productRes.rows.length === 0) {
+            throw new Error('Товар не найден');
+        }
+        const product = productRes.rows[0];
+        const sellerId = product.seller_id; // предполагаем, что в products есть seller_id (нужно добавить)
+        // Если seller_id нет, нужно получить из поля seller (username) -> найти user_id
+        
+        // Проверяем, что покупатель не продавец
+        if (buyerId === sellerId) {
+            throw new Error('Нельзя купить свой товар');
+        }
+        
+        // Парсим цену (например, "1000 ₽")
+        const priceMatch = product.price.match(/(\d+)/);
+        if (!priceMatch) throw new Error('Некорректная цена');
+        const amount = parseInt(priceMatch[1]);
+        
+        // Проверяем баланс покупателя
+        const buyerRes = await client.query(
+            'SELECT balance FROM users WHERE id = $1 FOR UPDATE',
+            [buyerId]
+        );
+        const buyerBalance = buyerRes.rows[0].balance;
+        if (buyerBalance < amount) {
+            throw new Error('Недостаточно средств');
+        }
+        
+        // Списываем с баланса покупателя
+        await client.query(
+            'UPDATE users SET balance = balance - $1 WHERE id = $2',
+            [amount, buyerId]
+        );
+        
+        // Создаём сделку
+        const dealId = crypto.randomBytes(16).toString('hex');
+        await client.query(
+            `INSERT INTO deals (id, product_id, buyer_id, seller_id, amount, escrow_amount, status)
+             VALUES ($1, $2, $3, $4, $5, $5, 'pending')`,
+            [dealId, productId, buyerId, sellerId, amount]
+        );
+        
+        await client.query('COMMIT');
+        
+        res.json({
+            success: true,
+            dealId,
+            message: 'Сделка создана, средства заморожены'
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        res.status(400).json({ error: error.message });
+    } finally {
+        client.release();
+    }
+});
+
+app.post('/api/deals/:dealId/seller-complete', authenticateToken, async (req, res) => {
+    const { dealId } = req.params;
+    const userId = req.userId;
+    
+    try {
+        const result = await pool.query(
+            `UPDATE deals SET seller_confirmed = TRUE, status = 
+                CASE WHEN buyer_confirmed THEN 'completed' ELSE 'seller_completed' END
+             WHERE id = $1 AND seller_id = $2 AND status IN ('pending', 'seller_completed')
+             RETURNING *`,
+            [dealId, userId]
+        );
+        if (result.rowCount === 0) {
+            return res.status(400).json({ error: 'Сделка не найдена или недоступна' });
+        }
+        const deal = result.rows[0];
+        
+        // Если оба подтвердили – завершаем сделку
+        if (deal.status === 'completed') {
+            await pool.query(
+                'UPDATE users SET balance = balance + $1 WHERE id = $2',
+                [deal.amount, deal.seller_id]
+            );
+            await pool.query(
+                'UPDATE deals SET completed_at = NOW(), escrow_amount = 0 WHERE id = $1',
+                [dealId]
+            );
+        }
+        
+        res.json({ success: true, status: deal.status });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/deals/:dealId/buyer-confirm', authenticateToken, async (req, res) => {
+    const { dealId } = req.params;
+    const userId = req.userId;
+    
+    try {
+        const result = await pool.query(
+            `UPDATE deals SET buyer_confirmed = TRUE, status = 
+                CASE WHEN seller_confirmed THEN 'completed' ELSE 'buyer_confirmed' END
+             WHERE id = $1 AND buyer_id = $2 AND status IN ('pending', 'buyer_confirmed', 'seller_completed')
+             RETURNING *`,
+            [dealId, userId]
+        );
+        if (result.rowCount === 0) {
+            return res.status(400).json({ error: 'Сделка не найдена или недоступна' });
+        }
+        const deal = result.rows[0];
+        
+        if (deal.status === 'completed') {
+            await pool.query(
+                'UPDATE users SET balance = balance + $1 WHERE id = $2',
+                [deal.amount, deal.seller_id]
+            );
+            await pool.query(
+                'UPDATE deals SET completed_at = NOW(), escrow_amount = 0 WHERE id = $1',
+                [dealId]
+            );
+        }
+        
+        res.json({ success: true, status: deal.status });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}); 
+
+
+app.post('/api/deals/:dealId/cancel', authenticateToken, async (req, res) => {
+    const { dealId } = req.params;
+    const userId = req.userId;
+    
+    try {
+        const result = await pool.query(
+            `UPDATE deals SET status = 'cancelled', cancelled_at = NOW()
+             WHERE id = $1 AND seller_id = $2 AND status IN ('pending', 'seller_completed', 'buyer_confirmed')
+             RETURNING *`,
+            [dealId, userId]
+        );
+        if (result.rowCount === 0) {
+            return res.status(400).json({ error: 'Сделка не найдена или недоступна' });
+        }
+        const deal = result.rows[0];
+        
+        // Возврат денег покупателю
+        await pool.query(
+            'UPDATE users SET balance = balance + $1 WHERE id = $2',
+            [deal.amount, deal.buyer_id]
+        );
+        await pool.query(
+            'UPDATE deals SET escrow_amount = 0 WHERE id = $1',
+            [dealId]
+        );
+        
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});

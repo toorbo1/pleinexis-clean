@@ -276,7 +276,108 @@ function autoReply(userMessage) {
     }
     renderDialogsList();
 }
+// После открытия диалога загружаем данные сделки
+async function loadDealInfo(dealId) {
+    try {
+        const res = await fetch(`/api/deals/${dealId}`);
+        return await res.json();
+    } catch (e) {
+        return null;
+    }
+}
 
+// Модифицируем openChatWithDialog
+async function openChatWithDialog(dialogId) {
+    // ... существующий код ...
+    const dialog = dialogs.find(d => d.id === dialogId);
+    if (dialog.dealId) {
+        const deal = await loadDealInfo(dialog.dealId);
+        renderDealActions(dialogId, deal);
+    }
+}
+
+function renderDealActions(dialogId, deal) {
+    const currentUser = localStorage.getItem('apex_user');
+    const isBuyer = (deal.buyer_username === currentUser); // нужно получить username из user_id
+    const isSeller = (deal.seller_username === currentUser);
+    
+    const actionsContainer = document.getElementById('chatDealActions');
+    if (!actionsContainer) return;
+    
+    let html = '';
+    if (deal.status === 'pending') {
+        if (isSeller) {
+            html = `
+                <button class="deal-btn complete" onclick="sellerCompleteDeal('${deal.id}')">
+                    ✅ Я выполнил работу
+                </button>
+                <button class="deal-btn cancel" onclick="cancelDeal('${deal.id}')">
+                    ❌ Отменить заказ
+                </button>
+            `;
+        } else if (isBuyer) {
+            html = `<div class="deal-info">Ожидание выполнения продавцом...</div>`;
+        }
+    } else if (deal.status === 'seller_completed') {
+        if (isBuyer) {
+            html = `
+                <button class="deal-btn confirm" onclick="buyerConfirmDeal('${deal.id}')">
+                    ✅ Подтвердить получение
+                </button>
+            `;
+        } else {
+            html = `<div class="deal-info">Ожидание подтверждения покупателем</div>`;
+        }
+    } else if (deal.status === 'completed') {
+        html = `<div class="deal-info completed">✅ Сделка завершена</div>`;
+    } else if (deal.status === 'cancelled') {
+        html = `<div class="deal-info cancelled">❌ Сделка отменена</div>`;
+    }
+    
+    actionsContainer.innerHTML = html;
+}
+
+// Функции для кнопок
+window.sellerCompleteDeal = async (dealId) => {
+    try {
+        const res = await fetch(`/api/deals/${dealId}/seller-complete`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        });
+        if (!res.ok) throw new Error('Ошибка');
+        showToast('Статус обновлён', 'success');
+        // Обновить чат
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+};
+
+window.buyerConfirmDeal = async (dealId) => {
+    try {
+        const res = await fetch(`/api/deals/${dealId}/buyer-confirm`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        });
+        if (!res.ok) throw new Error('Ошибка');
+        showToast('Сделка завершена!', 'success');
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+};
+
+window.cancelDeal = async (dealId) => {
+    if (!confirm('Отменить заказ? Деньги вернутся покупателю.')) return;
+    try {
+        const res = await fetch(`/api/deals/${dealId}/cancel`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        });
+        if (!res.ok) throw new Error('Ошибка');
+        showToast('Сделка отменена', 'success');
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+};
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>]/g, function(m) {
