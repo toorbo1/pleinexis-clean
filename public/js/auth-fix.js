@@ -1076,4 +1076,4 @@ window.enterAdminPanel = function() {
             return false;
         }
     }
-};
+}; 
