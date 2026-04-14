@@ -1,4 +1,4 @@
-// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (ИСПРАВЛЕННАЯ) ==========
+// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (ИСПРАВЛЕНО - КНОПКИ РАБОТАЮТ) ==========
 
 class AuthManager {
     constructor() {
@@ -25,10 +25,9 @@ class AuthManager {
         this.updateUI();
         this.checkGuestPages();
         
-        // Показываем модалку автоматически если пользователь не авторизован
         setTimeout(() => {
             if (!this.currentUser && !this.modalAutoShown) {
-                this.showAuthModal();
+                this.showAuthModal('register'); // Открываем сразу регистрацию
                 this.modalAutoShown = true;
             }
         }, 1000);
@@ -55,21 +54,22 @@ class AuthManager {
                 </div>
                 
                 <div class="auth-tabs">
-                    <button class="auth-tab active" id="loginTab">
+                    <button class="auth-tab" id="loginTab">
                         <i class="fas fa-sign-in-alt"></i> Вход
                     </button>
-                    <button class="auth-tab" id="registerTab">
+                    <button class="auth-tab active" id="registerTab">
                         <i class="fas fa-user-plus"></i> Регистрация
                     </button>
                 </div>
                 
-                <div id="loginForm" class="auth-form active">
+                <!-- Форма входа -->
+                <div id="loginForm" class="auth-form">
                     <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleLoginBtn">
+                        <button class="auth-social-btn google" id="googleLoginBtn2">
                             <i class="fab fa-google"></i>
                             <span>Google</span>
                         </button>
-                        <button class="auth-social-btn vk" id="vkLoginBtn">
+                        <button class="auth-social-btn vk" id="vkLoginBtn2">
                             <i class="fab fa-vk"></i>
                             <span>VK</span>
                         </button>
@@ -99,13 +99,19 @@ class AuthManager {
                     </p>
                 </div>
                 
-                <div id="registerForm" class="auth-form">
+                <!-- Форма регистрации -->
+                <div id="registerForm" class="auth-form active">
+                    <div class="auth-welcome-text">
+                        <i class="fas fa-hand-wave"></i>
+                        <span>Присоединяйся к нам!</span>
+                    </div>
+                    
                     <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleRegisterBtn">
+                        <button class="auth-social-btn google" id="googleRegisterBtn2">
                             <i class="fab fa-google"></i>
                             <span>Google</span>
                         </button>
-                        <button class="auth-social-btn vk" id="vkRegisterBtn">
+                        <button class="auth-social-btn vk" id="vkRegisterBtn2">
                             <i class="fab fa-vk"></i>
                             <span>VK</span>
                         </button>
@@ -154,8 +160,8 @@ class AuthManager {
                 .modal-glass {
                     position: fixed;
                     inset: 0;
-                    background: rgba(0, 0, 0, 0.8);
-                    backdrop-filter: blur(10px);
+                    background: rgba(0, 0, 0, 0.85);
+                    backdrop-filter: blur(12px);
                     display: none;
                     justify-content: center;
                     align-items: center;
@@ -165,7 +171,7 @@ class AuthManager {
                 
                 .modal-glass.active {
                     display: flex;
-                    animation: modalFadeIn 0.25s ease;
+                    animation: modalFadeIn 0.2s ease;
                 }
                 
                 @keyframes modalFadeIn {
@@ -180,7 +186,7 @@ class AuthManager {
                     width: 100%;
                     max-width: 420px;
                     border: 1px solid rgba(59, 130, 246, 0.3);
-                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
                 }
                 
                 .auth-modal-header {
@@ -228,6 +234,32 @@ class AuthManager {
                 .auth-close-btn:hover {
                     background: rgba(239, 68, 68, 0.2);
                     color: #f87171;
+                }
+                
+                .auth-welcome-text {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                    padding: 12px;
+                    background: rgba(59, 130, 246, 0.1);
+                    border-radius: 40px;
+                    color: white;
+                    font-weight: 600;
+                    border: 1px solid rgba(59, 130, 246, 0.2);
+                }
+                
+                .auth-welcome-text i {
+                    color: #fbbf24;
+                    font-size: 1.2rem;
+                    animation: wave 1s ease infinite;
+                }
+                
+                @keyframes wave {
+                    0%, 100% { transform: rotate(0deg); }
+                    25% { transform: rotate(-15deg); }
+                    75% { transform: rotate(15deg); }
                 }
                 
                 .auth-tabs {
@@ -304,7 +336,6 @@ class AuthManager {
                 .auth-social-btn.google:hover {
                     background: #f0f0f0;
                     transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
                 }
                 
                 .auth-social-btn.vk {
@@ -315,7 +346,6 @@ class AuthManager {
                 .auth-social-btn.vk:hover {
                     background: #0066dd;
                     transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(0, 119, 255, 0.3);
                 }
                 
                 .auth-divider {
@@ -396,7 +426,6 @@ class AuthManager {
                 .auth-submit-btn:hover {
                     transform: translateY(-2px);
                     box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-                    background: linear-gradient(135deg, #4f46e5, #3b82f6);
                 }
                 
                 .auth-footer-text {
@@ -508,10 +537,6 @@ class AuthManager {
                     
                     .guest-screen h3 {
                         font-size: 1.3rem;
-                    }
-                    
-                    .guest-screen p {
-                        font-size: 0.85rem;
                     }
                 }
             `;
@@ -726,7 +751,7 @@ class AuthManager {
         
         setTimeout(() => {
             if (!this.currentUser && !this.modalAutoShown) {
-                this.showAuthModal();
+                this.showAuthModal('register');
                 this.modalAutoShown = true;
             }
         }, 500);
@@ -787,13 +812,18 @@ class AuthManager {
         this.replacePageContent('products-manage', this.createGuestProductsScreen());
         this.replacePageContent('profile', this.createGuestProfileScreen());
         
-        // Привязываем обработчики к кнопкам в гостевых экранах
+        // Привязываем обработчики к кнопкам
         setTimeout(() => {
             document.querySelectorAll('.guest-login-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.replaceWith(btn.cloneNode(true));
+            });
+            
+            document.querySelectorAll('.guest-login-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    self.showAuthModal();
+                    console.log('Кнопка регистрации нажата!');
+                    self.showAuthModal('register');
                 });
             });
         }, 100);
@@ -865,11 +895,11 @@ class AuthManager {
         `;
     }
 
-    showAuthModal() {
+    showAuthModal(tab = 'register') {
         const modal = document.getElementById('authModal');
         if (modal) {
             modal.classList.add('active');
-            this.switchAuthTab('login');
+            this.switchAuthTab(tab);
         }
     }
 
@@ -891,6 +921,7 @@ class AuthManager {
             if (registerTab) registerTab.classList.remove('active');
         } else {
             if (loginForm) loginForm.classList.remove('active');
+            if (480 > 0) {} // пустая строка для избежания ошибки
             if (registerForm) registerForm.classList.add('active');
             if (loginTab) loginTab.classList.remove('active');
             if (registerTab) registerTab.classList.add('active');
@@ -898,13 +929,15 @@ class AuthManager {
     }
 
     setupEventListeners() {
+        // Кнопка входа в хедере
         const loginBtn = document.getElementById('loginBtn');
         if (loginBtn) {
             const newBtn = loginBtn.cloneNode(true);
             loginBtn.parentNode.replaceChild(newBtn, loginBtn);
-            newBtn.addEventListener('click', () => this.showAuthModal());
+            newBtn.addEventListener('click', () => this.showAuthModal('register'));
         }
 
+        // Кнопка выхода
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             const newBtn = logoutBtn.cloneNode(true);
@@ -919,6 +952,7 @@ class AuthManager {
             newBtn.addEventListener('click', () => this.logout());
         }
 
+        // Табы
         document.getElementById('loginTab')?.addEventListener('click', () => this.switchAuthTab('login'));
         document.getElementById('registerTab')?.addEventListener('click', () => this.switchAuthTab('register'));
         
@@ -932,6 +966,7 @@ class AuthManager {
             this.switchAuthTab('login');
         });
 
+        // Формы
         document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -957,11 +992,13 @@ class AuthManager {
             await this.register(email, username, password);
         });
 
-        document.getElementById('googleLoginBtn')?.addEventListener('click', () => this.loginWithGoogle());
-        document.getElementById('googleRegisterBtn')?.addEventListener('click', () => this.loginWithGoogle());
-        document.getElementById('vkLoginBtn')?.addEventListener('click', () => this.loginWithVK());
-        document.getElementById('vkRegisterBtn')?.addEventListener('click', () => this.loginWithVK());
+        // Соцсети
+        document.getElementById('googleLoginBtn2')?.addEventListener('click', () => this.loginWithGoogle());
+        document.getElementById('googleRegisterBtn2')?.addEventListener('click', () => this.loginWithGoogle());
+        document.getElementById('vkLoginBtn2')?.addEventListener('click', () => this.loginWithVK());
+        document.getElementById('vkRegisterBtn2')?.addEventListener('click', () => this.loginWithVK());
         
+        // Закрытие модалки
         const modal = document.getElementById('authModal');
         modal?.addEventListener('click', (e) => {
             if (e.target === modal) this.closeAuthModal();
@@ -969,6 +1006,7 @@ class AuthManager {
         
         document.querySelector('.auth-close-btn')?.addEventListener('click', () => this.closeAuthModal());
 
+        // Перехват навигации
         const originalShowPage = window.showPage;
         if (originalShowPage) {
             window.showPage = (pageId) => {
