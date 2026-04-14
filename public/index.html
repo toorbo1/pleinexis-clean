@@ -711,6 +711,14 @@ body::after {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
+.modal-glass {
+  z-index: 99999 !important;
+  background: rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+.modal-glass.active {
+  display: flex !important;
+}
 </style>
 </head>
 
@@ -1962,94 +1970,6 @@ body::after {
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
-
-<!-- Модальное окно авторизации -->
-<div class="modal-glass" id="authModal">
-    <div class="modal-content" style="max-width: 450px;">
-        <div class="modal-header">
-            <h3><i class="fas fa-user-circle"></i> Вход в аккаунт</h3>
-            <button class="close-modal"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <!-- Вкладки -->
-        <div class="auth-tabs">
-            <button class="auth-tab active" id="loginTab">Вход</button>
-            <button class="auth-tab" id="registerTab">Регистрация</button>
-        </div>
-        
-        <!-- Форма входа -->
-        <div id="loginForm" style="display: block;">
-            <form id="loginFormElement">
-                <div class="form-group">
-                    <input type="email" id="loginEmail" class="input-modern" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" class="input-modern" placeholder="Пароль" required>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">
-                    <i class="fas fa-sign-in-alt"></i> Войти
-                </button>
-            </form>
-            
-            <div class="auth-divider">или</div>
-            
-            <div class="social-buttons">
-                <button class="social-btn google" id="googleLoginBtn">
-                    <i class="fab fa-google"></i> Google
-                </button>
-                <button class="social-btn vk" id="vkLoginBtn">
-                    <i class="fab fa-vk"></i> VK
-                </button>
-            </div>
-        </div>
-        
-        <!-- Форма регистрации -->
-        <div id="registerForm" style="display: none;">
-            <form id="registerFormElement">
-                <div class="form-group">
-                    <input type="email" id="registerEmail" class="input-modern" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="registerUsername" class="input-modern" placeholder="Имя пользователя" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="registerPassword" class="input-modern" placeholder="Пароль (мин. 6 символов)" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="registerConfirmPassword" class="input-modern" placeholder="Подтвердите пароль" required>
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">
-                    <i class="fas fa-user-plus"></i> Зарегистрироваться
-                </button>
-            </form>
-            
-            <div class="auth-divider">или</div>
-            
-            <div class="social-buttons">
-                <button class="social-btn google" id="googleRegisterBtn">
-                    <i class="fab fa-google"></i> Google
-                </button>
-                <button class="social-btn vk" id="vkRegisterBtn">
-                    <i class="fab fa-vk"></i> VK
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Кнопка входа в хедере (добавьте в .header-right) -->
-<button class="admin-toggle-btn" id="loginBtn" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
-    <i class="fas fa-sign-in-alt"></i>
-</button>
-
-<!-- Меню пользователя (после входа) -->
-<div id="userMenu" style="display: none; align-items: center; gap: 12px;">
-    <img id="userAvatar" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; display: none;">
-    <span id="usernameDisplay" style="font-size: 0.9rem; font-weight: 500;"></span>
-    <button class="admin-toggle-btn" id="logoutBtn" style="background: rgba(239,68,68,0.2);">
-        <i class="fas fa-sign-out-alt"></i>
-    </button>
-</div>
 
 <!-- ========== СКРИПТЫ (JS) ========== -->
 <!-- 1. API и глобальные фиксы (ДОЛЖНЫ БЫТЬ ПЕРВЫМИ) -->
