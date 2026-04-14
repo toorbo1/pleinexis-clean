@@ -2078,89 +2078,1243 @@ body::after {
 <script src="js/reviews.js?v=2"></script>
 <script src="js/reviews-shop.js?v=2"></script>
 <script src="js/shop-connect.js?v=2"></script>
-
 <script>
-(function() {
-    'use strict';
+  
+// ===== ОБНОВЛЕНИЕ ЦЕНЫ НА КНОПКЕ =====
+const amountInput = document.getElementById('amountInput');
+const payBtnText = document.getElementById('payBtnText');
+let activePromo = { code: null, discount: 0 };
+
+function updatePaymentAmount() {
+    let amount = parseInt(amountInput.value) || 0;
+    let commission = Math.ceil(amount * 0.05);
+    let total = amount + commission;
     
-    console.log('🔧 ФИНАЛЬНЫЙ ФИКС АВТОРИЗАЦИИ');
-    
-    // ========== СОЗДАНИЕ МОДАЛЬНОГО ОКНА ==========
-    let authModal = null;
-    
-    function createAuthModal() {
-        if (authModal) return authModal;
-        
-        authModal = document.createElement('div');
-        authModal.id = 'SimpleAuthModal';
-        authModal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:100000;display:none;';
-        authModal.innerHTML = `
-            <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;">
-                <div style="background:linear-gradient(145deg,#0f1322,#0a0d18);border-radius:32px;padding:28px;width:90%;max-width:380px;border:1px solid rgba(59,130,246,0.3);box-shadow:0 25px 50px rgba(0,0,0,0.5);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                        <div style="display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:700;">
-                            <i class="fas fa-crown" style="color:#fbbf24;"></i>
-                            <span style="background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent;">Плейнексис</span>
-                        </div>
-                        <button id="CloseSimpleModal" style="background:rgba(255,255,255,0.05);border:none;width:32px;height:32px;border-radius:50%;color:#94a3b8;cursor:pointer;font-size:16px;">✕</button>
-                    </div>
-                    
-                    <div style="display:flex;gap:10px;margin-bottom:24px;background:rgba(255,255,255,0.03);padding:4px;border-radius:40px;">
-                        <button id="SimpleLoginTab" style="flex:1;padding:10px;background:transparent;border:none;border-radius:40px;color:#94a3b8;font-weight:600;cursor:pointer;">Вход</button>
-                        <button id="SimpleRegisterTab" style="flex:1;padding:10px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:40px;color:white;font-weight:600;cursor:pointer;">Регистрация</button>
-                    </div>
-                    
-                    <div id="SimpleLoginForm">
-                        <input type="email" id="SimpleLoginEmail" placeholder="Email" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:12px;outline:none;box-sizing:border-box;">
-                        <input type="password" id="SimpleLoginPassword" placeholder="Пароль" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:20px;outline:none;box-sizing:border-box;">
-                        <button id="SimpleSubmitLogin" style="width:100%;padding:12px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:40px;color:white;font-weight:700;cursor:pointer;">Войти</button>
-                    </div>
-                    
-                    <div id="SimpleRegisterForm" style="display:none;">
-                        <input type="email" id="SimpleRegEmail" placeholder="Email" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:12px;outline:none;box-sizing:border-box;">
-                        <input type="text" id="SimpleRegUsername" placeholder="Имя пользователя" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:12px;outline:none;box-sizing:border-box;">
-                        <input type="password" id="SimpleRegPassword" placeholder="Пароль (мин. 6 символов)" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:12px;outline:none;box-sizing:border-box;">
-                        <input type="password" id="SimpleRegConfirm" placeholder="Подтвердите пароль" style="width:100%;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:30px;color:white;margin-bottom:20px;outline:none;box-sizing:border-box;">
-                        <button id="SimpleSubmitRegister" style="width:100%;padding:12px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:40px;color:white;font-weight:700;cursor:pointer;">Зарегистрироваться</button>
-                    </div>
-                    
-                    <div style="text-align:center;margin-top:16px;font-size:0.7rem;color:#4a5568;">
-                        Тестовый аккаунт: test@test.com / 123456
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(authModal);
-        return authModal;
+    // Применяем скидку по промокоду
+    if (activePromo.discount > 0) {
+        let discountAmount = Math.ceil(total * (activePromo.discount / 100));
+        total = total - discountAmount;
+        if (total < 0) total = 0;
     }
     
-    // ========== ПОКАЗ МОДАЛКИ ==========
+    payBtnText.textContent = `Оплатить ${total} ₽`;
+}
+
+// ===== ПРОМОКОД =====
+const promoBtn = document.getElementById('promoCodeBtn');
+const promoModal = document.getElementById('promoModal');
+
+function openPromoModal() {
+    promoModal.style.display = 'flex';
+}
+
+function closePromoModal() {
+    promoModal.style.display = 'none';
+    document.getElementById('promoCodeInput').value = '';
+}
+
+function applyPromoCode() {
+    const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+    const promoCodes = {
+        'WELCOME10': { discount: 10, message: '✅ Промокод активирован! Скидка 10%' },
+        'STEAM20': { discount: 20, message: '✅ Промокод активирован! Скидка 20%' },
+        'SALE15': { discount: 15, message: '✅ Промокод активирован! Скидка 15%' }
+    };
+    
+    if (promoCodes[code]) {
+        activePromo = { code: code, discount: promoCodes[code].discount };
+        updatePaymentAmount();
+        showToast(promoCodes[code].message, 'success');
+        closePromoModal();
+        
+        // Визуальное изменение кнопки промокода
+        const promoBtn = document.getElementById('promoCodeBtn');
+        promoBtn.style.background = 'rgba(34, 197, 94, 0.2)';
+        promoBtn.style.color = '#4ade80';
+        promoBtn.style.border = '1px solid rgba(34, 197, 94, 0.3)';
+    } else {
+        showToast('❌ Неверный промокод!', 'error');
+    }
+}
+
+// Закрытие модалки по клику вне
+promoModal.addEventListener('click', function(e) {
+    if (e.target === promoModal) closePromoModal();
+});
+
+// Обработчики
+if (amountInput) {
+    amountInput.addEventListener('input', updatePaymentAmount);
+    updatePaymentAmount();
+}
+
+// ===== ФУНКЦИЯ ДЛЯ ТОСТ УВЕДОМЛЕНИЙ =====
+function showToast(message, type = 'success') {
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    toast.className = `toast-notification ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+  // ========== ФИКС СТРАНИЦЫ ВЫВОДА ==========
+(function() {
+    console.log('🔧 ФИКС СТРАНИЦЫ ВЫВОДА ЗАПУЩЕН');
+    
+    // Создаем страницу вывода заново, если её нет или она пустая
+    function fixWithdrawPage() {
+        let withdrawPage = document.getElementById('withdrawPage');
+        
+        // Если страницы нет - создаем
+        if (!withdrawPage) {
+            console.log('📄 Создаем страницу вывода');
+            withdrawPage = document.createElement('div');
+            withdrawPage.id = 'withdrawPage';
+            withdrawPage.className = 'page';
+            document.body.appendChild(withdrawPage);
+        }
+        
+        // Заполняем содержимое
+        withdrawPage.innerHTML = `
+           <div class="withdraw-header">
+    <button class="back-btn" onclick="showPage('profile')">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+</div>
+
+<div class="withdraw-container">
+    <!-- Баланс -->
+    <div class="balance-card">
+        <div class="balance-label">Доступно для вывода</div>
+        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+        <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+    </div>
+
+    <!-- Способ вывода -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-wallet"></i> Способ вывода
+        </div>
+        <div class="methods-grid" id="methodsList"></div>
+    </div>
+
+    <!-- Реквизиты -->
+    <div class="section-card" id="detailsSection">
+        <div class="section-title">
+            <i class="fas fa-address-card"></i> Реквизиты
+        </div>
+        <div class="input-group">
+            <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+        </div>
+    </div>
+
+    <!-- Сумма -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="fas fa-coins"></i> Сумма вывода
+        </div>
+        <div class="amount-row">
+            <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+            <div class="amount-presets">
+                <button class="preset-btn" data-amount="500">500₽</button>
+                <button class="preset-btn" data-amount="1000">1000₽</button>
+                <button class="preset-btn" data-amount="5000">5000₽</button>
+            </div>
+        </div>
+        
+        <div class="commission-info" id="commissionInfo">
+            <span>Комиссия системы:</span>
+            <span id="commissionValue">0 ₽</span>
+        </div>
+        <div class="commission-info">
+            <span>Итого к списанию:</span>
+            <span id="totalWithdraw">0 ₽</span>
+        </div>
+    </div>
+
+    <button class="withdraw-btn" id="submitWithdrawBtn">
+        <i class="fas fa-paper-plane"></i> Запросить вывод
+    </button>
+    <div class="warning-text">
+        <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
+    </div>
+</div>
+        `;
+        
+        console.log('✅ Страница вывода создана');
+        return withdrawPage;
+    }
+    
+    // Инициализация страницы вывода
+    function initWithdrawPage() {
+        console.log('🔄 Инициализация страницы вывода');
+        
+        const balance = document.getElementById('withdrawBalanceAmount');
+        const methodsList = document.getElementById('methodsList');
+        const detailsInput = document.getElementById('withdrawDetails');
+        const amountInput = document.getElementById('withdrawAmount');
+        const commissionSpan = document.getElementById('commissionValue');
+        const totalSpan = document.getElementById('totalWithdraw');
+        const submitBtn = document.getElementById('submitWithdrawBtn');
+        const detailsLabel = document.getElementById('detailsLabel');
+        
+        if (!methodsList) {
+            console.error('❌ Элементы не найдены');
+            return;
+        }
+        
+        // Данные пользователя
+        const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+        const currentBalance = userProfile.balance || 0;
+        if (balance) balance.innerText = currentBalance.toFixed(2) + ' ₽';
+        
+        // Методы вывода
+        const methods = [
+            { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', commission: 0.02, minAmount: 100, placeholder: 'Номер карты (16 цифр)' },
+            { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', commission: 0.01, minAmount: 100, placeholder: 'Номер телефона QIWI' },
+            { id: 'crypto', name: 'Криптовалюта', icon: 'fab fa-bitcoin', commission: 0.03, minAmount: 500, placeholder: 'Адрес USDT' }
+        ];
+        
+        let selectedMethod = methods[0];
+        
+        function renderMethods() {
+            if (!methodsList) return;
+            methodsList.innerHTML = methods.map(m => `
+                <div class="method-item ${selectedMethod.id === m.id ? 'selected' : ''}" data-method="${m.id}">
+                    <div class="method-icon ${m.id}">
+                        <i class="${m.icon}"></i>
+                    </div>
+                    <div class="method-info">
+                        <div class="method-name">${m.name}</div>
+                        <div class="method-desc">Комиссия: ${(m.commission * 100).toFixed(0)}%</div>
+                    </div>
+                    <div class="method-commission">от ${m.minAmount}₽</div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.method-item').forEach(el => {
+                el.onclick = () => {
+                    const methodId = el.getAttribute('data-method');
+                    selectedMethod = methods.find(m => m.id === methodId);
+                    renderMethods();
+                    if (detailsLabel) detailsLabel.innerText = selectedMethod.id === 'card' ? 'Номер карты' : (selectedMethod.id === 'qiwi' ? 'QIWI номер' : 'USDT адрес');
+                    if (detailsInput) detailsInput.placeholder = selectedMethod.placeholder;
+                    updateCommission();
+                };
+            });
+        }
+        
+        function updateCommission() {
+            const amount = parseFloat(amountInput?.value);
+            if (isNaN(amount) || amount <= 0) {
+                if (commissionSpan) commissionSpan.innerText = '0 ₽';
+                if (totalSpan) totalSpan.innerText = '0 ₽';
+                return;
+            }
+            const commission = amount * selectedMethod.commission;
+            const total = amount + commission;
+            if (commissionSpan) commissionSpan.innerText = commission.toFixed(2) + ' ₽';
+            if (totalSpan) totalSpan.innerText = total.toFixed(2) + ' ₽';
+        }
+        
+        function validate() {
+            const amount = parseFloat(amountInput?.value);
+            const details = detailsInput?.value.trim();
+            const isValid = !isNaN(amount) && amount >= selectedMethod.minAmount && amount <= currentBalance && details && details.length >= 3;
+            if (submitBtn) submitBtn.disabled = !isValid;
+        }
+        
+        function requestWithdraw() {
+            const amount = parseFloat(amountInput?.value);
+            const details = detailsInput?.value.trim();
+            const commission = amount * selectedMethod.commission;
+            const total = amount + commission;
+            
+            if (isNaN(amount) || amount < selectedMethod.minAmount) {
+                alert(`Минимальная сумма: ${selectedMethod.minAmount} ₽`);
+                return;
+            }
+            if (amount > currentBalance) {
+                alert(`Недостаточно средств. Доступно: ${currentBalance.toFixed(2)} ₽`);
+                return;
+            }
+            if (!details) {
+                alert('Введите реквизиты');
+                return;
+            }
+            
+            // Сохраняем заявку
+            const requests = JSON.parse(localStorage.getItem('apex_withdraw_requests') || '[]');
+            requests.push({
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                method: selectedMethod.name,
+                amount: amount,
+                commission: commission,
+                total: total,
+                details: details,
+                status: 'pending'
+            });
+            localStorage.setItem('apex_withdraw_requests', JSON.stringify(requests));
+            
+            // Списываем баланс
+            const newBalance = currentBalance - total;
+            userProfile.balance = newBalance;
+            localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+            
+            alert(`✅ Заявка на вывод ${amount} ₽ создана!`);
+            
+            if (balance) balance.innerText = newBalance.toFixed(2) + ' ₽';
+            if (amountInput) amountInput.value = '';
+            if (detailsInput) detailsInput.value = '';
+            updateCommission();
+            validate();
+        }
+        
+        // Настройка пресетов
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                if (amountInput) amountInput.value = btn.getAttribute('data-amount');
+                updateCommission();
+                validate();
+            };
+        });
+        
+        // Слушатели
+        if (amountInput) amountInput.oninput = () => { updateCommission(); validate(); };
+        if (detailsInput) detailsInput.oninput = validate;
+        if (submitBtn) submitBtn.onclick = requestWithdraw;
+        
+        renderMethods();
+        updateCommission();
+        validate();
+        
+        console.log('✅ Страница вывода инициализирована');
+    }
+    
+    // Переопределяем клик по балансу
+    function fixBalanceClick() {
+        const balanceCard = document.querySelector('.profile-balance-card');
+        if (!balanceCard) return;
+        
+        const newCard = balanceCard.cloneNode(true);
+        balanceCard.parentNode.replaceChild(newCard, balanceCard);
+        
+        newCard.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('💰 Открываем вывод средств');
+            
+            // Скрываем все страницы
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            
+            // Показываем страницу вывода
+            let withdrawPage = document.getElementById('withdrawPage');
+            if (!withdrawPage) {
+                withdrawPage = fixWithdrawPage();
+            }
+            
+            withdrawPage.style.display = 'block';
+            withdrawPage.classList.add('active');
+            
+            // Инициализируем
+            setTimeout(initWithdrawPage, 50);
+        });
+    }
+    
+    // Запускаем фикс после загрузки страницы
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(fixWithdrawPage, 100);
+            setTimeout(fixBalanceClick, 200);
+            setTimeout(initWithdrawPage, 300);
+        });
+    } else {
+        setTimeout(fixWithdrawPage, 100);
+        setTimeout(fixBalanceClick, 200);
+        setTimeout(initWithdrawPage, 300);
+    }
+    
+    window.initWithdrawPage = initWithdrawPage;
+    window.fixWithdrawPage = fixWithdrawPage;
+})();
+// ========== ГЛОБАЛЬНЫЕ ФИКСЫ И ИНИЦИАЛИЗАЦИЯ ==========
+(function() {
+    console.log(' ГЛОБАЛЬНЫЕ ФИКСЫ ЗАПУЩЕНЫ');
+    
+    // ========== ФИКС: ОЧИСТКА КЭША ПРИ НОВОЙ ВЕРСИИ ==========
+    const APP_VERSION = '2.2.0';
+    const savedVersion = localStorage.getItem('app_version');
+    
+    if (savedVersion !== APP_VERSION) {
+        console.log('🔄 Обнаружена новая версия, очищаем кэш...');
+        localStorage.setItem('app_version', APP_VERSION);
+        
+        // Сохраняем важные данные
+        const currentUser = localStorage.getItem('apex_user');
+        const profile = localStorage.getItem('apex_profile');
+        
+        // Очищаем всё
+        localStorage.clear();
+        
+        // Восстанавливаем важное
+        if (currentUser) localStorage.setItem('apex_user', currentUser);
+        if (profile) localStorage.setItem('apex_profile', profile);
+        
+        // Создаем админа по умолчанию
+        let admins = [{
+            id: 'admin_1',
+            username: 'Admin',
+            isOwner: true,
+            hiredBy: 'system',
+            hiredAt: new Date().toISOString()
+        }];
+        localStorage.setItem('apex_admins', JSON.stringify(admins));
+        
+        console.log('✅ Кэш очищен, админ создан');
+    }
+    
+    // ========== ФИКС: СОЗДАНИЕ АДМИНА ЕСЛИ НЕТ ==========
+    function ensureAdminExists() {
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        
+        if (admins.length === 0) {
+            admins.push({
+                id: 'admin_1',
+                username: 'Admin',
+                isOwner: true,
+                hiredBy: 'system',
+                hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Создан админ по умолчанию: Admin');
+        }
+        
+        if (currentUser === 'Admin' && !admins.some(a => a.username === 'Admin')) {
+            admins.push({
+                id: 'admin_' + Date.now(),
+                username: 'Admin',
+                isOwner: true,
+                hiredBy: 'system',
+                hiredAt: new Date().toISOString()
+            });
+            localStorage.setItem('apex_admins', JSON.stringify(admins));
+            console.log('✅ Admin добавлен в список админов');
+        }
+    }
+    ensureAdminExists();
+    
+    // ========== ФИКС: ФУНКЦИЯ ВХОДА В АДМИНКУ ==========
+    window.enterAdminPanel = function() {
+        console.log('🔐 enterAdminPanel вызвана');
+        
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        
+        // Проверяем, админ ли пользователь
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            // Уже админ - открываем панель
+            console.log('✅ Пользователь админ, открываем панель');
+            openAdminPage();
+            return true;
+        }
+        
+        // Не админ - запрашиваем пароль
+        const password = prompt('🔐 Введите пароль администратора:');
+        const ADMIN_PASSWORD = 'admin123';
+        
+        if (password === ADMIN_PASSWORD) {
+            // Добавляем в админы
+            if (!admins.some(a => a.username === currentUser)) {
+                admins.push({
+                    id: 'admin_' + Date.now(),
+                    username: currentUser,
+                    isOwner: false,
+                    hiredBy: 'system',
+                    hiredAt: new Date().toISOString()
+                });
+                localStorage.setItem('apex_admins', JSON.stringify(admins));
+                console.log('✅ Пользователь добавлен в админы:', currentUser);
+            }
+            
+            openAdminPage();
+            showToast('✅ Доступ к админ-панели получен!', 'success');
+            return true;
+        } else {
+            showToast('❌ Неверный пароль!', 'error');
+            return false;
+        }
+    };
+    
+    // Функция открытия админ-страницы
+    function openAdminPage() {
+        // Скрываем все страницы
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        
+        // Показываем админку
+        const adminPage = document.getElementById('admin');
+        if (adminPage) {
+            adminPage.style.display = 'block';
+            adminPage.classList.add('active');
+        }
+        
+        // Инициализируем админку
+        setTimeout(() => {
+            if (typeof window.initAdmin === 'function') {
+                window.initAdmin();
+                console.log('✅ initAdmin вызвана');
+            }
+            
+            // Показываем главную секцию админки
+            if (typeof window.showAdminSection === 'function') {
+                window.showAdminSection('adminMainSection');
+            }
+        }, 100);
+        
+        // Обновляем активные кнопки навигации
+        document.querySelectorAll('.nav-item, .nav-link').forEach(btn => {
+            btn.classList.remove('active');
+        });
+    }
+    
+    // ========== ФИКС: ФУНКЦИЯ ПОКАЗА УВЕДОМЛЕНИЙ ==========
+    window.showToast = function(message, type = 'success') {
+        let toast = document.querySelector('.toast-notification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        toast.className = `toast-notification ${type} show`;
+        
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    };
+    
+    // ========== ФИКС: КНОПКА АДМИНКИ В ПРОФИЛЕ ==========
+    function fixAdminButton() {
+        const adminBtn = document.getElementById('adminProfileBtn');
+        if (!adminBtn) {
+            console.log('⏳ Кнопка админки не найдена, ждем...');
+            setTimeout(fixAdminButton, 200);
+            return;
+        }
+        
+        console.log('✅ Кнопка админки найдена, применяем фикс');
+        
+        // Полностью пересоздаем кнопку
+        const newBtn = document.createElement('button');
+        newBtn.id = 'adminProfileBtn';
+        newBtn.className = 'shop-window-btn';
+        newBtn.style.cssText = adminBtn.style.cssText;
+        newBtn.style.background = 'linear-gradient(105deg, #ef4444, #dc2626)';
+        newBtn.style.marginBottom = '16px';
+        
+        const currentUser = localStorage.getItem('apex_user') || 'Гость';
+        const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+        const isAdmin = admins.some(a => a.username === currentUser);
+        
+        if (isAdmin) {
+            newBtn.innerHTML = '<i class="fas fa-user-shield"></i> Админ-панель';
+        } else {
+            newBtn.innerHTML = '<i class="fas fa-lock"></i> Войти в админ-панель';
+            newBtn.style.background = 'linear-gradient(105deg, #f59e0b, #d97706)';
+        }
+        
+        // Заменяем старую кнопку
+        adminBtn.parentNode.replaceChild(newBtn, adminBtn);
+        
+        // Вешаем обработчик
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🖱️ КЛИК ПО КНОПКЕ АДМИНКИ');
+            window.enterAdminPanel();
+        });
+        
+        console.log('✅ Фикс для кнопки админки применен, isAdmin:', isAdmin);
+    }
+    
+    // ========== ФИКС: КНОПКА ВИТРИНЫ ==========
+    function fixShopButton() {
+        const shopBtn = document.querySelector('#connectShopBtn');
+        if (!shopBtn) return;
+        
+        console.log('✅ Кнопка витрины найдена, применяем фикс');
+        
+        const newBtn = shopBtn.cloneNode(true);
+        shopBtn.parentNode.replaceChild(newBtn, shopBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🛒 КЛИК ПО КНОПКЕ ВИТРИНЫ');
+            
+            const user = localStorage.getItem('apex_user') || 'Гость';
+            const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+            const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+            
+            if (sellers.includes(user)) {
+                if (typeof window.showPage === 'function') window.showPage('products-manage');
+                return;
+            }
+            
+            if (application && application.status === 'pending') {
+                if (typeof window.showPage === 'function') {
+                    window.showPage('shopConnectPage');
+                    setTimeout(() => {
+                        if (typeof window.initShopConnectPage === 'function') {
+                            window.initShopConnectPage();
+                        }
+                    }, 50);
+                }
+                return;
+            }
+            
+            if (typeof window.showPage === 'function') {
+                window.showPage('shopConnectPage');
+                setTimeout(() => {
+                    if (typeof window.initShopConnectPage === 'function') {
+                        window.initShopConnectPage();
+                    }
+                }, 50);
+            }
+        });
+        
+        console.log('✅ Фикс для кнопки витрины применен');
+    }
+    
+    // ========== ФИКС: КНОПКА АДМИНКИ В ХЕДЕРЕ ==========
+    function fixHeaderAdminButton() {
+        const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+        if (!adminToggleBtn) return;
+        
+        console.log('✅ Кнопка админки в хедере найдена');
+        
+        const newBtn = adminToggleBtn.cloneNode(true);
+        adminToggleBtn.parentNode.replaceChild(newBtn, adminToggleBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ КЛИК ПО АДМИН-КНОПКЕ В ХЕДЕРЕ');
+            window.enterAdminPanel();
+        });
+    }
+    
+    // ========== ФИКС: КНОПКА СБРОСА КЭША ==========
+    function addCacheResetButton() {
+        const container = document.querySelector('.profile-new-container');
+        if (!container) return;
+        
+        if (document.getElementById('cacheResetBtn')) return;
+        
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'cacheResetBtn';
+        resetBtn.className = 'shop-window-btn';
+        resetBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Сбросить кэш';
+        resetBtn.style.background = 'linear-gradient(105deg, #6b7280, #4b5563)';
+        resetBtn.style.marginTop = '12px';
+        resetBtn.style.fontSize = '0.8rem';
+        
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Сбросить кэш и обновить интерфейс?')) {
+                localStorage.setItem('app_version', APP_VERSION);
+                window.location.reload();
+            }
+        });
+        
+        const paymentMethods = document.querySelector('.profile-payment-methods');
+        if (paymentMethods) {
+            paymentMethods.insertAdjacentElement('afterend', resetBtn);
+        }
+    }
+    
+    // ========== КАРУСЕЛЬ ==========
+    function initCarousel() {
+        console.log(' Инициализация карусели');
+        
+        const track = document.getElementById('myCarouselTrack');
+        if (!track) return;
+        
+        const slides = document.querySelectorAll('.my-carousel-slide');
+        if (slides.length === 0) return;
+        
+        let slideWidth = 0;
+        let slideFull = 0;
+        let setWidth = 0;
+        let position = 0;
+        let animFrame = null;
+        let isVisible = true;
+        
+        const gap = 16;
+        const slidesPerSet = 5;
+        const speed = 0.5;
+        
+        function waitForImages() {
+            return new Promise((resolve) => {
+                const images = document.querySelectorAll('.my-carousel-slide img');
+                let loaded = 0;
+                if (images.length === 0) { resolve(); return; }
+                
+                images.forEach(img => {
+                    if (img.complete) {
+                        loaded++;
+                        if (loaded === images.length) resolve();
+                    } else {
+                        img.addEventListener('load', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                        img.addEventListener('error', () => {
+                            loaded++;
+                            if (loaded === images.length) resolve();
+                        });
+                    }
+                });
+            });
+        }
+        
+        async function recalculateDimensions() {
+            await waitForImages();
+            
+            const firstSlide = slides[0];
+            slideWidth = firstSlide.offsetWidth;
+            slideFull = slideWidth + gap;
+            setWidth = slidesPerSet * slideFull;
+            
+            position = setWidth;
+            track.style.transform = `translateX(${-position}px)`;
+        }
+        
+        function highlightCenterSlide() {
+            const carousel = document.querySelector('.my-carousel');
+            if (!carousel) return;
+            
+            const carouselRect = carousel.getBoundingClientRect();
+            const centerX = carouselRect.left + carouselRect.width / 2;
+            
+            let closestSlide = null;
+            let minDistance = Infinity;
+            
+            slides.forEach(slide => {
+                const rect = slide.getBoundingClientRect();
+                const slideCenterX = rect.left + rect.width / 2;
+                const distance = Math.abs(centerX - slideCenterX);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestSlide = slide;
+                }
+            });
+            
+            if (closestSlide) {
+                slides.forEach(s => s.classList.remove('active'));
+                closestSlide.classList.add('active');
+            }
+        }
+        
+        function animate() {
+            if (!isVisible) {
+                animFrame = null;
+                return;
+            }
+            
+            position += speed;
+            
+            if (position >= setWidth * 2) {
+                position -= setWidth;
+            }
+            
+            track.style.transform = `translateX(${-position}px)`;
+            highlightCenterSlide();
+            
+            animFrame = requestAnimationFrame(animate);
+        }
+        
+        const observer = new IntersectionObserver((entries) => {
+            isVisible = entries[0].isIntersecting;
+            
+            if (isVisible && !animFrame) {
+                animFrame = requestAnimationFrame(animate);
+            } else if (!isVisible && animFrame) {
+                cancelAnimationFrame(animFrame);
+                animFrame = null;
+            }
+        }, { threshold: 0.1 });
+        
+        observer.observe(track);
+        
+        (async function init() {
+            await recalculateDimensions();
+            
+            if (animFrame) cancelAnimationFrame(animFrame);
+            animFrame = requestAnimationFrame(animate);
+            
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(async () => {
+                    await recalculateDimensions();
+                    highlightCenterSlide();
+                }, 150);
+            });
+            
+            console.log('✅ Карусель готова');
+        })();
+    }
+    
+    // ========== ЗАПУСК ВСЕХ ФИКСОВ ПОСЛЕ ЗАГРУЗКИ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM ЗАГРУЖЕН, ЗАПУСКАЕМ ФИКСЫ');
+        
+        // Загружаем данные
+        if (typeof window.loadGameBlocks === 'function') window.loadGameBlocks();
+        if (typeof window.loadAppBlocks === 'function') window.loadAppBlocks();
+        if (typeof window.loadProducts === 'function') window.loadProducts();
+        
+        // Показываем главную страницу
+        if (typeof window.showPage === 'function') {
+            window.showPage('home');
+        }
+        
+        // Применяем фиксы с задержкой
+        setTimeout(() => {
+            fixAdminButton();
+            fixShopButton();
+            fixHeaderAdminButton();
+            addCacheResetButton();
+            initCarousel();
+            
+            // Дополнительная проверка кнопки админки
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                console.log('✅ Кнопка админки присутствует в DOM');
+            } else {
+                console.warn('⚠️ Кнопка админки НЕ НАЙДЕНА в DOM');
+                // Пробуем найти позже
+                setTimeout(fixAdminButton, 500);
+            }
+        }, 300);
+        
+        // Еще одна проверка через секунду
+        setTimeout(() => {
+            const adminBtn = document.getElementById('adminProfileBtn');
+            if (adminBtn) {
+                // Проверяем, есть ли обработчик
+                const hasClick = adminBtn.onclick !== null || adminBtn._listeners;
+                console.log('🔍 Кнопка админки, есть обработчик:', hasClick);
+            }
+        }, 1000);
+    });
+    
+    // Экспорт функций
+    window.fixAdminButton = fixAdminButton;
+    window.fixShopButton = fixShopButton;
+    
+    console.log('✅ ВСЕ ГЛОБАЛЬНЫЕ ФИКСЫ ЗАГРУЖЕНЫ');
+
+    // ========== ПЕРЕОПРЕДЕЛЕНИЕ ФУНКЦИИ ПОКАЗА ИНФОРМАЦИОННЫХ СТРАНИЦ ==========
+window.showInfo = function(type) {
+    // Карта соответствия ключей и URL страниц
+    const pages = {
+        'about': 'about.html',
+        'privacy': 'privacy.html',
+        'info': 'project.html',      // "О проекте" -> project.html
+        'discounts': 'discounts.html',
+        'interesting': 'interesting.html',
+        'contacts': 'about.html'     // Контакты ведут на "О нас", там есть кнопка поддержки
+    };
+    
+    const url = pages[type];
+    
+    // Если страница есть в карте, переходим на неё
+    if (url) {
+        window.location.href = url;
+    } else {
+        // Fallback на случай неизвестного типа
+        alert('Информация: ' + type + '\n\nСтраница находится в разработке.');
+    }
+};
+
+console.log('✅ Функция showInfo переопределена для работы с отдельными страницами');
+})();
+// ===== ПРАВИЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ПРОМОКОДА =====
+document.addEventListener('DOMContentLoaded', function() {
+    const promoBtn = document.getElementById('promoCodeBtn');
+    const promoModal = document.getElementById('promoModal');
+    const closeModalBtn = document.querySelector('#promoModal .close-modal');
+    
+    if (promoBtn) {
+        // Убираем старые обработчики и вешаем новый
+        const newPromoBtn = promoBtn.cloneNode(true);
+        promoBtn.parentNode.replaceChild(newPromoBtn, promoBtn);
+        
+        newPromoBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Промокод кнопка нажата');
+            if (promoModal) {
+                promoModal.style.display = 'flex';
+            }
+        });
+    }
+    
+    // Закрытие модалки по клику на крестик
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', function() {
+            if (promoModal) promoModal.style.display = 'none';
+        });
+    }
+    
+    // Закрытие по клику вне
+    if (promoModal) {
+        promoModal.addEventListener('click', function(e) {
+            if (e.target === promoModal) {
+                promoModal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Кнопка применения промокода
+    const applyBtn = document.querySelector('#promoModal .btn-primary');
+    if (applyBtn) {
+        const newApplyBtn = applyBtn.cloneNode(true);
+        applyBtn.parentNode.replaceChild(newApplyBtn, applyBtn);
+        
+        newApplyBtn.addEventListener('click', function() {
+            const codeInput = document.getElementById('promoCodeInput');
+            const code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+            
+            const promoCodes = {
+                'WELCOME10': { discount: 10, message: '✅ Промокод активирован! Скидка 10%' },
+                'STEAM20': { discount: 20, message: '✅ Промокод активирован! Скидка 20%' },
+                'SALE15': { discount: 15, message: '✅ Промокод активирован! Скидка 15%' }
+            };
+            
+            if (promoCodes[code]) {
+                window.activePromo = { code: code, discount: promoCodes[code].discount };
+                if (typeof updatePaymentAmount === 'function') {
+                    updatePaymentAmount();
+                } else {
+                    // Ручное обновление
+                    const amountInput = document.getElementById('amountInput');
+                    const payBtnText = document.getElementById('payBtnText');
+                    if (amountInput && payBtnText) {
+                        let amount = parseInt(amountInput.value) || 0;
+                        let commission = Math.ceil(amount * 0.05);
+                        let total = amount + commission;
+                        let discountAmount = Math.ceil(total * (window.activePromo.discount / 100));
+                        total = total - discountAmount;
+                        if (total < 0) total = 0;
+                        payBtnText.textContent = `Оплатить ${total} ₽`;
+                    }
+                }
+                showToast(promoCodes[code].message, 'success');
+                if (promoModal) promoModal.style.display = 'none';
+                if (codeInput) codeInput.value = '';
+                
+                // Визуальное изменение кнопки промокода
+                const promoBtnEl = document.getElementById('promoCodeBtn');
+                if (promoBtnEl) {
+                    promoBtnEl.style.background = 'rgba(34, 197, 94, 0.15)';
+                    promoBtnEl.style.color = '#4ade80';
+                }
+            } else {
+                showToast('❌ Неверный промокод!', 'error');
+            }
+        });
+    }
+    
+    // Кнопка отмены
+    const cancelBtn = document.querySelector('#promoModal .btn-secondary');
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function() {
+            if (promoModal) promoModal.style.display = 'none';
+            const codeInput = document.getElementById('promoCodeInput');
+            if (codeInput) codeInput.value = '';
+        });
+    }
+});
+// ===== БЕСКОНЕЧНАЯ КАРУСЕЛЬ - ПЛАВНАЯ ПРОКРУТКА =====
+(function() {
+    const carousel = document.querySelector('.my-carousel');
+    const track = document.querySelector('.my-carousel-track');
+    
+    if (!carousel || !track) return;
+    
+    let autoScrollInterval;
+    let isDragging = false;
+    let startX;
+    let scrollLeft;
+    let autoScrollSpeed = 1.2;
+    
+    // Создаем копии слайдов для бесконечности
+    const slides = Array.from(document.querySelectorAll('.my-carousel-slide'));
+    const slidesToClone = 5;
+    
+    // Добавляем копии в конец
+    for (let i = 0; i < slidesToClone; i++) {
+        slides.forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.appendChild(clone);
+        });
+    }
+    
+    // Добавляем копии в начало
+    for (let i = 0; i < slidesToClone; i++) {
+        slides.slice().reverse().forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.insertBefore(clone, track.firstChild);
+        });
+    }
+    
+    // Устанавливаем начальную позицию в середину
+    let scrollPosition = track.scrollWidth / 2 - carousel.clientWidth / 2;
+    carousel.scrollLeft = scrollPosition;
+    
+    // Функция плавной автопрокрутки
+    function startAutoScroll() {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+        autoScrollInterval = setInterval(() => {
+            if (!isDragging && carousel) {
+                scrollPosition += autoScrollSpeed;
+                carousel.scrollLeft = scrollPosition;
+                
+                // Бесконечный цикл - сброс позиции
+                if (scrollPosition >= track.scrollWidth - carousel.clientWidth - 300) {
+                    scrollPosition = 300;
+                    carousel.scrollLeft = scrollPosition;
+                }
+                if (scrollPosition <= 100) {
+                    scrollPosition = track.scrollWidth - carousel.clientWidth - 300;
+                    carousel.scrollLeft = scrollPosition;
+                }
+            }
+        }, 30);
+    }
+    
+    function stopAutoScroll() {
+        if (autoScrollInterval) clearInterval(autoScrollInterval);
+    }
+    
+    // Мышь для ручной прокрутки
+    carousel.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        stopAutoScroll();
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+        carousel.style.cursor = 'grabbing';
+    });
+    
+    carousel.addEventListener('mouseleave', () => {
+        isDragging = false;
+        carousel.style.cursor = 'grab';
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('mouseup', () => {
+        isDragging = false;
+        carousel.style.cursor = 'grab';
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        scrollPosition = scrollLeft - walk;
+        carousel.scrollLeft = scrollPosition;
+    });
+    
+    // Touch для мобильных
+    carousel.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        stopAutoScroll();
+        startX = e.touches[0].pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+    });
+    
+    carousel.addEventListener('touchend', () => {
+        isDragging = false;
+        startAutoScroll();
+    });
+    
+    carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const x = e.touches[0].pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        scrollPosition = scrollLeft - walk;
+        carousel.scrollLeft = scrollPosition;
+    });
+    
+    // Подсветка центрального слайда
+    function highlightCenterSlide() {
+        if (!carousel) return;
+        const allSlides = document.querySelectorAll('.my-carousel-slide');
+        const carouselRect = carousel.getBoundingClientRect();
+        const centerX = carouselRect.left + carouselRect.width / 2;
+        
+        let closestSlide = null;
+        let minDistance = Infinity;
+        
+        allSlides.forEach(slide => {
+            const rect = slide.getBoundingClientRect();
+            const slideCenterX = rect.left + rect.width / 2;
+            const distance = Math.abs(centerX - slideCenterX);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestSlide = slide;
+            }
+        });
+        
+        if (closestSlide) {
+            allSlides.forEach(s => s.classList.remove('active'));
+            closestSlide.classList.add('active');
+        }
+    }
+    
+    // Обработчики для подсветки
+    carousel.addEventListener('scroll', () => {
+        requestAnimationFrame(highlightCenterSlide);
+    });
+    
+    // Запуск
+    startAutoScroll();
+    setTimeout(highlightCenterSlide, 200);
+    
+    // Обновление при ресайзе
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            scrollPosition = track.scrollWidth / 2 - carousel.clientWidth / 2;
+            carousel.scrollLeft = scrollPosition;
+            highlightCenterSlide();
+        }, 200);
+    });
+    
+    console.log('✅ Бесконечная карусель с плавной прокруткой запущена');
+})();
+
+(function() {
+    console.log('🔧 ФИНАЛЬНЫЙ ФИКС ГОСТЕВЫХ КНОПОК ЗАПУЩЕН');
+
+    // Функция показа модального окна авторизации
     function showAuthModal() {
-        const modal = createAuthModal();
-        modal.style.display = 'block';
+        console.log('🔓 Открываем модальное окно авторизации');
         
-        // Переключение табов
-        const loginTab = document.getElementById('SimpleLoginTab');
-        const registerTab = document.getElementById('SimpleRegisterTab');
-        const loginForm = document.getElementById('SimpleLoginForm');
-        const registerForm = document.getElementById('SimpleRegisterForm');
+        // Пробуем найти модалку
+        let modal = document.getElementById('authModal');
         
-        if (loginTab && registerTab) {
+        // Если модалки нет - создаём её
+        if (!modal) {
+            console.log('📦 Создаём модальное окно авторизации');
+            modal = document.createElement('div');
+            modal.id = 'authModal';
+            modal.className = 'modal-glass';
+            modal.innerHTML = `
+                <div class="auth-modal-content" style="
+                    background: linear-gradient(145deg, #0f1322, #0a0d18);
+                    border-radius: 32px;
+                    padding: 28px;
+                    width: 100%;
+                    max-width: 420px;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+                ">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                        <div style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 700;">
+                            <i class="fas fa-crown" style="color: #fbbf24;"></i>
+                            <span style="background: linear-gradient(135deg, #fff, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent;">Плейнексис</span>
+                        </div>
+                        <button id="authModalCloseBtn" style="background: rgba(255,255,255,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; color: #94a3b8; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 24px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 40px;">
+                        <button id="authLoginTab" style="flex: 1; padding: 12px; background: transparent; border: none; border-radius: 40px; color: #94a3b8; font-weight: 600; cursor: pointer;">Вход</button>
+                        <button id="authRegisterTab" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer;">Регистрация</button>
+                    </div>
+                    
+                    <!-- Форма входа -->
+                    <div id="authLoginForm" style="display: none;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button id="googleLoginBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #fff; color: #1a1a2e; font-weight: 600; cursor: pointer;"><i class="fab fa-google"></i> Google</button>
+                            <button id="vkLoginBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #0077ff; color: white; font-weight: 600; cursor: pointer;"><i class="fab fa-vk"></i> VK</button>
+                        </div>
+                        <div style="text-align: center; color: #4a5568; font-size: 0.8rem; margin: 20px 0;">или</div>
+                        <input type="email" id="loginEmail" placeholder="Email" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+                        <input type="password" id="loginPassword" placeholder="Пароль" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 20px; outline: none;">
+                        <button id="submitLoginBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 700; cursor: pointer;">Войти</button>
+                    </div>
+                    
+                    <!-- Форма регистрации -->
+                    <div id="authRegisterForm" style="display: block;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button id="googleRegisterBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #fff; color: #1a1a2e; font-weight: 600; cursor: pointer;"><i class="fab fa-google"></i> Google</button>
+                            <button id="vkRegisterBtn" style="flex: 1; padding: 12px; border: none; border-radius: 40px; background: #0077ff; color: white; font-weight: 600; cursor: pointer;"><i class="fab fa-vk"></i> VK</button>
+                        </div>
+                        <div style="text-align: center; color: #4a5568; font-size: 0.8rem; margin: 20px 0;">или</div>
+                        <input type="email" id="registerEmail" placeholder="Email" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+                        <input type="text" id="registerUsername" placeholder="Имя пользователя" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 12px; outline: none;">
+                        <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; color: white; margin-bottom: 20px; outline: none;">
+                        <button id="submitRegisterBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 40px; color: white; font-weight: 700; cursor: pointer;">Зарегистрироваться</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Показываем модалку
+        modal.style.display = 'flex';
+        
+        // Настраиваем переключение вкладок
+        const loginTab = document.getElementById('authLoginTab');
+        const registerTab = document.getElementById('authRegisterTab');
+        const loginForm = document.getElementById('authLoginForm');
+        const registerForm = document.getElementById('authRegisterForm');
+        
+        if (loginTab && registerTab && loginForm && registerForm) {
+            // Убираем старые обработчики
             const newLoginTab = loginTab.cloneNode(true);
             const newRegisterTab = registerTab.cloneNode(true);
             loginTab.parentNode.replaceChild(newLoginTab, loginTab);
             registerTab.parentNode.replaceChild(newRegisterTab, registerTab);
             
             newLoginTab.onclick = () => {
-                newLoginTab.style.background = 'linear-gradient(135deg,#3b82f6,#2563eb)';
+                newLoginTab.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
                 newLoginTab.style.color = 'white';
                 newRegisterTab.style.background = 'transparent';
                 newRegisterTab.style.color = '#94a3b8';
                 loginForm.style.display = 'block';
                 registerForm.style.display = 'none';
             };
+            
             newRegisterTab.onclick = () => {
-                newRegisterTab.style.background = 'linear-gradient(135deg,#3b82f6,#2563eb)';
+                newRegisterTab.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
                 newRegisterTab.style.color = 'white';
                 newLoginTab.style.background = 'transparent';
                 newLoginTab.style.color = '#94a3b8';
@@ -2169,68 +3323,44 @@ body::after {
             };
         }
         
-        // Закрытие
-        const closeBtn = document.getElementById('CloseSimpleModal');
+        // Настраиваем закрытие
+        const closeBtn = document.getElementById('authModalCloseBtn');
         if (closeBtn) {
-            const newClose = closeBtn.cloneNode(true);
-            closeBtn.parentNode.replaceChild(newClose, closeBtn);
-            newClose.onclick = () => modal.style.display = 'none';
+            const newCloseBtn = closeBtn.cloneNode(true);
+            closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+            newCloseBtn.onclick = () => { modal.style.display = 'none'; };
         }
         
-        modal.onclick = (e) => { if (e.target === modal.firstChild) modal.style.display = 'none'; };
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
         
-        // ЛОГИН
-        const submitLogin = document.getElementById('SimpleSubmitLogin');
-        if (submitLogin) {
-            const newLogin = submitLogin.cloneNode(true);
-            submitLogin.parentNode.replaceChild(newLogin, submitLogin);
-            newLogin.onclick = () => {
-                const email = document.getElementById('SimpleLoginEmail').value.trim();
-                const password = document.getElementById('SimpleLoginPassword').value;
-                
-                const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
-                const user = users.find(u => u.email === email && u.password === btoa(password));
-                
-                if (user) {
-                    localStorage.setItem('apex_user', user.username);
-                    localStorage.setItem('apex_user_id', user.id);
-                    localStorage.setItem('apex_user_email', user.email);
-                    alert('✅ Добро пожаловать, ' + user.username + '!');
-                    modal.style.display = 'none';
-                    window.location.reload();
-                } else {
-                    alert('❌ Неверный email или пароль\n\nТестовый: test@test.com / 123456');
-                }
-            };
-        }
-        
-        // РЕГИСТРАЦИЯ
-        const submitReg = document.getElementById('SimpleSubmitRegister');
-        if (submitReg) {
-            const newReg = submitReg.cloneNode(true);
-            submitReg.parentNode.replaceChild(newReg, submitReg);
-            newReg.onclick = () => {
-                const email = document.getElementById('SimpleRegEmail').value.trim();
-                const username = document.getElementById('SimpleRegUsername').value.trim();
-                const password = document.getElementById('SimpleRegPassword').value;
-                const confirm = document.getElementById('SimpleRegConfirm').value;
+        // Регистрация
+        const submitRegister = document.getElementById('submitRegisterBtn');
+        if (submitRegister) {
+            const newRegisterBtn = submitRegister.cloneNode(true);
+            submitRegister.parentNode.replaceChild(newRegisterBtn, submitRegister);
+            newRegisterBtn.onclick = () => {
+                const email = document.getElementById('registerEmail').value.trim();
+                const username = document.getElementById('registerUsername').value.trim();
+                const password = document.getElementById('registerPassword').value;
+                const confirm = document.getElementById('registerConfirmPassword').value;
                 
                 if (!email || !username || !password) {
-                    alert('❌ Заполните все поля');
+                    alert('Заполните все поля');
                     return;
                 }
                 if (password !== confirm) {
-                    alert('❌ Пароли не совпадают');
+                    alert('Пароли не совпадают');
                     return;
                 }
                 if (password.length < 6) {
-                    alert('❌ Пароль должен быть не менее 6 символов');
+                    alert('Пароль должен быть не менее 6 символов');
                     return;
                 }
                 
+                // Сохраняем пользователя
                 const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
                 if (users.find(u => u.email === email)) {
-                    alert('❌ Пользователь с таким email уже существует');
+                    alert('Пользователь с таким email уже существует');
                     return;
                 }
                 
@@ -2238,7 +3368,7 @@ body::after {
                     id: 'user_' + Date.now(),
                     email: email,
                     username: username,
-                    password: btoa(password),
+                    password: btoa(password), // простое кодирование
                     balance: 0,
                     joinedDate: new Date().toISOString()
                 };
@@ -2248,215 +3378,115 @@ body::after {
                 localStorage.setItem('apex_user_id', newUser.id);
                 localStorage.setItem('apex_user_email', email);
                 
-                alert('✅ Регистрация успешна!');
+                alert('Регистрация успешна!');
                 modal.style.display = 'none';
                 window.location.reload();
             };
         }
-    }
-    
-    // ========== ПЕРЕХВАТ КЛИКОВ ПО ГОСТЕВЫМ КНОПКАМ ==========
-    function bindAllGuestButtons() {
-        // Все кнопки, которые могут быть гостевые
-        const allButtons = document.querySelectorAll('button, .guest-login-btn, .guest-register-btn, .welcome-login-btn, [class*="guest"], [class*="login"], [class*="register"]');
         
-        allButtons.forEach(btn => {
-            const text = (btn.textContent || '').toLowerCase();
-            const isGuestBtn = text.includes('войти') || 
-                              text.includes('регистрац') ||
-                              text.includes('зарегистрироваться') ||
-                              text.includes('вход') ||
-                              btn.classList.contains('guest-login-btn') ||
-                              btn.classList.contains('guest-register-btn') ||
-                              btn.classList.contains('welcome-login-btn');
-            
-            if (isGuestBtn && !btn.hasAttribute('data-auth-handler')) {
-                btn.setAttribute('data-auth-handler', 'true');
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
-                newBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('🖱️ Гостевая кнопка нажата:', text);
-                    showAuthModal();
-                });
-            }
+        // Вход
+        const submitLogin = document.getElementById('submitLoginBtn');
+        if (submitLogin) {
+            const newLoginBtn = submitLogin.cloneNode(true);
+            submitLogin.parentNode.replaceChild(newLoginBtn, submitLogin);
+            newLoginBtn.onclick = () => {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                
+                const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+                const user = users.find(u => u.email === email && u.password === btoa(password));
+                
+                if (user) {
+                    localStorage.setItem('apex_user', user.username);
+                    localStorage.setItem('apex_user_id', user.id);
+                    localStorage.setItem('apex_user_email', user.email);
+                    alert('Вход выполнен!');
+                    modal.style.display = 'none';
+                    window.location.reload();
+                } else {
+                    alert('Неверный email или пароль');
+                }
+            };
+        }
+        
+        // Соцсети (демо)
+        const googleBtns = document.querySelectorAll('#googleLoginBtn, #googleRegisterBtn');
+        googleBtns.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.onclick = () => alert('Вход через Google (демо)');
         });
         
-        // Кнопка входа в хедере
-        const headerBtn = document.getElementById('loginBtn');
-        if (headerBtn && !headerBtn.hasAttribute('data-auth-handler')) {
-            headerBtn.setAttribute('data-auth-handler', 'true');
-            const newBtn = headerBtn.cloneNode(true);
-            headerBtn.parentNode.replaceChild(newBtn, headerBtn);
-            newBtn.addEventListener('click', (e) => {
+        const vkBtns = document.querySelectorAll('#vkLoginBtn, #vkRegisterBtn');
+        vkBtns.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.onclick = () => alert('Вход через VK (демо)');
+        });
+    }
+    
+    // Функция для привязки обработчиков ко всем гостевым кнопкам
+    function bindGuestButtons() {
+        console.log('🔍 Поиск гостевых кнопок...');
+        
+        // Ищем все возможные гостевые кнопки
+        const guestButtons = document.querySelectorAll('.guest-login-btn, .guest-register-btn, .welcome-login-btn');
+        console.log(`📊 Найдено кнопок: ${guestButtons.length}`);
+        
+        guestButtons.forEach(btn => {
+            // Удаляем старые обработчики через клонирование
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            // Добавляем новый обработчик
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ КЛИК ПО ГОСТЕВОЙ КНОПКЕ!');
+                showAuthModal();
+            });
+        });
+        
+        // Также кнопка входа в хедере
+        const loginHeaderBtn = document.getElementById('loginBtn');
+        if (loginHeaderBtn) {
+            const newHeaderBtn = loginHeaderBtn.cloneNode(true);
+            loginHeaderBtn.parentNode.replaceChild(newHeaderBtn, loginHeaderBtn);
+            newHeaderBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 showAuthModal();
             });
         }
-        
-        // Кнопка выхода
-        const logoutBtns = document.querySelectorAll('#logoutBtn, #profileLogoutBtn');
-        logoutBtns.forEach(btn => {
-            if (!btn.hasAttribute('data-logout-handler')) {
-                btn.setAttribute('data-logout-handler', 'true');
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
-                newBtn.addEventListener('click', () => {
-                    localStorage.removeItem('apex_user');
-                    localStorage.removeItem('apex_user_id');
-                    localStorage.removeItem('apex_user_email');
-                    window.location.reload();
+    }
+    
+    // Запускаем сразу
+    bindGuestButtons();
+    
+    // Запускаем через MutationObserver для отслеживания новых кнопок
+    const observer = new MutationObserver(function(mutations) {
+        let shouldBind = false;
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && (node.classList?.contains('guest-screen') || node.querySelector?.('.guest-login-btn'))) {
+                        shouldBind = true;
+                    }
                 });
             }
         });
-    }
-    
-    // ========== ЗАМЕНА ГОСТЕВЫХ ЭКРАНОВ ==========
-    function replaceGuestScreens() {
-        const isLoggedIn = !!localStorage.getItem('apex_user');
-        if (isLoggedIn) return;
-        
-        const protectedPages = ['chat', 'products-manage', 'profile'];
-        
-        protectedPages.forEach(pageId => {
-            const page = document.getElementById(pageId);
-            if (!page) return;
-            if (page.querySelector('.guest-replacement')) return;
-            if (!page.dataset.originalContent) {
-                page.dataset.originalContent = page.innerHTML;
-            }
-            
-            const icons = {
-                chat: 'fa-comments',
-                'products-manage': 'fa-tags',
-                profile: 'fa-user-circle'
-            };
-            const titles = {
-                chat: 'Чат с продавцами',
-                'products-manage': 'Ваши товары',
-                profile: 'Ваш профиль'
-            };
-            const texts = {
-                chat: 'Войдите чтобы общаться с продавцами и получать поддержку 24/7',
-                'products-manage': 'Войдите чтобы создавать товары, отслеживать продажи и зарабатывать',
-                profile: 'Войдите чтобы управлять балансом, отслеживать покупки и получать бонусы'
-            };
-            
-            page.innerHTML = `
-                <div class="guest-replacement" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;padding:40px20px;">
-                    <div style="width:100px;height:100px;margin-bottom:24px;">
-                        <i class="fas ${icons[pageId]}" style="font-size:70px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent;"></i>
-                    </div>
-                    <h3 style="font-size:1.6rem;font-weight:700;margin-bottom:12px;background:linear-gradient(135deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;">${titles[pageId]}</h3>
-                    <p style="color:#94a3b8;max-width:380px;margin-bottom:24px;">${texts[pageId]}</p>
-                    <button class="guest-action-btn" style="padding:14px32px;border-radius:40px;font-weight:600;font-size:1rem;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border:none;box-shadow:0 8px 20px rgba(59,130,246,0.3);">
-                        <i class="fas fa-sign-in-alt"></i> Войти или зарегистрироваться
-                    </button>
-                </div>
-            `;
-            
-            const actionBtn = page.querySelector('.guest-action-btn');
-            if (actionBtn) {
-                actionBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    showAuthModal();
-                });
-            }
-        });
-    }
-    
-    // ========== ОБНОВЛЕНИЕ UI ПОСЛЕ ВХОДА ==========
-    function updateUIAfterLogin() {
-        const username = localStorage.getItem('apex_user');
-        if (!username) return;
-        
-        // Обновляем профиль
-        const profileName = document.getElementById('profileUsername');
-        if (profileName) profileName.textContent = username;
-        
-        const avatarSpan = document.getElementById('avatarInitial');
-        if (avatarSpan) avatarSpan.textContent = username.charAt(0).toUpperCase();
-        
-        // Меню пользователя
-        const loginBtn = document.getElementById('loginBtn');
-        const userMenu = document.getElementById('userMenu');
-        const usernameDisplay = document.getElementById('usernameDisplay');
-        
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (userMenu) userMenu.style.display = 'flex';
-        if (usernameDisplay) usernameDisplay.textContent = username;
-        
-        // Восстанавливаем страницы
-        const pages = ['chat', 'products-manage', 'profile'];
-        pages.forEach(pageId => {
-            const page = document.getElementById(pageId);
-            if (page && page.dataset.originalContent && page.querySelector('.guest-replacement')) {
-                page.innerHTML = page.dataset.originalContent;
-                delete page.dataset.originalContent;
-            }
-        });
-        
-        // Перезагружаем данные
-        if (typeof window.loadUserProducts === 'function') window.loadUserProducts();
-        if (typeof window.loadUserProductsInProfile === 'function') window.loadUserProductsInProfile();
-    }
-    
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
-    function init() {
-        console.log('🚀 AUTH FIX INIT');
-        
-        // Обновляем UI если залогинены
-        if (localStorage.getItem('apex_user')) {
-            updateUIAfterLogin();
-        } else {
-            replaceGuestScreens();
+        if (shouldBind) {
+            setTimeout(bindGuestButtons, 100);
         }
-        
-        // Привязываем кнопки
-        bindAllGuestButtons();
-        
-        // Наблюдатель за новыми элементами
-        const observer = new MutationObserver(() => {
-            bindAllGuestButtons();
-            if (!localStorage.getItem('apex_user')) {
-                replaceGuestScreens();
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-        
-        // Периодическая проверка
-        setInterval(bindAllGuestButtons, 2000);
-        
-        // Создаём тестового пользователя если нет
-        let users = JSON.parse(localStorage.getItem('apex_users') || '[]');
-        if (users.length === 0) {
-            users.push({
-                id: 'user_1',
-                email: 'test@test.com',
-                username: 'Тестовый',
-                password: btoa('123456'),
-                balance: 1000,
-                joinedDate: new Date().toISOString()
-            });
-            localStorage.setItem('apex_users', JSON.stringify(users));
-            console.log('✅ Создан тестовый пользователь: test@test.com / 123456');
-        }
-        
-        console.log('✅ AUTH FIX READY');
-    }
+    });
     
-    // Запуск
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    observer.observe(document.body, { childList: true, subtree: true });
     
-    // Глобальные функции
-    window.showAuthModal = showAuthModal;
-    window.updateUIAfterLogin = updateUIAfterLogin;
+    // Периодическая проверка (на всякий случай)
+    setInterval(bindGuestButtons, 3000);
+    
+    console.log('✅ ФИНАЛЬНЫЙ ФИКС ЗАВЕРШЁН');
 })();
+
 </script>
 
 </body>
