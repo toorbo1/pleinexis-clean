@@ -367,29 +367,90 @@ class AuthManager {
         return null;
     }
 
-    async register(email, username, password) {
-        try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, username, password })
-            });
+async register(email, username, password) {
+    // Простейшая валидация
+    if (!email || !username || !password) {
+        this.showToast('Заполните все поля', 'error');
+        return false;
+    }
+    if (password.length < 6) {
+        this.showToast('Пароль должен быть не менее 6 символов', 'error');
+        return false;
+    }
+
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, username, password })
+        });
+        
+        const data = await response.json();
+        if (response.ok) {
+            this.setSession(data);
+            this.showToast('Регистрация успешна!', 'success');
+            this.closeAuthModal();
+            return true;
+        } else {
+            // Сервер вернул ошибку
+            this.showToast(data.error || 'Ошибка регистрации на сервере', 'error');
             
-            const data = await response.json();
-            if (response.ok) {
-                this.setSession(data);
-                this.showToast('Регистрация успешна! Добро пожаловать!', 'success');
+            // Предлагаем локальную регистрацию (демо)
+            if (confirm('Сервер временно недоступен. Зарегистрироваться локально (демо)?')) {
+                const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+                if (users.find(u => u.email === email)) {
+                    this.showToast('Пользователь с таким email уже существует', 'error');
+                    return false;
+                }
+                const newUser = {
+                    id: 'user_' + Date.now(),
+                    email: email,
+                    username: username,
+                    password: btoa(password),
+                    balance: 0,
+                    joinedDate: new Date().toISOString()
+                };
+                users.push(newUser);
+                localStorage.setItem('apex_users', JSON.stringify(users));
+                localStorage.setItem('apex_user', username);
+                localStorage.setItem('apex_user_id', newUser.id);
+                localStorage.setItem('apex_user_email', email);
+                
+                this.setSession({ token: 'demo_token', user: newUser });
+                this.showToast('Регистрация (демо) успешна!', 'success');
                 this.closeAuthModal();
                 return true;
-            } else {
-                this.showToast(data.error || 'Ошибка регистрации', 'error');
-                return false;
             }
-        } catch (error) {
-            this.showToast('Ошибка соединения', 'error');
             return false;
         }
+    } catch (error) {
+        this.showToast('Ошибка соединения с сервером', 'error');
+        
+        // Fallback при сетевой ошибке
+        if (confirm('Нет связи с сервером. Зарегистрироваться локально (демо)?')) {
+            const users = JSON.parse(localStorage.getItem('apex_users') || '[]');
+            const newUser = {
+                id: 'user_' + Date.now(),
+                email: email,
+                username: username,
+                password: btoa(password),
+                balance: 0,
+                joinedDate: new Date().toISOString()
+            };
+            users.push(newUser);
+            localStorage.setItem('apex_users', JSON.stringify(users));
+            localStorage.setItem('apex_user', username);
+            localStorage.setItem('apex_user_id', newUser.id);
+            localStorage.setItem('apex_user_email', email);
+            
+            this.setSession({ token: 'demo_token', user: newUser });
+            this.showToast('Регистрация (демо) успешна!', 'success');
+            this.closeAuthModal();
+            return true;
+        }
+        return false;
     }
+}
 
     async login(email, password) {
         try {
