@@ -1,4 +1,4 @@
-// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ С АВТО-МОДАЛКОЙ ==========
+// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (ИСПРАВЛЕННАЯ) ==========
 
 class AuthManager {
     constructor() {
@@ -15,8 +15,8 @@ class AuthManager {
 
     async init() {
         await this.loadExternalScripts();
+        this.injectAuthModal();
         this.setupEventListeners();
-        this.injectAuthModal(); // Внедряем модальное окно если его нет
         
         if (this.token) {
             await this.fetchCurrentUser();
@@ -36,7 +36,6 @@ class AuthManager {
         console.log('✅ AuthManager инициализирован');
     }
 
-    // Внедрение модального окна в DOM если его нет
     injectAuthModal() {
         if (document.getElementById('authModal')) return;
         
@@ -64,7 +63,6 @@ class AuthManager {
                     </button>
                 </div>
                 
-                <!-- Форма входа -->
                 <div id="loginForm" class="auth-form active">
                     <div class="auth-social-buttons">
                         <button class="auth-social-btn google" id="googleLoginBtn">
@@ -101,7 +99,6 @@ class AuthManager {
                     </p>
                 </div>
                 
-                <!-- Форма регистрации -->
                 <div id="registerForm" class="auth-form">
                     <div class="auth-social-buttons">
                         <button class="auth-social-btn google" id="googleRegisterBtn">
@@ -150,7 +147,6 @@ class AuthManager {
         
         document.body.appendChild(modal);
         
-        // Добавляем стили для модалки
         if (!document.getElementById('auth-modal-styles')) {
             const styles = document.createElement('style');
             styles.id = 'auth-modal-styles';
@@ -169,7 +165,7 @@ class AuthManager {
                 
                 .modal-glass.active {
                     display: flex;
-                    animation: modalFadeIn 0.3s ease;
+                    animation: modalFadeIn 0.25s ease;
                 }
                 
                 @keyframes modalFadeIn {
@@ -185,12 +181,6 @@ class AuthManager {
                     max-width: 420px;
                     border: 1px solid rgba(59, 130, 246, 0.3);
                     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(59, 130, 246, 0.1) inset;
-                    animation: modalSlideUp 0.3s ease;
-                }
-                
-                @keyframes modalSlideUp {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
                 }
                 
                 .auth-modal-header {
@@ -428,6 +418,84 @@ class AuthManager {
                     text-decoration: underline;
                 }
                 
+                /* Гостевые экраны */
+                .guest-screen {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 40px 20px;
+                    text-align: center;
+                    background: radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.08), transparent 70%);
+                    z-index: 100;
+                    min-height: 70vh;
+                }
+                
+                .guest-screen-icon {
+                    width: 100px;
+                    height: 100px;
+                    margin-bottom: 24px;
+                }
+                
+                .guest-screen-icon i {
+                    font-size: 70px;
+                    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
+                    filter: drop-shadow(0 0 30px rgba(96, 165, 250, 0.4));
+                    animation: iconFloat 3s ease-in-out infinite;
+                }
+                
+                @keyframes iconFloat {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-8px); }
+                }
+                
+                .guest-screen h3 {
+                    font-size: 1.6rem;
+                    font-weight: 700;
+                    margin-bottom: 12px;
+                    background: linear-gradient(135deg, #fff, #c4b5fd);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    color: transparent;
+                }
+                
+                .guest-screen p {
+                    color: #94a3b8;
+                    font-size: 0.95rem;
+                    max-width: 380px;
+                    margin-bottom: 24px;
+                    line-height: 1.5;
+                }
+                
+                .guest-login-btn {
+                    padding: 14px 32px;
+                    border-radius: 40px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    background: linear-gradient(135deg, #3b82f6, #2563eb);
+                    color: white;
+                    border: none;
+                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+                    transition: all 0.3s ease;
+                }
+                
+                .guest-login-btn:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+                }
+                
                 @media (max-width: 480px) {
                     .auth-modal-content {
                         padding: 20px;
@@ -437,12 +505,19 @@ class AuthManager {
                     .auth-social-buttons {
                         flex-direction: column;
                     }
+                    
+                    .guest-screen h3 {
+                        font-size: 1.3rem;
+                    }
+                    
+                    .guest-screen p {
+                        font-size: 0.85rem;
+                    }
                 }
             `;
             document.head.appendChild(styles);
         }
         
-        // Перепривязываем обработчики
         this.setupEventListeners();
     }
 
@@ -647,10 +722,8 @@ class AuthManager {
         this.checkGuestPages();
         if (showMessage) this.showToast('Вы вышли из аккаунта', 'success');
         
-        // Сбрасываем флаг чтобы модалка показалась снова
         this.modalAutoShown = false;
         
-        // Показываем модалку через секунду
         setTimeout(() => {
             if (!this.currentUser && !this.modalAutoShown) {
                 this.showAuthModal();
@@ -708,94 +781,30 @@ class AuthManager {
     }
 
     showGuestScreens() {
-        if (!document.getElementById('guest-screens-styles')) {
-            const styles = document.createElement('style');
-            styles.id = 'guest-screens-styles';
-            styles.textContent = `
-                .guest-screen {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 40px 20px;
-                    text-align: center;
-                    background: transparent;
-                    z-index: 100;
-                    min-height: 60vh;
-                }
-                
-                .guest-screen-icon {
-                    width: 100px;
-                    height: 100px;
-                    margin-bottom: 24px;
-                }
-                
-                .guest-screen-icon i {
-                    font-size: 70px;
-                    background: linear-gradient(135deg, #60a5fa, #a78bfa);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                    filter: drop-shadow(0 0 30px rgba(96, 165, 250, 0.4));
-                }
-                
-                .guest-screen h3 {
-                    font-size: 1.6rem;
-                    font-weight: 700;
-                    margin-bottom: 12px;
-                    background: linear-gradient(135deg, #fff, #c4b5fd);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    color: transparent;
-                }
-                
-                .guest-screen p {
-                    color: #94a3b8;
-                    font-size: 0.95rem;
-                    max-width: 380px;
-                    margin-bottom: 24px;
-                    line-height: 1.5;
-                }
-                
-                .guest-login-btn {
-                    padding: 14px 32px;
-                    border-radius: 40px;
-                    font-weight: 600;
-                    font-size: 1rem;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    background: linear-gradient(135deg, #3b82f6, #2563eb);
-                    color: white;
-                    border: none;
-                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-                    transition: all 0.3s ease;
-                }
-                
-                .guest-login-btn:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
-                }
-            `;
-            document.head.appendChild(styles);
-        }
-
+        const self = this;
+        
         this.replacePageContent('chat', this.createGuestChatScreen());
         this.replacePageContent('products-manage', this.createGuestProductsScreen());
         this.replacePageContent('profile', this.createGuestProfileScreen());
+        
+        // Привязываем обработчики к кнопкам в гостевых экранах
+        setTimeout(() => {
+            document.querySelectorAll('.guest-login-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.showAuthModal();
+                });
+            });
+        }, 100);
     }
 
     hideGuestScreens() {
         ['chat', 'products-manage', 'profile'].forEach(pageId => {
             const page = document.getElementById(pageId);
-            if (page && page.querySelector('.guest-screen')) {
-                page.querySelector('.guest-screen')?.remove();
+            if (page && page.dataset.originalContent) {
+                page.innerHTML = page.dataset.originalContent;
+                delete page.dataset.originalContent;
             }
         });
     }
@@ -809,10 +818,6 @@ class AuthManager {
         }
         
         page.innerHTML = guestContent;
-        
-        page.querySelectorAll('.guest-login-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.showAuthModal());
-        });
     }
 
     createGuestChatScreen() {
