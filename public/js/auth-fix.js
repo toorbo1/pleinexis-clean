@@ -368,7 +368,7 @@ class AuthManager {
     }
 
 async register(email, username, password) {
-    // Простейшая валидация
+    // Простейшая валидация на клиенте
     if (!email || !username || !password) {
         this.showToast('Заполните все поля', 'error');
         return false;
@@ -380,52 +380,32 @@ async register(email, username, password) {
 
     console.log('🔐 Отправка регистрации:', { email, username, password: '***' });
 
-    const tryRegister = async (payload) => {
+    try {
         const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ email, username, password })
         });
+        
         const data = await response.json();
-        console.log(`📡 Ответ сервера (${response.status}):`, data);
-        return { ok: response.ok, data };
-    };
-
-    // Варианты payload
-    const variants = [
-        { email, username, password },       // стандартный
-        { email, name: username, password }, // с полем name
-        { email, login: username, password } // с полем login
-    ];
-
-    for (const payload of variants) {
-        try {
-            const { ok, data } = await tryRegister(payload);
-            if (ok) {
-                // Успех — устанавливаем сессию
-                // Нормализуем ответ: если сервер не вернул user, создаём его из данных
-                if (!data.user && data.userId) {
-                    data.user = { id: data.userId, username, email };
-                } else if (!data.user) {
-                    data.user = { id: 'user_' + Date.now(), username, email };
-                }
-                // Если сервер не вернул token, генерируем демо-токен
-                if (!data.token) {
-                    data.token = 'server_generated_token_' + Date.now();
-                }
-                this.setSession(data);
-                this.showToast('Регистрация успешна!', 'success');
-                this.closeAuthModal();
-                return true;
-            }
-        } catch (e) {
-            console.warn('Ошибка сети при попытке варианта:', payload, e);
+        console.log('📡 Ответ сервера:', response.status, data);
+        
+        if (response.ok) {
+            this.setSession(data);
+            this.showToast('Регистрация успешна!', 'success');
+            this.closeAuthModal();
+            return true;
+        } else {
+            // Показываем конкретную ошибку от сервера
+            const errorMsg = data.error || data.message || 'Ошибка регистрации';
+            this.showToast(errorMsg, 'error');
+            return false;
         }
+    } catch (error) {
+        console.error('❌ Ошибка сети:', error);
+        this.showToast('Ошибка соединения с сервером', 'error');
+        return false;
     }
-
-    // Если ни один вариант не сработал
-    this.showToast('Ошибка регистрации. Попробуйте позже.', 'error');
-    return false;
 }
 
     async login(email, password) {
