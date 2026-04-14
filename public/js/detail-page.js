@@ -297,15 +297,16 @@ function formatDescription(text) {
 
 // detail-page.js
 window.buyProduct = async function(productId) {
-    const currentUser = localStorage.getItem('apex_user');
-    if (!currentUser || currentUser === 'Гость') {
-        // показать модалку авторизации
-        if (typeof window.auth !== 'undefined') {
-            window.auth.showAuthModal();
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        // Пользователь не авторизован - показать модалку входа
+        if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
+            window.auth.showAuthModal('login');
+        } else {
+            alert('Для покупки необходимо войти в аккаунт');
         }
         return;
     }
-
     try {
         // 1. Проверить баланс пользователя (можно запросить /api/auth/me)
         const meRes = await fetch('/api/auth/me', {

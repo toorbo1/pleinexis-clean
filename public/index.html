@@ -719,6 +719,87 @@ body::after {
 .modal-glass.active {
   display: flex !important;
 }
+/* ===== ПЛАВНАЯ КАРУСЕЛЬ: ФОТО МЕНЬШЕ, ВИДНЕЮТСЯ ПО БОКАМ ===== */
+.smooth-carousel {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 32px;
+    padding: 20px 0;
+    /* Градиент по бокам - фото плавно появляются и исчезают */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%, black 75%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 25%, black 75%, transparent 100%);
+}
+
+.smooth-carousel-track {
+    display: flex;
+    gap: 30px; /* Расстояние между слайдами */
+    width: fit-content;
+    animation: scrollCarousel 50s linear infinite;
+}
+
+/* Остановка при наведении */
+.smooth-carousel:hover .smooth-carousel-track {
+    animation-play-state: paused;
+}
+
+.smooth-slide {
+    flex: 0 0 auto;
+    width: 380px; /* УМЕНЬШЕНО: чтобы влезало 2-3 штуки */
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    transition: all 0.4s ease;
+    opacity: 0.5; /* По умолчанию полупрозрачные */
+    transform: scale(0.9);
+    filter: brightness(0.7);
+    pointer-events: none; /* Отключаем клики */
+}
+
+/* Центральный слайд - яркий */
+.smooth-slide.center {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    filter: brightness(1.1) !important;
+    box-shadow: 0 0 45px rgba(59, 130, 246, 0.7), 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    border-color: rgba(96, 165, 250, 0.7) !important;
+    z-index: 10;
+}
+
+.smooth-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
+
+@keyframes scrollCarousel {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Адаптивность */
+@media (min-width: 1600px) {
+    .smooth-slide { width: 450px; }
+}
+@media (max-width: 1200px) {
+    .smooth-slide { width: 340px; }
+}
+@media (max-width: 768px) {
+    .smooth-slide { width: 300px; }
+    .smooth-carousel-track { gap: 20px; }
+    .smooth-carousel {
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+    }
+}
+@media (max-width: 480px) {
+    .smooth-slide { width: 260px; }
+    .smooth-carousel-track { gap: 15px; }
+}
 </style>
 </head>
 
@@ -802,28 +883,14 @@ body::after {
   </div>
 
 
-<div class="my-carousel">
-    <div class="my-carousel-track" id="myCarouselTrack">
-        <!-- ХВОСТ (копия 3) -->
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
-
-        <!-- НАЧАЛО (копия 1) -->
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
-
-        <!-- ПРОДОЛЖЕНИЕ (копия 2) -->
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide"></div>
-        <div class="my-carousel-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide"></div>
+<!-- ===== ПЛАВНАЯ КАРУСЕЛЬ ===== -->
+<div class="smooth-carousel">
+    <div class="smooth-carousel-track" id="smoothCarouselTrack">
+        <div class="smooth-slide"><img src="https://i.pinimg.com/736x/65/ac/7e/65ac7efa913352333ec175c21c26bb67.jpg" alt="slide" loading="lazy"></div>
+        <div class="smooth-slide"><img src="https://i.pinimg.com/1200x/0e/71/2f/0e712f3893d03ce39058dc87c578281e.jpg" alt="slide" loading="lazy"></div>
+        <div class="smooth-slide"><img src="https://i.pinimg.com/736x/94/c8/fc/94c8fc8c7ea9817f72aac0f7b5bad54a.jpg" alt="slide" loading="lazy"></div>
+        <div class="smooth-slide"><img src="https://i.pinimg.com/1200x/80/9f/54/809f543db500f76b205e09444b2953f2.jpg" alt="slide" loading="lazy"></div>
+        <div class="smooth-slide"><img src="https://i.pinimg.com/1200x/02/8d/b9/028db91f448f42890439403aeca89d5a.jpg" alt="slide" loading="lazy"></div>
     </div>
 </div>
 <!-- ПОПОЛНЕНИЕ БАЛАНСА STEAM -->
@@ -3602,6 +3669,79 @@ document.addEventListener('DOMContentLoaded', function() {
   
   console.log('🎉 ИСПРАВЛЕННАЯ АВТОРИЗАЦИЯ ПОЛНОСТЬЮ ГОТОВА');
 })();
+(function() {
+    console.log('🎠 Запуск плавной карусели');
+    
+    let track = null;
+    let animationFrame = null;
+    
+    function initCarousel() {
+        track = document.getElementById('smoothCarouselTrack');
+        if (!track) return;
+        
+        const slides = Array.from(track.querySelectorAll('.smooth-slide'));
+        if (slides.length === 0) return;
+        
+        // Дублируем слайды для бесконечности
+        slides.forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.appendChild(clone);
+        });
+        
+        console.log(`✅ Карусель готова. Слайдов: ${track.children.length}`);
+        
+        // Запускаем отслеживание центрального слайда
+        startCenterDetection();
+    }
+    
+    function startCenterDetection() {
+        function updateCenter() {
+            if (!track) return;
+            
+            const carousel = document.querySelector('.smooth-carousel');
+            if (!carousel) return;
+            
+            const carouselRect = carousel.getBoundingClientRect();
+            const centerX = carouselRect.left + carouselRect.width / 2;
+            
+            const allSlides = track.querySelectorAll('.smooth-slide');
+            let closestSlide = null;
+            let minDistance = Infinity;
+            
+            allSlides.forEach(slide => {
+                const rect = slide.getBoundingClientRect();
+                const slideCenterX = rect.left + rect.width / 2;
+                const distance = Math.abs(centerX - slideCenterX);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestSlide = slide;
+                }
+            });
+            
+            if (closestSlide) {
+                allSlides.forEach(s => s.classList.remove('center'));
+                closestSlide.classList.add('center');
+            }
+            
+            animationFrame = requestAnimationFrame(updateCenter);
+        }
+        
+        animationFrame = requestAnimationFrame(updateCenter);
+    }
+    
+    // Очистка
+    window.addEventListener('beforeunload', function() {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+    });
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+        initCarousel();
+    }
+})();
+
 </script>
 
 </body>
