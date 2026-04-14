@@ -1,4 +1,4 @@
-// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (ИСПРАВЛЕНО - КНОПКИ РАБОТАЮТ) ==========
+// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (РАБОЧАЯ ВЕРСИЯ) ==========
 
 class AuthManager {
     constructor() {
@@ -27,7 +27,7 @@ class AuthManager {
         
         setTimeout(() => {
             if (!this.currentUser && !this.modalAutoShown) {
-                this.showAuthModal('register'); // Открываем сразу регистрацию
+                this.showAuthModal('register');
                 this.modalAutoShown = true;
             }
         }, 1000);
@@ -48,7 +48,7 @@ class AuthManager {
                         <i class="fas fa-crown"></i>
                         <span>Плейнексис</span>
                     </div>
-                    <button class="auth-close-btn">
+                    <button class="auth-close-btn" id="authModalCloseBtn">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -543,7 +543,8 @@ class AuthManager {
             document.head.appendChild(styles);
         }
         
-        this.setupEventListeners();
+        // Перепривязываем обработчики после создания модалки
+        setTimeout(() => this.setupEventListeners(), 50);
     }
 
     async loadExternalScripts() {
@@ -808,24 +809,28 @@ class AuthManager {
     showGuestScreens() {
         const self = this;
         
+        // Сохраняем оригинальное содержимое и заменяем на гостевой экран
         this.replacePageContent('chat', this.createGuestChatScreen());
         this.replacePageContent('products-manage', this.createGuestProductsScreen());
         this.replacePageContent('profile', this.createGuestProfileScreen());
         
-        // Привязываем обработчики к кнопкам
+        // Привязываем обработчики к кнопкам - ВАЖНО!
         setTimeout(() => {
             document.querySelectorAll('.guest-login-btn').forEach(btn => {
-                btn.replaceWith(btn.cloneNode(true));
-            });
-            
-            document.querySelectorAll('.guest-login-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                // Удаляем старые обработчики
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                // Добавляем новый обработчик
+                newBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Кнопка регистрации нажата!');
+                    console.log('🖱️ Кнопка "Войти или зарегистрироваться" нажата!');
                     self.showAuthModal('register');
                 });
             });
+            
+            console.log('✅ Обработчики для гостевых кнопок привязаны');
         }, 100);
     }
 
@@ -843,6 +848,7 @@ class AuthManager {
         const page = document.getElementById(pageId);
         if (!page) return;
         
+        // Сохраняем оригинальное содержимое только один раз
         if (!page.dataset.originalContent) {
             page.dataset.originalContent = page.innerHTML;
         }
@@ -900,6 +906,7 @@ class AuthManager {
         if (modal) {
             modal.classList.add('active');
             this.switchAuthTab(tab);
+            console.log('🔓 Модальное окно открыто, вкладка:', tab);
         }
     }
 
@@ -921,7 +928,6 @@ class AuthManager {
             if (registerTab) registerTab.classList.remove('active');
         } else {
             if (loginForm) loginForm.classList.remove('active');
-            if (480 > 0) {} // пустая строка для избежания ошибки
             if (registerForm) registerForm.classList.add('active');
             if (loginTab) loginTab.classList.remove('active');
             if (registerTab) registerTab.classList.add('active');
@@ -1004,7 +1010,7 @@ class AuthManager {
             if (e.target === modal) this.closeAuthModal();
         });
         
-        document.querySelector('.auth-close-btn')?.addEventListener('click', () => this.closeAuthModal());
+        document.getElementById('authModalCloseBtn')?.addEventListener('click', () => this.closeAuthModal());
 
         // Перехват навигации
         const originalShowPage = window.showPage;
