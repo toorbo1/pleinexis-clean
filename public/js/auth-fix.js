@@ -35,100 +35,116 @@ class AuthManager {
         console.log('✅ AuthManager инициализирован');
     }
 
-    injectAuthModal() {
-        if (document.getElementById('authModal')) return;
-        
-        const modal = document.createElement('div');
-        modal.id = 'authModal';
-        modal.className = 'modal-glass';
-        modal.innerHTML = `
-            <div class="auth-modal-content">
-                <div class="auth-modal-header">
-                    <span class="auth-logo-text">Плейнексис</span>
-                    <button class="auth-close-btn" id="authModalCloseBtn">
-                        <i class="fas fa-times"></i>
+injectAuthModal() {
+    if (document.getElementById('authModal')) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'authModal';
+    modal.className = 'modal-glass';
+    modal.innerHTML = `
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <span class="auth-logo-text">Плейнексис</span>
+                <button class="auth-close-btn" id="authModalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab" id="loginTab">Вход</button>
+                <button class="auth-tab active" id="registerTab">Регистрация</button>
+            </div>
+            
+            <!-- Форма входа -->
+            <div id="loginForm" class="auth-form">
+                <div class="auth-social-buttons">
+                    <button class="auth-social-btn google" id="googleLoginBtn2">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button class="auth-social-btn vk" id="vkLoginBtn2">
+                        <i class="fab fa-vk"></i> VK
                     </button>
                 </div>
-                
-                <div class="auth-tabs">
-                    <button class="auth-tab" id="loginTab">Вход</button>
-                    <button class="auth-tab active" id="registerTab">Регистрация</button>
-                </div>
-                
-                <!-- Форма входа -->
-                <div id="loginForm" class="auth-form">
-                    <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleLoginBtn2">
-                            <i class="fab fa-google"></i> Google
-                        </button>
-                        <button class="auth-social-btn vk" id="vkLoginBtn2">
-                            <i class="fab fa-vk"></i> VK
-                        </button>
+                <div class="auth-divider"><span>или</span></div>
+                <form id="loginFormElement">
+                    <div class="auth-input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="Email" required>
                     </div>
-                    <div class="auth-divider"><span>или</span></div>
-                    <form id="loginFormElement">
-                        <div class="auth-input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="loginEmail" placeholder="Email" required>
-                        </div>
-                        <div class="auth-input-group password-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="loginPassword" placeholder="Пароль" required>
-                            <i class="far fa-eye toggle-password" data-target="loginPassword"></i>
-                        </div>
-                        <button type="submit" class="auth-submit-btn">Войти</button>
-                    </form>
-                    <p class="auth-footer-text">
-                        Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a>
-                    </p>
-                </div>
-                
-                <!-- Форма регистрации -->
-                <div id="registerForm" class="auth-form active">
-                    <div class="auth-social-buttons">
-                        <button class="auth-social-btn google" id="googleRegisterBtn2">
-                            <i class="fab fa-google"></i> Google
-                        </button>
-                        <button class="auth-social-btn vk" id="vkRegisterBtn2">
-                            <i class="fab fa-vk"></i> VK
-                        </button>
+                    <div class="auth-error-message" id="loginEmailError"></div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Пароль" required>
+                        <i class="far fa-eye toggle-password" data-target="loginPassword"></i>
                     </div>
-                    <div class="auth-divider"><span>или</span></div>
-                    <form id="registerFormElement">
-                        <div class="auth-input-group">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="registerEmail" placeholder="Email" required>
-                        </div>
-                        <div class="auth-input-group">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
-                        </div>
-                        <div class="auth-input-group password-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
-                            <i class="far fa-eye toggle-password" data-target="registerPassword"></i>
-                        </div>
-                        <div class="auth-input-group password-group">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
-                            <i class="far fa-eye toggle-password" data-target="registerConfirmPassword"></i>
-                        </div>
-                        <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
-                    </form>
-                    <p class="auth-footer-text">
-                        Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a>
-                    </p>
-                </div>
+                    <div class="auth-error-message" id="loginPasswordError"></div>
+                    <div class="auth-error-message" id="loginFormError"></div>
+                    <button type="submit" class="auth-submit-btn">Войти</button>
+                </form>
+                <p class="auth-footer-text">
+                    Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a>
+                </p>
             </div>
-        `;
-        
-        document.body.appendChild(modal);
+            
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="auth-form active">
+                <div class="auth-social-buttons">
+                    <button class="auth-social-btn google" id="googleRegisterBtn2">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button class="auth-social-btn vk" id="vkRegisterBtn2">
+                        <i class="fab fa-vk"></i> VK
+                    </button>
+                </div>
+                <div class="auth-divider"><span>или</span></div>
+                <form id="registerFormElement">
+                    <div class="auth-input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" placeholder="Email" required>
+                    </div>
+                    <div class="auth-error-message" id="registerEmailError"></div>
+                    <div class="auth-input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
+                    </div>
+                    <div class="auth-error-message" id="registerUsernameError"></div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
+                        <i class="far fa-eye toggle-password" data-target="registerPassword"></i>
+                    </div>
+                    <div class="auth-error-message" id="registerPasswordError"></div>
+                    <div class="auth-input-group password-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
+                        <i class="far fa-eye toggle-password" data-target="registerConfirmPassword"></i>
+                    </div>
+                    <div class="auth-error-message" id="registerConfirmError"></div>
+                    <div class="auth-error-message" id="registerFormError"></div>
+                    <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
+                </form>
+                <p class="auth-footer-text">
+                    Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a>
+                </p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
         
         // Встроенные стили для модального окна
         if (!document.getElementById('auth-modal-styles')) {
             const styles = document.createElement('style');
             styles.id = 'auth-modal-styles';
             styles.textContent = `
+            .auth-error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    padding-left: 16px;
+    min-height: 18px;
+}
                 /* Прозрачный чёрный фон модалки */
                 .modal-glass {
                     background: rgba(0, 0, 0, 0.7) !important;
@@ -368,13 +384,24 @@ class AuthManager {
     }
 
 async register(email, username, password) {
-    // Простейшая валидация на клиенте
+    // Очищаем предыдущие ошибки
+    document.getElementById('registerEmailError').textContent = '';
+    document.getElementById('registerUsernameError').textContent = '';
+    document.getElementById('registerPasswordError').textContent = '';
+    document.getElementById('registerConfirmError').textContent = '';
+    document.getElementById('registerFormError').textContent = '';
+
     if (!email || !username || !password) {
-        this.showToast('Заполните все поля', 'error');
+        document.getElementById('registerFormError').textContent = 'Заполните все поля';
         return false;
     }
     if (password.length < 6) {
-        this.showToast('Пароль должен быть не менее 6 символов', 'error');
+        document.getElementById('registerPasswordError').textContent = 'Пароль должен быть не менее 6 символов';
+        return false;
+    }
+    const confirm = document.getElementById('registerConfirmPassword').value;
+    if (password !== confirm) {
+        document.getElementById('registerConfirmError').textContent = 'Пароли не совпадают';
         return false;
     }
 
@@ -396,18 +423,73 @@ async register(email, username, password) {
             this.closeAuthModal();
             return true;
         } else {
-            // Показываем конкретную ошибку от сервера
-            const errorMsg = data.error || data.message || 'Ошибка регистрации';
+            // Обработка конкретных ошибок
+            const errorMsg = data.error || 'Ошибка регистрации';
+            if (errorMsg.includes('email') || errorMsg.includes('Email')) {
+                document.getElementById('registerEmailError').textContent = errorMsg;
+            } else if (errorMsg.includes('пользователь') || errorMsg.includes('существует')) {
+                document.getElementById('registerFormError').textContent = errorMsg;
+            } else {
+                document.getElementById('registerFormError').textContent = errorMsg;
+            }
             this.showToast(errorMsg, 'error');
             return false;
         }
     } catch (error) {
         console.error('❌ Ошибка сети:', error);
+        document.getElementById('registerFormError').textContent = 'Ошибка соединения с сервером';
         this.showToast('Ошибка соединения с сервером', 'error');
         return false;
     }
 }
 
+async login(email, password) {
+    // Очищаем предыдущие ошибки
+    document.getElementById('loginEmailError').textContent = '';
+    document.getElementById('loginPasswordError').textContent = '';
+    document.getElementById('loginFormError').textContent = '';
+
+    if (!email || !password) {
+        document.getElementById('loginFormError').textContent = 'Введите email и пароль';
+        return false;
+    }
+
+    console.log('🔐 Отправка входа:', { email, password: '***' });
+
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        console.log('📡 Ответ сервера:', response.status, data);
+        
+        if (response.ok) {
+            this.setSession(data);
+            this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
+            this.closeAuthModal();
+            return true;
+        } else {
+            const errorMsg = data.error || 'Ошибка входа';
+            if (errorMsg.includes('пароль') || errorMsg.includes('Password')) {
+                document.getElementById('loginPasswordError').textContent = 'Неверный пароль';
+            } else if (errorMsg.includes('email') || errorMsg.includes('Email') || errorMsg.includes('пользователь')) {
+                document.getElementById('loginEmailError').textContent = errorMsg;
+            } else {
+                document.getElementById('loginFormError').textContent = errorMsg;
+            }
+            this.showToast(errorMsg, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка сети:', error);
+        document.getElementById('loginFormError').textContent = 'Ошибка соединения с сервером';
+        this.showToast('Ошибка соединения с сервером', 'error');
+        return false;
+    }
+}
     async login(email, password) {
         try {
             const response = await fetch('/api/auth/login', {
@@ -678,13 +760,15 @@ async register(email, username, password) {
         `;
     }
 
-    showAuthModal(tab = 'register') {
-        const modal = document.getElementById('authModal');
-        if (modal) {
-            modal.classList.add('active');
-            this.switchAuthTab(tab);
-        }
+showAuthModal(tab = 'register') {
+    const modal = document.getElementById('authModal');
+    if (modal) {
+        modal.classList.add('active');
+        this.switchAuthTab(tab);
+        // Очистка ошибок
+        document.querySelectorAll('.auth-error-message').forEach(el => el.textContent = '');
     }
+}
 
     closeAuthModal() {
         const modal = document.getElementById('authModal');
