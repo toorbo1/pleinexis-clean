@@ -1,45 +1,70 @@
-// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ ==========
+// ========== ПОЛНАЯ ИНТЕГРАЦИЯ АВТОРИЗАЦИИ С СЕРВЕРОМ ==========
 
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('auth_token');
         this.currentUser = null;
-        this.isInitialized = false;
+        
+        // ID приложений (ЗАМЕНИТЕ НА СВОИ!)
+        this.GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+        this.VK_APP_ID = 12345678; // ID приложения VK
+        
+        this.init();
     }
 
-    // Инициализация
     async init() {
+        await this.loadExternalScripts();
+        this.setupEventListeners();
+        
         if (this.token) {
             await this.fetchCurrentUser();
         }
-        this.isInitialized = true;
-        this.setupEventListeners();
+        this.updateUI();
         console.log('✅ AuthManager инициализирован');
     }
 
-    // Получение текущего пользователя
+    // Загрузка внешних скриптов для соцсетей
+    async loadExternalScripts() {
+        // Google
+        if (!document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
+            const gScript = document.createElement('script');
+            gScript.src = 'https://accounts.google.com/gsi/client';
+            gScript.async = true;
+            gScript.defer = true;
+            document.head.appendChild(gScript);
+        }
+
+        // VK
+        if (!document.querySelector('script[src*="vk.com/js/api/openapi"]')) {
+            const vkScript = document.createElement('script');
+            vkScript.src = 'https://vk.com/js/api/openapi.js?169';
+            vkScript.async = true;
+            vkScript.defer = true;
+            document.head.appendChild(vkScript);
+        }
+    }
+
+    // Получение текущего пользователя с сервера
     async fetchCurrentUser() {
+        if (!this.token) return null;
         try {
             const response = await fetch('/api/auth/me', {
-                headers: {
-                    'Authorization': `Bearer ${this.token}`
-                }
+                headers: { 'Authorization': `Bearer ${this.token}` }
             });
-            
             if (response.ok) {
                 this.currentUser = await response.json();
                 this.updateUI();
                 return this.currentUser;
             } else {
-                this.logout();
+                this.logout(false); // Тихо разлогиниваем если токен протух
             }
         } catch (error) {
-            console.error('Error fetching user:', error);
+            console.error('Fetch user error:', error);
         }
         return null;
     }
 
-    // Регистрация по email
+    // Регистрация Email/Password
     async register(email, username, password) {
         try {
             const response = await fetch('/api/auth/register', {
@@ -49,13 +74,9 @@ class AuthManager {
             });
             
             const data = await response.json();
-            
             if (response.ok) {
-                this.token = data.token;
-                localStorage.setItem('auth_token', this.token);
-                this.currentUser = data.user;
-                this.updateUI();
-                this.showToast('Регистрация успешна! Добро пожаловать!', 'success');
+                this.setSession(data);
+                this.showToast('Регистрация успешна!', 'success');
                 this.closeAuthModal();
                 return true;
             } else {
@@ -63,13 +84,12 @@ class AuthManager {
                 return false;
             }
         } catch (error) {
-            console.error('Register error:', error);
             this.showToast('Ошибка соединения', 'error');
             return false;
         }
     }
 
-    // Вход по email
+    // Вход Email/Password
     async login(email, password) {
         try {
             const response = await fetch('/api/auth/login', {
@@ -79,12 +99,8 @@ class AuthManager {
             });
             
             const data = await response.json();
-            
             if (response.ok) {
-                this.token = data.token;
-                localStorage.setItem('auth_token', this.token);
-                this.currentUser = data.user;
-                this.updateUI();
+                this.setSession(data);
                 this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
                 this.closeAuthModal();
                 return true;
@@ -93,7 +109,6 @@ class AuthManager {
                 return false;
             }
         } catch (error) {
-            console.error('Login error:', error);
             this.showToast('Ошибка соединения', 'error');
             return false;
         }
@@ -101,15 +116,13 @@ class AuthManager {
 
     // Вход через Google
     async loginWithGoogle() {
-        // Инициализируем Google Identity Services
         if (!window.google) {
-            this.showToast('Загрузка Google сервисов...', 'info');
-            await this.loadGoogleScript();
+            this.showToast('Сервисы Google загружаются...', 'info');
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
-        
-        // Показываем One Tap UI
+
         window.google?.accounts.id.initialize({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com', // Замените на свой
+            client_id: this.GOOGLE_CLIENT_ID,
             callback: async (response) => {
                 try {
                     const res = await fetch('/api/auth/google', {
@@ -119,19 +132,14 @@ class AuthManager {
                     });
                     
                     const data = await res.json();
-                    
                     if (res.ok) {
-                        this.token = data.token;
-                        localStorage.setItem('auth_token', this.token);
-                        this.currentUser = data.user;
-                        this.updateUI();
+                        this.setSession(data);
                         this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
                         this.closeAuthModal();
                     } else {
                         this.showToast(data.error || 'Ошибка входа через Google', 'error');
                     }
                 } catch (error) {
-                    console.error('Google auth error:', error);
                     this.showToast('Ошибка соединения', 'error');
                 }
             }
@@ -142,160 +150,131 @@ class AuthManager {
 
     // Вход через VK
     async loginWithVK() {
-        // Загружаем VK SDK
         if (!window.VK) {
-            await this.loadVKScript();
+            this.showToast('Сервисы VK загружаются...', 'info');
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
+
+        window.VK.init({ apiId: this.VK_APP_ID });
         
-        // Инициализируем VK Mini Apps
-        window.VK?.init({
-            apiId: 12345678 // Замените на свой VK App ID
-        });
-        
-        // Запрашиваем доступ
-        window.VK?.Auth.login(async (response) => {
+        window.VK.Auth.login(async (response) => {
             if (response.session) {
-                const vkId = response.session.user.id;
-                const userInfo = await this.getVKUserInfo(vkId, response.session.access_token);
+                const vkId = response.session.mid;
                 
-                try {
-                    const res = await fetch('/api/auth/vk', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            vkId: vkId,
-                            email: userInfo.email || null,
-                            username: `${userInfo.first_name} ${userInfo.last_name}`,
-                            avatarUrl: userInfo.photo_200
-                        })
-                    });
-                    
-                    const data = await res.json();
-                    
-                    if (res.ok) {
-                        this.token = data.token;
-                        localStorage.setItem('auth_token', this.token);
-                        this.currentUser = data.user;
-                        this.updateUI();
-                        this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
-                        this.closeAuthModal();
-                    } else {
-                        this.showToast(data.error || 'Ошибка входа через VK', 'error');
+                // Получаем данные пользователя VK
+                window.VK.Api.call('users.get', {
+                    user_ids: vkId,
+                    fields: 'photo_200',
+                    v: '5.131'
+                }, async (userData) => {
+                    if (userData.response) {
+                        const user = userData.response[0];
+                        try {
+                            const res = await fetch('/api/auth/vk', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    vkId: vkId,
+                                    username: `${user.first_name} ${user.last_name}`,
+                                    avatarUrl: user.photo_200
+                                })
+                            });
+                            
+                            const data = await res.json();
+                            if (res.ok) {
+                                this.setSession(data);
+                                this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
+                                this.closeAuthModal();
+                            } else {
+                                this.showToast(data.error || 'Ошибка входа через VK', 'error');
+                            }
+                        } catch (error) {
+                            this.showToast('Ошибка соединения', 'error');
+                        }
                     }
-                } catch (error) {
-                    console.error('VK auth error:', error);
-                    this.showToast('Ошибка соединения', 'error');
-                }
+                });
             }
-        }, 2); // 2 - email permission
+        }, 2); // 2 - запрос доступа к email (хотя в текущем бэке email не обязателен для VK)
     }
 
-    // Получение информации пользователя VK
-    async getVKUserInfo(userId, accessToken) {
-        return new Promise((resolve) => {
-            window.VK?.Api.call('users.get', {
-                user_ids: userId,
-                fields: 'photo_200,email',
-                access_token: accessToken,
-                v: '5.131'
-            }, (response) => {
-                if (response.response && response.response.length) {
-                    resolve(response.response[0]);
-                } else {
-                    resolve({ first_name: 'User', last_name: userId.toString() });
-                }
-            });
-        });
+    // Установка сессии
+    setSession(data) {
+        this.token = data.token;
+        this.currentUser = data.user;
+        localStorage.setItem('auth_token', this.token);
+        localStorage.setItem('apex_user', data.user.username);
+        localStorage.setItem('apex_user_id', data.user.id);
+        localStorage.setItem('apex_user_email', data.user.email);
+        if (data.user.avatar_url) {
+            localStorage.setItem('apex_user_picture', data.user.avatar_url);
+        }
+        this.updateUI();
     }
 
     // Выход
-    async logout() {
+    async logout(showMessage = true) {
         if (this.token) {
             try {
                 await fetch('/api/auth/logout', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${this.token}` }
                 });
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
+            } catch (e) {}
         }
         
         this.token = null;
         this.currentUser = null;
         localStorage.removeItem('auth_token');
-        this.updateUI();
-        this.showToast('Вы вышли из аккаунта', 'success');
+        localStorage.removeItem('apex_user');
+        localStorage.removeItem('apex_user_id');
+        localStorage.removeItem('apex_user_email');
+        localStorage.removeItem('apex_user_picture');
         
-        // Перезагружаем страницу для сброса состояния
-        setTimeout(() => window.location.reload(), 1000);
+        this.updateUI();
+        if (showMessage) this.showToast('Вы вышли из аккаунта', 'success');
     }
 
-    // Обновление UI
+    // Обновление интерфейса
     updateUI() {
         const isLoggedIn = !!this.currentUser;
         
-        // Обновляем кнопку входа/профиля
         const loginBtn = document.getElementById('loginBtn');
         const userMenu = document.getElementById('userMenu');
-        const usernameSpan = document.getElementById('usernameDisplay');
-        const avatarImg = document.getElementById('userAvatar');
-        
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+        const profileUsername = document.getElementById('profileUsername');
+        const avatarCircle = document.getElementById('profileAvatarCircle');
+
         if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : 'flex';
         if (userMenu) userMenu.style.display = isLoggedIn ? 'flex' : 'none';
-        if (usernameSpan && this.currentUser) {
-            usernameSpan.textContent = this.currentUser.username;
-        }
         
-        if (avatarImg && this.currentUser) {
-            if (this.currentUser.avatar_url) {
-                avatarImg.src = this.currentUser.avatar_url;
-                avatarImg.style.display = 'block';
-            } else {
-                avatarImg.style.display = 'none';
-            }
-        }
-        
-        // Обновляем профиль
-        const profileUsername = document.getElementById('profileUsername');
-        const profileBalance = document.getElementById('profileBalance');
-        const profileAvatar = document.getElementById('profileAvatarCircle');
-        
-        if (profileUsername && this.currentUser) {
-            profileUsername.textContent = this.currentUser.username;
-        }
-        
-        if (profileBalance && this.currentUser) {
-            profileBalance.textContent = (this.currentUser.balance || 0).toFixed(2) + ' ₽';
-        }
-        
-        if (profileAvatar && this.currentUser) {
-            if (this.currentUser.avatar_url) {
-                profileAvatar.style.backgroundImage = `url(${this.currentUser.avatar_url})`;
-                profileAvatar.style.backgroundSize = 'cover';
-                profileAvatar.classList.add('has-bg');
-            }
-        }
-        
-        // Сохраняем в localStorage для совместимости со старым кодом
         if (this.currentUser) {
-            localStorage.setItem('apex_user', this.currentUser.username);
-            localStorage.setItem('apex_user_id', this.currentUser.id);
-            localStorage.setItem('apex_user_email', this.currentUser.email);
+            if (usernameDisplay) usernameDisplay.textContent = this.currentUser.username;
+            if (profileUsername) profileUsername.textContent = this.currentUser.username;
+            
             if (this.currentUser.avatar_url) {
-                localStorage.setItem('apex_user_picture', this.currentUser.avatar_url);
+                if (userAvatar) { userAvatar.src = this.currentUser.avatar_url; userAvatar.style.display = 'block'; }
+                if (avatarCircle) {
+                    avatarCircle.style.backgroundImage = `url(${this.currentUser.avatar_url})`;
+                    avatarCircle.style.backgroundSize = 'cover';
+                    avatarCircle.classList.add('has-bg');
+                }
             }
         } else {
-            localStorage.removeItem('apex_user');
-            localStorage.removeItem('apex_user_id');
-            localStorage.removeItem('apex_user_email');
-            localStorage.removeItem('apex_user_picture');
+            if (profileUsername) profileUsername.textContent = 'Гость';
+            if (avatarCircle) {
+                avatarCircle.style.backgroundImage = '';
+                avatarCircle.classList.remove('has-bg');
+            }
+        }
+
+        // Триггерим обновление профиля
+        if (isLoggedIn && typeof window.loadUserProductsInProfile === 'function') {
+            window.loadUserProductsInProfile();
         }
     }
 
-    // Показать модальное окно авторизации
+    // Модальное окно
     showAuthModal() {
         const modal = document.getElementById('authModal');
         if (modal) {
@@ -304,13 +283,11 @@ class AuthManager {
         }
     }
 
-    // Закрыть модальное окно
     closeAuthModal() {
         const modal = document.getElementById('authModal');
         if (modal) modal.classList.remove('active');
     }
 
-    // Переключение между вкладками
     switchAuthTab(tab) {
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
@@ -330,117 +307,72 @@ class AuthManager {
         }
     }
 
-    // Обработчики событий
+    // Настройка обработчиков событий
     setupEventListeners() {
-        // Кнопка входа
+        // Кнопка входа в хедере
         const loginBtn = document.getElementById('loginBtn');
         if (loginBtn) {
             loginBtn.addEventListener('click', () => this.showAuthModal());
         }
-        
+
         // Кнопка выхода
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => this.logout());
         }
         
-        // Закрытие модалки
-        const closeBtn = document.querySelector('#authModal .close-modal');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.closeAuthModal());
+        // Кнопка выхода в профиле
+        const profileLogoutBtn = document.getElementById('profileLogoutBtn');
+        if (profileLogoutBtn) {
+            profileLogoutBtn.addEventListener('click', () => this.logout());
         }
-        
-        // Переключение вкладок
-        const loginTab = document.getElementById('loginTab');
-        const registerTab = document.getElementById('registerTab');
-        if (loginTab) loginTab.addEventListener('click', () => this.switchAuthTab('login'));
-        if (registerTab) registerTab.addEventListener('click', () => this.switchAuthTab('register'));
-        
-        // Форма входа
-        const loginForm = document.getElementById('loginFormElement');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                await this.login(email, password);
-            });
-        }
-        
-        // Форма регистрации
-        const registerForm = document.getElementById('registerFormElement');
-        if (registerForm) {
-            registerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('registerEmail').value;
-                const username = document.getElementById('registerUsername').value;
-                const password = document.getElementById('registerPassword').value;
-                const confirmPassword = document.getElementById('registerConfirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    this.showToast('Пароли не совпадают', 'error');
-                    return;
-                }
-                
-                await this.register(email, username, password);
-            });
-        }
-        
-        // Кнопки соцсетей
-        const googleBtn = document.getElementById('googleLoginBtn');
-        const vkBtn = document.getElementById('vkLoginBtn');
-        
-        if (googleBtn) {
-            googleBtn.addEventListener('click', () => this.loginWithGoogle());
-        }
-        if (vkBtn) {
-            vkBtn.addEventListener('click', () => this.loginWithVK());
-        }
-        
-        // Клик вне модалки
-        const modal = document.getElementById('authModal');
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) this.closeAuthModal();
-            });
-        }
-    }
 
-    // Загрузка скриптов
-    loadGoogleScript() {
-        return new Promise((resolve, reject) => {
-            if (document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
-                resolve();
+        // Табы
+        document.getElementById('loginTab')?.addEventListener('click', () => this.switchAuthTab('login'));
+        document.getElementById('registerTab')?.addEventListener('click', () => this.switchAuthTab('register'));
+
+        // Формы
+        document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            await this.login(email, password);
+        });
+
+        document.getElementById('registerFormElement')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirm) {
+                this.showToast('Пароли не совпадают', 'error');
                 return;
             }
-            const script = document.createElement('script');
-            script.src = 'https://accounts.google.com/gsi/client';
-            script.async = true;
-            script.defer = true;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
+            await this.register(email, username, password);
         });
-    }
-    
-    loadVKScript() {
-        return new Promise((resolve, reject) => {
-            if (document.querySelector('script[src*="vk.com/js/api/openapi"]')) {
-                resolve();
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = 'https://vk.com/js/api/openapi.js?169';
-            script.async = true;
-            script.defer = true;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
+
+        // Соцсети
+        document.getElementById('googleLoginBtn')?.addEventListener('click', () => this.loginWithGoogle());
+        document.getElementById('vkLoginBtn')?.addEventListener('click', () => this.loginWithVK());
+        
+        // Закрытие модалки по клику вне
+        const modal = document.getElementById('authModal');
+        modal?.addEventListener('click', (e) => {
+            if (e.target === modal) this.closeAuthModal();
         });
+        document.querySelector('#authModal .close-modal')?.addEventListener('click', () => this.closeAuthModal());
     }
 
     // Уведомления
     showToast(message, type = 'success') {
+        // Используем существующую функцию showToast если она есть, или создаем новую
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type);
+            return;
+        }
+        
         let toast = document.querySelector('.toast-notification');
         if (!toast) {
             toast = document.createElement('div');
@@ -448,9 +380,7 @@ class AuthManager {
             document.body.appendChild(toast);
         }
         
-        const icon = type === 'success' ? 'fa-check-circle' : 
-                     type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
-        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
         toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
         toast.className = `toast-notification ${type} show`;
         
@@ -458,15 +388,37 @@ class AuthManager {
     }
 }
 
-// Глобальный экземпляр
+// Инициализация
 window.auth = new AuthManager();
 
-// Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-    window.auth.init();
-});
+// Для совместимости с admin.js
+window.isUserAdmin = function(username) {
+    const admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+    return admins.some(a => a.username === username);
+};
 
-// Для совместимости со старым кодом
-window.getCurrentUser = () => window.auth.currentUser;
-window.isAuthenticated = () => !!window.auth.currentUser;
-window.logout = () => window.auth.logout();
+window.enterAdminPanel = function() {
+    const currentUser = window.auth.currentUser?.username || localStorage.getItem('apex_user') || 'Гость';
+    
+    if (window.isUserAdmin(currentUser)) {
+        if (typeof window.showPage === 'function') window.showPage('admin');
+        setTimeout(() => { if (typeof window.initAdmin === 'function') window.initAdmin(); }, 100);
+        return true;
+    } else {
+        const password = prompt("Введите пароль администратора:");
+        if (password === 'admin123') {
+            let admins = JSON.parse(localStorage.getItem('apex_admins') || '[]');
+            if (!admins.some(a => a.username === currentUser)) {
+                admins.push({ id: 'admin_' + Date.now(), username: currentUser, isOwner: false, hiredBy: 'system', hiredAt: new Date().toISOString() });
+                localStorage.setItem('apex_admins', JSON.stringify(admins));
+            }
+            if (typeof window.showPage === 'function') window.showPage('admin');
+            setTimeout(() => { if (typeof window.initAdmin === 'function') window.initAdmin(); }, 100);
+            window.showToast('✅ Доступ к админ-панели получен!', 'success');
+            return true;
+        } else {
+            window.showToast('❌ Неверный пароль!', 'error');
+            return false;
+        }
+    }
+};
