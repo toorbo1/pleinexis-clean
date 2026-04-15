@@ -62,8 +62,6 @@ if (!userProfile.username) {
 
     console.log('✅ Профиль инициализирован');
 }
-
-
   // ===== ОБНОВЛЕНИЕ ИНФОРМАЦИИ ПРОФИЛЯ =====
   function updateProfileInfo() {
     const usernameEl = document.getElementById('profileUsername');
