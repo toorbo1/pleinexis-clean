@@ -53,23 +53,7 @@ function updateActiveNavButton(pageId) {
     });
 }
 
-if (pageId === 'profile') {
-    setTimeout(() => {
-        if (typeof window.initProfilePage === 'function') {
-            window.initProfilePage();
-        }
-        // Дополнительно привязываем кнопку, если вдруг не сработало
-        const topupBtn = document.getElementById('quickTopupBtn');
-        if (topupBtn && !topupBtn._listener) {
-            topupBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('quickTopupModal').style.display = 'flex';
-            });
-            topupBtn._listener = true;
-        }
-    }, 100);
-}
+
 
 // ========== ИНИЦИАЛИЗАЦИЯ НАВИГАЦИИ ==========
 function initNavigation() {
@@ -275,4 +259,21 @@ function showToast(message, type = 'success') {
     toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
     toast.className = `toast-notification ${type} show`;
     setTimeout(() => toast.classList.remove('show'), 3000);
+}
+if (pageId === 'profile') {
+    setTimeout(() => {
+        if (typeof window.initProfilePage === 'function') {
+            window.initProfilePage();
+        }
+        // Дополнительно привязываем кнопку, если вдруг не сработало
+        const topupBtn = document.getElementById('quickTopupBtn');
+        if (topupBtn && !topupBtn._listener) {
+            topupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('quickTopupModal').style.display = 'flex';
+            });
+            topupBtn._listener = true;
+        }
+    }, 100);
 }
