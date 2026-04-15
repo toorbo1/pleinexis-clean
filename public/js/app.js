@@ -26,6 +26,31 @@ window.showPage = function(pageId) {
     
     // Обновляем активные кнопки в нижней навигации
     updateActiveNavButton(pageId);
+    
+    // ===== ВАЖНО: Инициализация страницы профиля =====
+    if (pageId === 'profile') {
+        setTimeout(() => {
+            if (typeof window.initProfilePage === 'function') {
+                window.initProfilePage();
+            }
+            // Дополнительно привязываем кнопку пополнения
+            const topupBtn = document.getElementById('quickTopupBtn');
+            if (topupBtn) {
+                const newBtn = topupBtn.cloneNode(true);
+                topupBtn.parentNode.replaceChild(newBtn, topupBtn);
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const modal = document.getElementById('quickTopupModal');
+                    if (modal) {
+                        modal.style.display = 'flex';
+                        modal.style.zIndex = '99999';
+                    }
+                });
+                console.log('✅ Кнопка + привязана из showPage');
+            }
+        }, 100);
+    }
 };
 
 window.navigate = window.showPage;
@@ -52,8 +77,6 @@ function updateActiveNavButton(pageId) {
         }
     });
 }
-
-
 
 // ========== ИНИЦИАЛИЗАЦИЯ НАВИГАЦИИ ==========
 function initNavigation() {
@@ -106,7 +129,6 @@ window.scrollGames = function(direction) {
         const scrollAmount = 280;
         scrollWrapper.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
     } else {
-        // Fallback
         const scrollAmount = 280;
         container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
     }
@@ -259,21 +281,4 @@ function showToast(message, type = 'success') {
     toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
     toast.className = `toast-notification ${type} show`;
     setTimeout(() => toast.classList.remove('show'), 3000);
-}
-if (pageId === 'profile') {
-    setTimeout(() => {
-        if (typeof window.initProfilePage === 'function') {
-            window.initProfilePage();
-        }
-        // Дополнительно привязываем кнопку, если вдруг не сработало
-        const topupBtn = document.getElementById('quickTopupBtn');
-        if (topupBtn && !topupBtn._listener) {
-            topupBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                document.getElementById('quickTopupModal').style.display = 'flex';
-            });
-            topupBtn._listener = true;
-        }
-    }, 100);
 }
