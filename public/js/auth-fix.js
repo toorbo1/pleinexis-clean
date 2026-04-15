@@ -388,18 +388,13 @@ async fetchCurrentUser() {
         
         if (response.ok) {
             this.currentUser = await response.json();
-            
-            // Сохраняем данные пользователя
             localStorage.setItem('apex_user', this.currentUser.username);
             localStorage.setItem('apex_user_id', this.currentUser.id);
-            localStorage.setItem('apex_user_email', this.currentUser.email || '');
-            
             await this.loadUserProfile();
             this.updateUI();
-            console.log('✅ Пользователь загружен:', this.currentUser.username);
             return true;
         } else if (response.status === 401) {
-            // Токен истёк или недействителен
+            // Токен недействителен - очищаем всё
             console.warn('❌ Токен недействителен, очищаем...');
             this.token = null;
             this.currentUser = null;
@@ -407,13 +402,12 @@ async fetchCurrentUser() {
             localStorage.removeItem('apex_user');
             localStorage.removeItem('apex_user_id');
             localStorage.removeItem('apex_user_email');
-            localStorage.removeItem('apex_user_picture');
             localStorage.removeItem('apex_profile');
             return false;
         }
         return false;
     } catch (error) {
-        console.error('❌ Ошибка при получении пользователя:', error);
+        console.error('❌ Ошибка:', error);
         return false;
     }
 }

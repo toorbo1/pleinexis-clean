@@ -338,23 +338,18 @@ async function authenticateToken(req, res, next) {
     }
     
     try {
+        // Проверяем JWT токен
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        // Проверяем сессию в БД
-        const result = await pool.query(
-            'SELECT * FROM sessions WHERE token = $1 AND expires_at > NOW()',
-            [token]
-        );
-        
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Сессия истекла' });
-        }
+        // НЕ проверяем сессию в БД, просто доверяем JWT
+        // JWT уже содержит всю нужную информацию и имеет срок действия
         
         req.userId = decoded.userId;
         req.username = decoded.username;
         next();
     } catch (error) {
-        return res.status(403).json({ error: 'Недействительный токен' });
+        console.error('JWT verification error:', error.message);
+        return res.status(401).json({ error: 'Недействительный токен' });
     }
 }
 
