@@ -28,29 +28,29 @@ window.showPage = function(pageId) {
     updateActiveNavButton(pageId);
     
     // ===== ВАЖНО: Инициализация страницы профиля =====
-    if (pageId === 'profile') {
-        setTimeout(() => {
-            if (typeof window.initProfilePage === 'function') {
-                window.initProfilePage();
-            }
-            // Дополнительно привязываем кнопку пополнения
-            const topupBtn = document.getElementById('quickTopupBtn');
-            if (topupBtn) {
-                const newBtn = topupBtn.cloneNode(true);
-                topupBtn.parentNode.replaceChild(newBtn, topupBtn);
-                newBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const modal = document.getElementById('quickTopupModal');
-                    if (modal) {
-                        modal.style.display = 'flex';
-                        modal.style.zIndex = '99999';
-                    }
-                });
-                console.log('✅ Кнопка + привязана из showPage');
-            }
-        }, 100);
-    }
+    // if (pageId === 'profile') {
+    //     setTimeout(() => {
+    //         if (typeof window.initProfilePage === 'function') {
+    //             window.initProfilePage();
+    //         }
+    //         // Дополнительно привязываем кнопку пополнения
+    //         const topupBtn = document.getElementById('quickTopupBtn');
+    //         if (topupBtn) {
+    //             const newBtn = topupBtn.cloneNode(true);
+    //             topupBtn.parentNode.replaceChild(newBtn, topupBtn);
+    //             newBtn.addEventListener('click', function(e) {
+    //                 e.preventDefault();
+    //                 e.stopPropagation();
+    //                 const modal = document.getElementById('quickTopupModal');
+    //                 if (modal) {
+    //                     modal.style.display = 'flex';
+    //                     modal.style.zIndex = '99999';
+    //                 }
+    //             });
+    //             console.log('✅ Кнопка + привязана из showPage');
+    //         }
+    //     }, 100);
+    // }
 };
 
 window.navigate = window.showPage;

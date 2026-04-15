@@ -712,12 +712,21 @@ body::after {
     -ms-overflow-style: none !important;
 }
 .modal-glass {
-  z-index: 99999 !important;
-  background: rgba(0,0,0,0.8) !important;
-  backdrop-filter: blur(8px) !important;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
 }
 .modal-glass.active {
-  display: flex !important;
+    display: flex !important;
 }
 /* ===== ПЛАВНАЯ КАРУСЕЛЬ: ФОТО МЕНЬШЕ, ВИДНЕЮТСЯ ПО БОКАМ ===== */
 .smooth-carousel {
@@ -2026,8 +2035,7 @@ body::after {
   </div>
 </footer>
 <!-- Модальное окно быстрого пополнения -->
-<div id="quickTopupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2147483647; align-items: center; justify-content: center;" onclick="if(event.target===this){ this.style.display='none'; document.body.style.overflow=''; }">
-    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
+<div id="quickTopupModal" class="modal-glass" onclick="if(event.target===this){ this.classList.remove('active'); document.body.style.overflow=''; }">    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
         <h3 style="margin-bottom: 20px; color: white;">
             <i class="fas fa-wallet" style="color: #22c55e;"></i> Пополнение баланса
         </h3>
@@ -2230,291 +2238,291 @@ function showToast(message, type = 'success') {
 }
 
   // ========== ФИКС СТРАНИЦЫ ВЫВОДА ==========
-(function() {
-    console.log('🔧 ФИКС СТРАНИЦЫ ВЫВОДА ЗАПУЩЕН');
+// (function() {
+//     console.log('🔧 ФИКС СТРАНИЦЫ ВЫВОДА ЗАПУЩЕН');
     
-    // Создаем страницу вывода заново, если её нет или она пустая
-    function fixWithdrawPage() {
-        let withdrawPage = document.getElementById('withdrawPage');
+//     // Создаем страницу вывода заново, если её нет или она пустая
+//     function fixWithdrawPage() {
+//         let withdrawPage = document.getElementById('withdrawPage');
         
-        // Если страницы нет - создаем
-        if (!withdrawPage) {
-            console.log('📄 Создаем страницу вывода');
-            withdrawPage = document.createElement('div');
-            withdrawPage.id = 'withdrawPage';
-            withdrawPage.className = 'page';
-            document.body.appendChild(withdrawPage);
-        }
+//         // Если страницы нет - создаем
+//         if (!withdrawPage) {
+//             console.log('📄 Создаем страницу вывода');
+//             withdrawPage = document.createElement('div');
+//             withdrawPage.id = 'withdrawPage';
+//             withdrawPage.className = 'page';
+//             document.body.appendChild(withdrawPage);
+//         }
         
-        // Заполняем содержимое
-        withdrawPage.innerHTML = `
-           <div class="withdraw-header">
-    <button class="back-btn" onclick="showPage('profile')">
-        <i class="fas fa-arrow-left"></i>
-    </button>
-    <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
-</div>
+//         // Заполняем содержимое
+//         withdrawPage.innerHTML = `
+//            <div class="withdraw-header">
+//     <button class="back-btn" onclick="showPage('profile')">
+//         <i class="fas fa-arrow-left"></i>
+//     </button>
+//     <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
+// </div>
 
-<div class="withdraw-container">
-    <!-- Баланс -->
-    <div class="balance-card">
-        <div class="balance-label">Доступно для вывода</div>
-        <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-        <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
-    </div>
+// <div class="withdraw-container">
+//     <!-- Баланс -->
+//     <div class="balance-card">
+//         <div class="balance-label">Доступно для вывода</div>
+//         <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
+//         <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
+//     </div>
 
-    <!-- Способ вывода -->
-    <div class="section-card">
-        <div class="section-title">
-            <i class="fas fa-wallet"></i> Способ вывода
-        </div>
-        <div class="methods-grid" id="methodsList"></div>
-    </div>
+//     <!-- Способ вывода -->
+//     <div class="section-card">
+//         <div class="section-title">
+//             <i class="fas fa-wallet"></i> Способ вывода
+//         </div>
+//         <div class="methods-grid" id="methodsList"></div>
+//     </div>
 
-    <!-- Реквизиты -->
-    <div class="section-card" id="detailsSection">
-        <div class="section-title">
-            <i class="fas fa-address-card"></i> Реквизиты
-        </div>
-        <div class="input-group">
-            <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
-            <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
-        </div>
-    </div>
+//     <!-- Реквизиты -->
+//     <div class="section-card" id="detailsSection">
+//         <div class="section-title">
+//             <i class="fas fa-address-card"></i> Реквизиты
+//         </div>
+//         <div class="input-group">
+//             <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
+//             <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
+//         </div>
+//     </div>
 
-    <!-- Сумма -->
-    <div class="section-card">
-        <div class="section-title">
-            <i class="fas fa-coins"></i> Сумма вывода
-        </div>
-        <div class="amount-row">
-            <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
-            <div class="amount-presets">
-                <button class="preset-btn" data-amount="500">500₽</button>
-                <button class="preset-btn" data-amount="1000">1000₽</button>
-                <button class="preset-btn" data-amount="5000">5000₽</button>
-            </div>
-        </div>
+//     <!-- Сумма -->
+//     <div class="section-card">
+//         <div class="section-title">
+//             <i class="fas fa-coins"></i> Сумма вывода
+//         </div>
+//         <div class="amount-row">
+//             <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
+//             <div class="amount-presets">
+//                 <button class="preset-btn" data-amount="500">500₽</button>
+//                 <button class="preset-btn" data-amount="1000">1000₽</button>
+//                 <button class="preset-btn" data-amount="5000">5000₽</button>
+//             </div>
+//         </div>
         
-        <div class="commission-info" id="commissionInfo">
-            <span>Комиссия системы:</span>
-            <span id="commissionValue">0 ₽</span>
-        </div>
-        <div class="commission-info">
-            <span>Итого к списанию:</span>
-            <span id="totalWithdraw">0 ₽</span>
-        </div>
-    </div>
+//         <div class="commission-info" id="commissionInfo">
+//             <span>Комиссия системы:</span>
+//             <span id="commissionValue">0 ₽</span>
+//         </div>
+//         <div class="commission-info">
+//             <span>Итого к списанию:</span>
+//             <span id="totalWithdraw">0 ₽</span>
+//         </div>
+//     </div>
 
-    <button class="withdraw-btn" id="submitWithdrawBtn">
-        <i class="fas fa-paper-plane"></i> Запросить вывод
-    </button>
-    <div class="warning-text">
-        <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
-    </div>
-</div>
-        `;
+//     <button class="withdraw-btn" id="submitWithdrawBtn">
+//         <i class="fas fa-paper-plane"></i> Запросить вывод
+//     </button>
+//     <div class="warning-text">
+//         <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
+//     </div>
+// </div>
+//         `;
         
-        console.log('✅ Страница вывода создана');
-        return withdrawPage;
-    }
+//         console.log('✅ Страница вывода создана');
+//         return withdrawPage;
+//     }
     
-    // Инициализация страницы вывода
-    function initWithdrawPage() {
-        console.log('🔄 Инициализация страницы вывода');
+//     // Инициализация страницы вывода
+//     function initWithdrawPage() {
+//         console.log('🔄 Инициализация страницы вывода');
         
-        const balance = document.getElementById('withdrawBalanceAmount');
-        const methodsList = document.getElementById('methodsList');
-        const detailsInput = document.getElementById('withdrawDetails');
-        const amountInput = document.getElementById('withdrawAmount');
-        const commissionSpan = document.getElementById('commissionValue');
-        const totalSpan = document.getElementById('totalWithdraw');
-        const submitBtn = document.getElementById('submitWithdrawBtn');
-        const detailsLabel = document.getElementById('detailsLabel');
+//         const balance = document.getElementById('withdrawBalanceAmount');
+//         const methodsList = document.getElementById('methodsList');
+//         const detailsInput = document.getElementById('withdrawDetails');
+//         const amountInput = document.getElementById('withdrawAmount');
+//         const commissionSpan = document.getElementById('commissionValue');
+//         const totalSpan = document.getElementById('totalWithdraw');
+//         const submitBtn = document.getElementById('submitWithdrawBtn');
+//         const detailsLabel = document.getElementById('detailsLabel');
         
-        if (!methodsList) {
-            console.error('❌ Элементы не найдены');
-            return;
-        }
+//         if (!methodsList) {
+//             console.error('❌ Элементы не найдены');
+//             return;
+//         }
         
-        // Данные пользователя
-        const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
-        const currentBalance = userProfile.balance || 0;
-        if (balance) balance.innerText = currentBalance.toFixed(2) + ' ₽';
+//         // Данные пользователя
+//         const userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+//         const currentBalance = userProfile.balance || 0;
+//         if (balance) balance.innerText = currentBalance.toFixed(2) + ' ₽';
         
-        // Методы вывода
-        const methods = [
-            { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', commission: 0.02, minAmount: 100, placeholder: 'Номер карты (16 цифр)' },
-            { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', commission: 0.01, minAmount: 100, placeholder: 'Номер телефона QIWI' },
-            { id: 'crypto', name: 'Криптовалюта', icon: 'fab fa-bitcoin', commission: 0.03, minAmount: 500, placeholder: 'Адрес USDT' }
-        ];
+//         // Методы вывода
+//         const methods = [
+//             { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', commission: 0.02, minAmount: 100, placeholder: 'Номер карты (16 цифр)' },
+//             { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', commission: 0.01, minAmount: 100, placeholder: 'Номер телефона QIWI' },
+//             { id: 'crypto', name: 'Криптовалюта', icon: 'fab fa-bitcoin', commission: 0.03, minAmount: 500, placeholder: 'Адрес USDT' }
+//         ];
         
-        let selectedMethod = methods[0];
+//         let selectedMethod = methods[0];
         
-        function renderMethods() {
-            if (!methodsList) return;
-            methodsList.innerHTML = methods.map(m => `
-                <div class="method-item ${selectedMethod.id === m.id ? 'selected' : ''}" data-method="${m.id}">
-                    <div class="method-icon ${m.id}">
-                        <i class="${m.icon}"></i>
-                    </div>
-                    <div class="method-info">
-                        <div class="method-name">${m.name}</div>
-                        <div class="method-desc">Комиссия: ${(m.commission * 100).toFixed(0)}%</div>
-                    </div>
-                    <div class="method-commission">от ${m.minAmount}₽</div>
-                </div>
-            `).join('');
+//         function renderMethods() {
+//             if (!methodsList) return;
+//             methodsList.innerHTML = methods.map(m => `
+//                 <div class="method-item ${selectedMethod.id === m.id ? 'selected' : ''}" data-method="${m.id}">
+//                     <div class="method-icon ${m.id}">
+//                         <i class="${m.icon}"></i>
+//                     </div>
+//                     <div class="method-info">
+//                         <div class="method-name">${m.name}</div>
+//                         <div class="method-desc">Комиссия: ${(m.commission * 100).toFixed(0)}%</div>
+//                     </div>
+//                     <div class="method-commission">от ${m.minAmount}₽</div>
+//                 </div>
+//             `).join('');
             
-            document.querySelectorAll('.method-item').forEach(el => {
-                el.onclick = () => {
-                    const methodId = el.getAttribute('data-method');
-                    selectedMethod = methods.find(m => m.id === methodId);
-                    renderMethods();
-                    if (detailsLabel) detailsLabel.innerText = selectedMethod.id === 'card' ? 'Номер карты' : (selectedMethod.id === 'qiwi' ? 'QIWI номер' : 'USDT адрес');
-                    if (detailsInput) detailsInput.placeholder = selectedMethod.placeholder;
-                    updateCommission();
-                };
-            });
-        }
+//             document.querySelectorAll('.method-item').forEach(el => {
+//                 el.onclick = () => {
+//                     const methodId = el.getAttribute('data-method');
+//                     selectedMethod = methods.find(m => m.id === methodId);
+//                     renderMethods();
+//                     if (detailsLabel) detailsLabel.innerText = selectedMethod.id === 'card' ? 'Номер карты' : (selectedMethod.id === 'qiwi' ? 'QIWI номер' : 'USDT адрес');
+//                     if (detailsInput) detailsInput.placeholder = selectedMethod.placeholder;
+//                     updateCommission();
+//                 };
+//             });
+//         }
         
-        function updateCommission() {
-            const amount = parseFloat(amountInput?.value);
-            if (isNaN(amount) || amount <= 0) {
-                if (commissionSpan) commissionSpan.innerText = '0 ₽';
-                if (totalSpan) totalSpan.innerText = '0 ₽';
-                return;
-            }
-            const commission = amount * selectedMethod.commission;
-            const total = amount + commission;
-            if (commissionSpan) commissionSpan.innerText = commission.toFixed(2) + ' ₽';
-            if (totalSpan) totalSpan.innerText = total.toFixed(2) + ' ₽';
-        }
+//         function updateCommission() {
+//             const amount = parseFloat(amountInput?.value);
+//             if (isNaN(amount) || amount <= 0) {
+//                 if (commissionSpan) commissionSpan.innerText = '0 ₽';
+//                 if (totalSpan) totalSpan.innerText = '0 ₽';
+//                 return;
+//             }
+//             const commission = amount * selectedMethod.commission;
+//             const total = amount + commission;
+//             if (commissionSpan) commissionSpan.innerText = commission.toFixed(2) + ' ₽';
+//             if (totalSpan) totalSpan.innerText = total.toFixed(2) + ' ₽';
+//         }
         
-        function validate() {
-            const amount = parseFloat(amountInput?.value);
-            const details = detailsInput?.value.trim();
-            const isValid = !isNaN(amount) && amount >= selectedMethod.minAmount && amount <= currentBalance && details && details.length >= 3;
-            if (submitBtn) submitBtn.disabled = !isValid;
-        }
+//         function validate() {
+//             const amount = parseFloat(amountInput?.value);
+//             const details = detailsInput?.value.trim();
+//             const isValid = !isNaN(amount) && amount >= selectedMethod.minAmount && amount <= currentBalance && details && details.length >= 3;
+//             if (submitBtn) submitBtn.disabled = !isValid;
+//         }
         
-        function requestWithdraw() {
-            const amount = parseFloat(amountInput?.value);
-            const details = detailsInput?.value.trim();
-            const commission = amount * selectedMethod.commission;
-            const total = amount + commission;
+//         function requestWithdraw() {
+//             const amount = parseFloat(amountInput?.value);
+//             const details = detailsInput?.value.trim();
+//             const commission = amount * selectedMethod.commission;
+//             const total = amount + commission;
             
-            if (isNaN(amount) || amount < selectedMethod.minAmount) {
-                alert(`Минимальная сумма: ${selectedMethod.minAmount} ₽`);
-                return;
-            }
-            if (amount > currentBalance) {
-                alert(`Недостаточно средств. Доступно: ${currentBalance.toFixed(2)} ₽`);
-                return;
-            }
-            if (!details) {
-                alert('Введите реквизиты');
-                return;
-            }
+//             if (isNaN(amount) || amount < selectedMethod.minAmount) {
+//                 alert(`Минимальная сумма: ${selectedMethod.minAmount} ₽`);
+//                 return;
+//             }
+//             if (amount > currentBalance) {
+//                 alert(`Недостаточно средств. Доступно: ${currentBalance.toFixed(2)} ₽`);
+//                 return;
+//             }
+//             if (!details) {
+//                 alert('Введите реквизиты');
+//                 return;
+//             }
             
-            // Сохраняем заявку
-            const requests = JSON.parse(localStorage.getItem('apex_withdraw_requests') || '[]');
-            requests.push({
-                id: Date.now(),
-                date: new Date().toLocaleString(),
-                method: selectedMethod.name,
-                amount: amount,
-                commission: commission,
-                total: total,
-                details: details,
-                status: 'pending'
-            });
-            localStorage.setItem('apex_withdraw_requests', JSON.stringify(requests));
+//             // Сохраняем заявку
+//             const requests = JSON.parse(localStorage.getItem('apex_withdraw_requests') || '[]');
+//             requests.push({
+//                 id: Date.now(),
+//                 date: new Date().toLocaleString(),
+//                 method: selectedMethod.name,
+//                 amount: amount,
+//                 commission: commission,
+//                 total: total,
+//                 details: details,
+//                 status: 'pending'
+//             });
+//             localStorage.setItem('apex_withdraw_requests', JSON.stringify(requests));
             
-            // Списываем баланс
-            const newBalance = currentBalance - total;
-            userProfile.balance = newBalance;
-            localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+//             // Списываем баланс
+//             const newBalance = currentBalance - total;
+//             userProfile.balance = newBalance;
+//             localStorage.setItem('apex_profile', JSON.stringify(userProfile));
             
-            alert(`✅ Заявка на вывод ${amount} ₽ создана!`);
+//             alert(`✅ Заявка на вывод ${amount} ₽ создана!`);
             
-            if (balance) balance.innerText = newBalance.toFixed(2) + ' ₽';
-            if (amountInput) amountInput.value = '';
-            if (detailsInput) detailsInput.value = '';
-            updateCommission();
-            validate();
-        }
+//             if (balance) balance.innerText = newBalance.toFixed(2) + ' ₽';
+//             if (amountInput) amountInput.value = '';
+//             if (detailsInput) detailsInput.value = '';
+//             updateCommission();
+//             validate();
+//         }
         
-        // Настройка пресетов
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.onclick = () => {
-                if (amountInput) amountInput.value = btn.getAttribute('data-amount');
-                updateCommission();
-                validate();
-            };
-        });
+//         // Настройка пресетов
+//         document.querySelectorAll('.preset-btn').forEach(btn => {
+//             btn.onclick = () => {
+//                 if (amountInput) amountInput.value = btn.getAttribute('data-amount');
+//                 updateCommission();
+//                 validate();
+//             };
+//         });
         
-        // Слушатели
-        if (amountInput) amountInput.oninput = () => { updateCommission(); validate(); };
-        if (detailsInput) detailsInput.oninput = validate;
-        if (submitBtn) submitBtn.onclick = requestWithdraw;
+//         // Слушатели
+//         if (amountInput) amountInput.oninput = () => { updateCommission(); validate(); };
+//         if (detailsInput) detailsInput.oninput = validate;
+//         if (submitBtn) submitBtn.onclick = requestWithdraw;
         
-        renderMethods();
-        updateCommission();
-        validate();
+//         renderMethods();
+//         updateCommission();
+//         validate();
         
-        console.log('✅ Страница вывода инициализирована');
-    }
+//         console.log('✅ Страница вывода инициализирована');
+//     }
     
-    // Переопределяем клик по балансу
-    function fixBalanceClick() {
-        const balanceCard = document.querySelector('.profile-balance-card');
-        if (!balanceCard) return;
+//     // Переопределяем клик по балансу
+//     function fixBalanceClick() {
+//         const balanceCard = document.querySelector('.profile-balance-card');
+//         if (!balanceCard) return;
         
-        const newCard = balanceCard.cloneNode(true);
-        balanceCard.parentNode.replaceChild(newCard, balanceCard);
+//         const newCard = balanceCard.cloneNode(true);
+//         balanceCard.parentNode.replaceChild(newCard, balanceCard);
         
-        newCard.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('💰 Открываем вывод средств');
+//         newCard.addEventListener('click', function(e) {
+//             e.preventDefault();
+//             e.stopPropagation();
+//             console.log('💰 Открываем вывод средств');
             
-            // Скрываем все страницы
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-                page.style.display = 'none';
-            });
+//             // Скрываем все страницы
+//             document.querySelectorAll('.page').forEach(page => {
+//                 page.classList.remove('active');
+//                 page.style.display = 'none';
+//             });
             
-            // Показываем страницу вывода
-            let withdrawPage = document.getElementById('withdrawPage');
-            if (!withdrawPage) {
-                withdrawPage = fixWithdrawPage();
-            }
+//             // Показываем страницу вывода
+//             let withdrawPage = document.getElementById('withdrawPage');
+//             if (!withdrawPage) {
+//                 withdrawPage = fixWithdrawPage();
+//             }
             
-            withdrawPage.style.display = 'block';
-            withdrawPage.classList.add('active');
+//             withdrawPage.style.display = 'block';
+//             withdrawPage.classList.add('active');
             
-            // Инициализируем
-            setTimeout(initWithdrawPage, 50);
-        });
-    }
+//             // Инициализируем
+//             setTimeout(initWithdrawPage, 50);
+//         });
+//     }
     
-    // Запускаем фикс после загрузки страницы
-    // if (document.readyState === 'loading') {
-    //     document.addEventListener('DOMContentLoaded', function() {
-    //         setTimeout(fixWithdrawPage, 100);
-    //         setTimeout(fixBalanceClick, 200);
-    //         setTimeout(initWithdrawPage, 300);
-    //     });
-    // } else {
-    //     setTimeout(fixWithdrawPage, 100);
-    //     setTimeout(fixBalanceClick, 200);
-    //     setTimeout(initWithdrawPage, 300);
-    // }
+//     // Запускаем фикс после загрузки страницы
+//     // if (document.readyState === 'loading') {
+//     //     document.addEventListener('DOMContentLoaded', function() {
+//     //         setTimeout(fixWithdrawPage, 100);
+//     //         setTimeout(fixBalanceClick, 200);
+//     //         setTimeout(initWithdrawPage, 300);
+//     //     });
+//     // } else {
+//     //     setTimeout(fixWithdrawPage, 100);
+//     //     setTimeout(fixBalanceClick, 200);
+//     //     setTimeout(initWithdrawPage, 300);
+//     // }
     
-    window.initWithdrawPage = initWithdrawPage;
-    window.fixWithdrawPage = fixWithdrawPage;
-})();
+//     window.initWithdrawPage = initWithdrawPage;
+//     window.fixWithdrawPage = fixWithdrawPage;
+// })();
 // ========== ГЛОБАЛЬНЫЕ ФИКСЫ И ИНИЦИАЛИЗАЦИЯ ==========
 (function() {
     console.log(' ГЛОБАЛЬНЫЕ ФИКСЫ ЗАПУЩЕНЫ');
@@ -3996,41 +4004,21 @@ if (topupPage) {
 
 console.log('✅ TOPUP МОДУЛЬ ГОТОВ');
 // ========== ФУНКЦИИ ПОПОЛНЕНИЯ ==========
-console.log('💸 СКРИПТ ПОПОЛНЕНИЯ ЗАГРУЖЕН');
-
-// Определяем функции ГЛОБАЛЬНО
+// ========== ФУНКЦИИ ПОПОЛНЕНИЯ (ИСПРАВЛЕННЫЕ) ==========
 window.showQuickTopupModal = function() {
     console.log('🟢 showQuickTopupModal вызвана');
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
-        modal.style.cssText = `
-            display: flex !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            background: rgba(0,0,0,0.8) !important;
-            backdrop-filter: blur(8px) !important;
-            z-index: 2147483647 !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        `;
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        console.log('✅ Модальное окно показано');
-    } else {
-        console.error('❌ Модальное окно не найдено!');
     }
 };
+
 window.quickTopup = async function(amount) {
     console.log('💰 Пополнение на сумму:', amount);
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('active');
         document.body.style.overflow = '';
     }
     
@@ -4039,6 +4027,9 @@ window.quickTopup = async function(amount) {
     
     if (!token || !user || user === 'Гость') {
         alert('Для пополнения необходимо войти в аккаунт');
+        if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
+            window.auth.showAuthModal('login');
+        }
         return;
     }
     
@@ -4080,6 +4071,8 @@ window.quickTopup = async function(amount) {
     
     setTimeout(function() { toast.remove(); }, 3000);
 };
+
+console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
 // Добавляем обработчик на кнопку + после загрузки DOM
 (function() {
     function bindTopupButton() {
