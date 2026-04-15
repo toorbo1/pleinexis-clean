@@ -1387,7 +1387,12 @@ app.post('/api/deals', authenticateToken, async (req, res) => {
 app.post('/api/deals/:dealId/seller-complete', authenticateToken, async (req, res) => {
     const { dealId } = req.params;
     const userId = req.userId;
-    
+    // В эндпоинте завершения сделки (/api/deals/:dealId/complete)
+// После перевода денег продавцу:
+await pool.query(
+    'UPDATE users SET sales_count = sales_count + 1 WHERE id = $1',
+    [deal.seller_id]
+);
     try {
         const result = await pool.query(
             `UPDATE deals SET seller_confirmed = TRUE, status = 
@@ -1481,6 +1486,79 @@ app.post('/api/deals/:dealId/cancel', authenticateToken, async (req, res) => {
         );
         
         res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// Обновление статистики пользователя
+app.post('/api/user/stats', authenticateToken, async (req, res) => {
+    const userId = req.userId;
+    const { purchasesCount, productsCount, salesCount } = req.body;
+    
+    try {
+        const updates = [];
+        const values = [];
+        let paramIndex = 1;
+        
+        if (purchasesCount !== undefined) {
+            updates.push(`purchases_count = $${paramIndex}`);
+            values.push(purchasesCount);
+            paramIndex++;
+        }
+        if (productsCount !== undefined) {
+            updates.push(`products_count = $${paramIndex}`);
+            values.push(productsCount);
+            paramIndex++;
+        }
+        if (salesCount !== undefined) {
+            updates.push(`sales_count = $${paramIndex}`);
+            values.push(salesCount);
+            paramIndex++;
+        }
+        
+        if (updates.length > 0) {
+            values.push(userId);
+            await pool.query(
+                `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIndex}`,
+                values
+            );
+        }
+        
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// Пополнение баланса (тестовое)
+app.post('/api/user/topup', authenticateToken, async (req, res) => {
+    const userId = req.userId;
+    const { amount } = req.body;
+    
+    if (!amount || amount < 100) {
+        return res.status(400).json({ error: 'Минимальная сумма пополнения 100 ₽' });
+    }
+    
+    try {
+        await pool.query(
+            'UPDATE users SET balance = balance + $1 WHERE id = $2',
+            [amount, userId]
+        );
+        
+        // Получаем обновлённый баланс
+        const result = await pool.query(
+            'SELECT balance FROM users WHERE id = $1',
+            [userId]
+        );
+        
+        res.json({ 
+            success: true, 
+            balance: result.rows[0].balance,
+            message: `Баланс пополнен на ${amount} ₽`
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

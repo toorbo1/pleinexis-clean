@@ -5,34 +5,34 @@
   
   console.log('🔥 Cyber-Premium Profile JS загружен');
   
-  // ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ =====
-  let currentUser = localStorage.getItem('apex_user') || 'Гость';
-  let userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
-  
-  // Инициализация профиля по умолчанию
-  if (!userProfile.username) {
-    userProfile = {
-      id: 'user_' + Date.now(),
-      username: currentUser,
-      balance: 12480,
-      rating: 4.9,
-      reviewsCount: 42,
-      productsCount: 14,
-      purchasesCount: 67,
-      salesCount: 42,
-      activeOrders: 3,
-      completedOrders: 11,
-      joinedDate: 'января 2024',
-      verified: true,
-      avatarUrl: null
-    };
-    localStorage.setItem('apex_profile', JSON.stringify(userProfile));
-  }
+// ===== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ =====
+let currentUser = localStorage.getItem('apex_user') || 'Гость';
+let userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+
+// Инициализация профиля по умолчанию - ВСЕ ПО НУЛЯМ
+if (!userProfile.username) {
+  userProfile = {
+    id: 'user_' + Date.now(),
+    username: currentUser,
+    balance: 0,           // 0 рублей
+    rating: 0,            // 0 рейтинг
+    reviewsCount: 0,      // 0 отзывов
+    productsCount: 0,     // 0 товаров
+    purchasesCount: 0,    // 0 покупок
+    salesCount: 0,        // 0 продаж
+    activeOrders: 0,      // 0 активных
+    completedOrders: 0,   // 0 завершённых
+    joinedDate: new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
+    verified: false,      // не верифицирован
+    avatarUrl: null
+  };
+  localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+}
   
   // ===== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ =====
   function initProfilePage() {
     console.log('🔄 Инициализация профиля...');
-    
+    addTopUpButton();
     updateProfileInfo();
     updateBalance();
     updateStats();
@@ -506,3 +506,156 @@
     }, 500);
   }
 })();
+
+// Функция пополнения баланса
+async function topUpBalance(amount) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        showToast('Необходимо войти в аккаунт', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/user/topup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ amount })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Обновляем локальный профиль
+            userProfile.balance = data.balance;
+            localStorage.setItem('apex_profile', JSON.stringify(userProfile));
+            
+            // Обновляем отображение
+            updateBalance();
+            
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.error, 'error');
+        }
+    } catch (error) {
+        showToast('Ошибка соединения', 'error');
+    }
+}
+
+// Добавить кнопку пополнения в профиль
+function addTopUpButton() {
+    const balanceCard = document.querySelector('.balance-card');
+    if (!balanceCard) return;
+    
+    // Проверяем, нет ли уже кнопки
+    if (document.getElementById('topUpBtn')) return;
+    
+    const topUpBtn = document.createElement('button');
+    topUpBtn.id = 'topUpBtn';
+    topUpBtn.className = 'topup-btn';
+    topUpBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Пополнить';
+    topUpBtn.style.cssText = `
+        position: absolute;
+        right: 60px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        border: none;
+        padding: 8px 16px;
+        border-radius: 40px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    `;
+    
+    topUpBtn.addEventListener('mouseenter', () => {
+        topUpBtn.style.transform = 'translateY(-50%) scale(1.05)';
+    });
+    topUpBtn.addEventListener('mouseleave', () => {
+        topUpBtn.style.transform = 'translateY(-50%) scale(1)';
+    });
+    
+    topUpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showTopUpModal();
+    });
+    
+    balanceCard.style.position = 'relative';
+    balanceCard.appendChild(topUpBtn);
+}
+
+// Модальное окно пополнения
+function showTopUpModal() {
+    const amounts = [100, 500, 1000, 5000];
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-glass';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 350px;">
+            <h3 style="margin-bottom: 20px; color: white;">
+                <i class="fas fa-wallet" style="color: #22c55e;"></i> Пополнение баланса
+            </h3>
+            <p style="color: #94a3b8; margin-bottom: 20px; font-size: 0.9rem;">
+                Выберите сумму пополнения:
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+                ${amounts.map(amt => `
+                    <button class="amount-option" data-amount="${amt}" style="
+                        padding: 16px;
+                        background: rgba(255,255,255,0.05);
+                        border: 1px solid rgba(59,130,246,0.3);
+                        border-radius: 16px;
+                        color: white;
+                        font-size: 1.2rem;
+                        font-weight: 700;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                    ">${amt} ₽</button>
+                `).join('')}
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-secondary" onclick="this.closest('.modal-glass').remove()" style="flex: 1;">
+                    Отмена
+                </button>
+            </div>
+            <p style="color: #6b7280; font-size: 0.7rem; text-align: center; margin-top: 16px;">
+                <i class="fas fa-shield-alt"></i> Тестовое пополнение (демо)
+            </p>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Обработчики для кнопок сумм
+    modal.querySelectorAll('.amount-option').forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            btn.style.background = 'rgba(34, 197, 94, 0.2)';
+            btn.style.borderColor = '#22c55e';
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.background = 'rgba(255,255,255,0.05)';
+            btn.style.borderColor = 'rgba(59,130,246,0.3)';
+        });
+        btn.addEventListener('click', async () => {
+            const amount = parseInt(btn.dataset.amount);
+            modal.remove();
+            await topUpBalance(amount);
+        });
+    });
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+}
+
+// Экспорт
+window.topUpBalance = topUpBalance;
+window.showTopUpModal = showTopUpModal;

@@ -429,6 +429,34 @@ function sendPurchaseNotification(sellerName, productTitle, buyerName) {
     
     showToast(`✅ Уведомление отправлено продавцу ${sellerName}`, 'success');
 }
+// В конец функции buyProduct, после успешного создания сделки
+async function incrementPurchasesCount() {
+    const profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+    profile.purchasesCount = (profile.purchasesCount || 0) + 1;
+    localStorage.setItem('apex_profile', JSON.stringify(profile));
+    
+    // Обновляем отображение в профиле
+    if (typeof window.updateProfileStats === 'function') {
+        window.updateProfileStats();
+    }
+    
+    // Отправляем на сервер
+    try {
+        await fetch('/api/user/stats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({ purchasesCount: profile.purchasesCount })
+        });
+    } catch (e) {
+        console.error('Ошибка обновления статистики:', e);
+    }
+}
+
+// Вызвать в buyProduct после успешного ответа от /api/deals
+
 
 // Показать уведомление
 function showToast(message, type = 'success') {

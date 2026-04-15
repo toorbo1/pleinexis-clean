@@ -147,7 +147,29 @@ function cancelCreateProduct() {
     document.querySelector('input[name="productType"][value="monthly"]').checked = true;
     removeProductImage();
 }
-
+// В функции createNewProduct после успешного создания
+async function incrementProductsCount() {
+    const profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+    profile.productsCount = (profile.productsCount || 0) + 1;
+    localStorage.setItem('apex_profile', JSON.stringify(profile));
+    
+    if (typeof window.updateProfileStats === 'function') {
+        window.updateProfileStats();
+    }
+    
+    try {
+        await fetch('/api/user/stats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            },
+            body: JSON.stringify({ productsCount: profile.productsCount })
+        });
+    } catch (e) {
+        console.error('Ошибка обновления статистики:', e);
+    }
+}
 // ========== СОЗДАНИЕ ТОВАРА С ОТПРАВКОЙ НА МОДЕРАЦИЮ ==========
 
 async function createNewProduct() {
