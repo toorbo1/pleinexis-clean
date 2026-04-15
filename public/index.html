@@ -4195,24 +4195,16 @@ document.addEventListener('DOMContentLoaded', function() {
             topupBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                e.stopImmediatePropagation();
                 console.log('🖱️ КЛИК ПО КНОПКЕ +');
-                
-                var modal = document.getElementById('quickTopupModal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    modal.style.zIndex = '99999';
-                    console.log('✅ Модальное окно показано');
-                } else {
-                    console.error('❌ Модальное окно не найдено!');
-                }
-                return false;
+                window.showQuickTopupModal();
             };
         } else {
             console.warn('⚠️ Кнопка quickTopupBtn не найдена');
         }
     }, 500);
 });
+
+console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
 </script>
 
 </body>
