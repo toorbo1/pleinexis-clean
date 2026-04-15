@@ -4115,8 +4115,27 @@ window.showQuickTopupModal = function() {
     console.log('🟢 showQuickTopupModal вызвана');
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
-        modal.style.display = 'flex';
-        modal.style.zIndex = '999999';
+        // Принудительно сбрасываем все стили, которые могут мешать
+        modal.style.cssText = `
+            display: flex !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(0,0,0,0.8) !important;
+            backdrop-filter: blur(8px) !important;
+            z-index: 999999 !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        `;
+        // Также убираем возможные transform у родительских элементов
+        document.body.style.overflow = 'hidden';
+        console.log('✅ Модальное окно показано');
     } else {
         console.error('❌ Модальное окно не найдено!');
     }
@@ -4124,7 +4143,11 @@ window.showQuickTopupModal = function() {
 
 window.quickTopup = async function(amount) {
     console.log('💰 Пополнение на сумму:', amount);
-    
+        var modal = document.getElementById('quickTopupModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // восстанавливаем прокрутку
+    }
     var modal = document.getElementById('quickTopupModal');
     if (modal) modal.style.display = 'none';
     
