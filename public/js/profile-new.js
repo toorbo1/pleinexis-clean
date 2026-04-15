@@ -48,19 +48,15 @@ if (!userProfile.username) {
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             const modal = document.getElementById('quickTopupModal');
             if (modal) {
                 modal.style.display = 'flex';
-            } else {
-                console.error('❌ Модальное окно quickTopupModal не найдено!');
+                modal.style.zIndex = '99999';
             }
         });
-        console.log('✅ Обработчик на кнопку + привязан');
-    } else {
-        console.warn('⚠️ Кнопка quickTopupBtn не найдена при инициализации профиля');
+        console.log('✅ Обработчик на кнопку + привязан в profile-new');
     }
-
-    console.log('✅ Профиль инициализирован');
 }
 
 
