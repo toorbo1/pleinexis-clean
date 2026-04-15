@@ -1383,7 +1383,71 @@ app.post('/api/deals', authenticateToken, async (req, res) => {
         client.release();
     }
 });
+// Получение профиля пользователя по ID
+app.get('/api/users/:userId', authenticateToken, async (req, res) => {
+    const { userId } = req.params;
+    
+    // Проверяем, что запрашиваем свой профиль или админ
+    if (req.userId !== userId) {
+        const isAdmin = await checkIsAdmin(req.userId);
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'Доступ запрещён' });
+        }
+    }
+    
+    try {
+        const result = await pool.query(
+            `SELECT id, username, email, avatar_url, balance, rating, 
+                    reviews_count, sales_count, purchases_count, created_at
+             FROM users WHERE id = $1`,
+            [userId]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Пользователь не найден' });
+        }
+        
+        const user = result.rows[0];
+        
+        // Формируем профиль
+        const profile = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            balance: user.balance,
+            rating: user.rating,
+            reviewsCount: user.reviews_count,
+            productsCount: 0, // Пока нет таблицы товаров пользователя
+            purchasesCount: user.purchases_count,
+            salesCount: user.sales_count,
+            activeOrders: 0,
+            completedOrders: 0,
+            joinedDate: new Date(user.created_at).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
+            verified: false,
+            avatarUrl: user.avatar_url
+        };
+        
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
+// Вспомогательная функция проверки админа
+async function checkIsAdmin(userId) {
+    const result = await pool.query(
+        'SELECT username FROM users WHERE id = $1',
+        [userId]
+    );
+    if (result.rows.length === 0) return false;
+    
+    const username = result.rows[0].username;
+    const adminResult = await pool.query(
+        'SELECT * FROM admins WHERE username = $1',
+        [username]
+    );
+    return adminResult.rows.length > 0;
+}
 app.post('/api/deals/:dealId/seller-complete', authenticateToken, async (req, res) => {
     const { dealId } = req.params;
     const userId = req.userId;

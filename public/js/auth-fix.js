@@ -1,10 +1,11 @@
-// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (ОБНОВЛЁННЫЙ ДИЗАЙН) ==========
+// ========== ПОЛНАЯ СИСТЕМА АВТОРИЗАЦИИ (С СОХРАНЕНИЕМ СЕССИИ) ==========
 
 class AuthManager {
     constructor() {
         this.token = localStorage.getItem('auth_token');
         this.currentUser = null;
         this.modalAutoShown = false;
+        this.isInitialized = false;
         
         // ID приложений (ЗАМЕНИТЕ НА СВОИ!)
         this.GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
@@ -14,152 +15,171 @@ class AuthManager {
     }
 
     async init() {
+        console.log('🔐 AuthManager: инициализация...');
+        
         await this.loadExternalScripts();
         this.injectAuthModal();
         this.setupEventListeners();
         
+        // ВАЖНО: Проверяем токен и восстанавливаем сессию
         if (this.token) {
-            await this.fetchCurrentUser();
+            console.log('🔐 Найден токен, восстанавливаем сессию...');
+            const success = await this.fetchCurrentUser();
+            if (success) {
+                console.log('✅ Сессия восстановлена:', this.currentUser?.username);
+            } else {
+                console.warn('⚠️ Токен недействителен, требуется повторный вход');
+                this.logout(false);
+            }
         }
         
         this.updateUI();
         this.checkGuestPages();
+        this.isInitialized = true;
         
-        setTimeout(() => {
-            if (!this.currentUser && !this.modalAutoShown) {
-                this.showAuthModal('register');
-                this.modalAutoShown = true;
-            }
-        }, 1000);
+        // НЕ показываем модалку автоматически, если пользователь уже вошёл
+        if (!this.currentUser && !this.modalAutoShown) {
+            // Показываем модалку только если нет токена и пользователь не на странице входа
+            setTimeout(() => {
+                if (!this.currentUser) {
+                    this.showAuthModal('register');
+                    this.modalAutoShown = true;
+                }
+            }, 1000);
+        }
         
-        console.log('✅ AuthManager инициализирован');
+        console.log('✅ AuthManager инициализирован, пользователь:', this.currentUser?.username || 'Гость');
     }
 
-injectAuthModal() {
-    if (document.getElementById('authModal')) return;
-    
-    const modal = document.createElement('div');
-    modal.id = 'authModal';
-    modal.className = 'modal-glass';
-    modal.innerHTML = `
-        <div class="auth-modal-content">
-            <div class="auth-modal-header">
-                <span class="auth-logo-text">Плейнексис</span>
-                <button class="auth-close-btn" id="authModalCloseBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="auth-tabs">
-                <button class="auth-tab" id="loginTab">Вход</button>
-                <button class="auth-tab active" id="registerTab">Регистрация</button>
-            </div>
-            
-            <!-- Форма входа -->
-            <div id="loginForm" class="auth-form">
-                <div class="auth-social-buttons">
-                    <button class="auth-social-btn google" id="googleLoginBtn2">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                    <button class="auth-social-btn vk" id="vkLoginBtn2">
-                        <i class="fab fa-vk"></i> VK
-                    </button>
-                </div>
-                <div class="auth-divider"><span>или</span></div>
-                <form id="loginFormElement">
-                    <div class="auth-input-group">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" id="loginEmail" placeholder="Email" required>
-                    </div>
-                    <div class="auth-error-message" id="loginEmailError"></div>
-                    <div class="auth-input-group password-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="loginPassword" placeholder="Пароль" required>
-                        <i class="far fa-eye toggle-password" data-target="loginPassword"></i>
-                    </div>
-                    <div class="auth-error-message" id="loginPasswordError"></div>
-                    <div class="auth-error-message" id="loginFormError"></div>
-                    <button type="submit" class="auth-submit-btn">Войти</button>
-                </form>
-                <p class="auth-footer-text">
-                    Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a>
-                </p>
-            </div>
-            
-            <!-- Форма регистрации -->
-            <div id="registerForm" class="auth-form active">
-                <div class="auth-social-buttons">
-                    <button class="auth-social-btn google" id="googleRegisterBtn2">
-                        <i class="fab fa-google"></i> Google
-                    </button>
-                    <button class="auth-social-btn vk" id="vkRegisterBtn2">
-                        <i class="fab fa-vk"></i> VK
-                    </button>
-                </div>
-                <div class="auth-divider"><span>или</span></div>
-                <form id="registerFormElement">
-                    <div class="auth-input-group">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" id="registerEmail" placeholder="Email" required>
-                    </div>
-                    <div class="auth-error-message" id="registerEmailError"></div>
-                    <div class="auth-input-group">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
-                    </div>
-                    <div class="auth-error-message" id="registerUsernameError"></div>
-                    <div class="auth-input-group password-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
-                        <i class="far fa-eye toggle-password" data-target="registerPassword"></i>
-                    </div>
-                    <div class="auth-error-message" id="registerPasswordError"></div>
-                    <div class="auth-input-group password-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
-                        <i class="far fa-eye toggle-password" data-target="registerConfirmPassword"></i>
-                    </div>
-                    <div class="auth-error-message" id="registerConfirmError"></div>
-                    <div class="auth-error-message" id="registerFormError"></div>
-                    <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
-                </form>
-                <p class="auth-footer-text">
-                    Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a>
-                </p>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
+    injectAuthModal() {
+        if (document.getElementById('authModal')) return;
         
-        // Встроенные стили для модального окна
+        const modal = document.createElement('div');
+        modal.id = 'authModal';
+        modal.className = 'modal-glass';
+        modal.innerHTML = `
+            <div class="auth-modal-content">
+                <div class="auth-modal-header">
+                    <span class="auth-logo-text">Плейнексис</span>
+                    <button class="auth-close-btn" id="authModalCloseBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="auth-tabs">
+                    <button class="auth-tab" id="loginTab">Вход</button>
+                    <button class="auth-tab active" id="registerTab">Регистрация</button>
+                </div>
+                
+                <!-- Форма входа -->
+                <div id="loginForm" class="auth-form">
+                    <div class="auth-social-buttons">
+                        <button class="auth-social-btn google" id="googleLoginBtn2">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        <button class="auth-social-btn vk" id="vkLoginBtn2">
+                            <i class="fab fa-vk"></i> VK
+                        </button>
+                    </div>
+                    <div class="auth-divider"><span>или</span></div>
+                    <form id="loginFormElement">
+                        <div class="auth-input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="loginEmail" placeholder="Email" required>
+                        </div>
+                        <div class="auth-error-message" id="loginEmailError"></div>
+                        <div class="auth-input-group password-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="loginPassword" placeholder="Пароль" required>
+                            <i class="far fa-eye toggle-password" data-target="loginPassword"></i>
+                        </div>
+                        <div class="auth-error-message" id="loginPasswordError"></div>
+                        <div class="auth-error-message" id="loginFormError"></div>
+                        <button type="submit" class="auth-submit-btn">Войти</button>
+                    </form>
+                    <p class="auth-footer-text">
+                        Нет аккаунта? <a href="#" id="switchToRegister">Зарегистрироваться</a>
+                    </p>
+                </div>
+                
+                <!-- Форма регистрации -->
+                <div id="registerForm" class="auth-form active">
+                    <div class="auth-social-buttons">
+                        <button class="auth-social-btn google" id="googleRegisterBtn2">
+                            <i class="fab fa-google"></i> Google
+                        </button>
+                        <button class="auth-social-btn vk" id="vkRegisterBtn2">
+                            <i class="fab fa-vk"></i> VK
+                        </button>
+                    </div>
+                    <div class="auth-divider"><span>или</span></div>
+                    <form id="registerFormElement">
+                        <div class="auth-input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="registerEmail" placeholder="Email" required>
+                        </div>
+                        <div class="auth-error-message" id="registerEmailError"></div>
+                        <div class="auth-input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="registerUsername" placeholder="Имя пользователя" required>
+                        </div>
+                        <div class="auth-error-message" id="registerUsernameError"></div>
+                        <div class="auth-input-group password-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="registerPassword" placeholder="Пароль (мин. 6 символов)" required>
+                            <i class="far fa-eye toggle-password" data-target="registerPassword"></i>
+                        </div>
+                        <div class="auth-error-message" id="registerPasswordError"></div>
+                        <div class="auth-input-group password-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="registerConfirmPassword" placeholder="Подтвердите пароль" required>
+                            <i class="far fa-eye toggle-password" data-target="registerConfirmPassword"></i>
+                        </div>
+                        <div class="auth-error-message" id="registerConfirmError"></div>
+                        <div class="auth-error-message" id="registerFormError"></div>
+                        <button type="submit" class="auth-submit-btn">Зарегистрироваться</button>
+                    </form>
+                    <p class="auth-footer-text">
+                        Уже есть аккаунт? <a href="#" id="switchToLogin">Войти</a>
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Стили для модалки
         if (!document.getElementById('auth-modal-styles')) {
             const styles = document.createElement('style');
             styles.id = 'auth-modal-styles';
             styles.textContent = `
-            .auth-error-message {
-    color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 4px;
-    margin-bottom: 8px;
-    padding-left: 16px;
-    min-height: 18px;
-}
-                /* Прозрачный чёрный фон модалки */
+                .auth-error-message {
+                    color: #ef4444;
+                    font-size: 0.75rem;
+                    margin-top: 4px;
+                    margin-bottom: 8px;
+                    padding-left: 16px;
+                    min-height: 18px;
+                }
                 .modal-glass {
-                    background: rgba(0, 0, 0, 0.7) !important;
+                    background: rgba(0, 0, 0, 0.8) !important;
                     backdrop-filter: blur(12px) !important;
                     -webkit-backdrop-filter: blur(12px) !important;
                     z-index: 99999 !important;
+                    position: fixed;
+                    inset: 0;
+                    display: none;
+                    justify-content: center;
+                    align-items: center;
                 }
                 .modal-glass.active {
                     display: flex !important;
                 }
                 .auth-modal-content {
-                    background: rgba(5, 5, 15, 0.85) !important;
+                    background: rgba(5, 5, 15, 0.95) !important;
                     backdrop-filter: blur(16px) !important;
                     -webkit-backdrop-filter: blur(16px) !important;
-                    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.1) !important;
                     border-radius: 32px !important;
                     padding: 28px !important;
                     max-width: 420px;
@@ -310,11 +330,6 @@ injectAuthModal() {
                     text-decoration: none;
                     cursor: pointer;
                 }
-                /* Скрываем старые приветственные тексты */
-                .auth-welcome-text {
-                    display: none !important;
-                }
-                /* Адаптивность */
                 @media (max-width: 480px) {
                     .auth-modal-content {
                         padding: 20px;
@@ -342,7 +357,6 @@ injectAuthModal() {
             });
         });
         
-        // Привязываем остальные обработчики
         setTimeout(() => this.setupEventListeners(), 50);
     }
 
@@ -365,132 +379,138 @@ injectAuthModal() {
     }
 
     async fetchCurrentUser() {
-        if (!this.token) return null;
+        if (!this.token) return false;
+        
         try {
             const response = await fetch('/api/auth/me', {
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
+            
             if (response.ok) {
                 this.currentUser = await response.json();
+                
+                // Сохраняем данные пользователя в localStorage
+                localStorage.setItem('apex_user', this.currentUser.username);
+                localStorage.setItem('apex_user_id', this.currentUser.id);
+                localStorage.setItem('apex_user_email', this.currentUser.email || '');
+                
+                // Загружаем или создаём профиль
+                await this.loadUserProfile();
+                
                 this.updateUI();
-                return this.currentUser;
+                console.log('✅ Пользователь загружен:', this.currentUser.username);
+                return true;
             } else {
-                this.logout(false);
+                console.warn('❌ Токен недействителен');
+                return false;
             }
         } catch (error) {
-            console.error('Fetch user error:', error);
-        }
-        return null;
-    }
-
-async register(email, username, password) {
-    // Очищаем предыдущие ошибки
-    document.getElementById('registerEmailError').textContent = '';
-    document.getElementById('registerUsernameError').textContent = '';
-    document.getElementById('registerPasswordError').textContent = '';
-    document.getElementById('registerConfirmError').textContent = '';
-    document.getElementById('registerFormError').textContent = '';
-
-    if (!email || !username || !password) {
-        document.getElementById('registerFormError').textContent = 'Заполните все поля';
-        return false;
-    }
-    if (password.length < 6) {
-        document.getElementById('registerPasswordError').textContent = 'Пароль должен быть не менее 6 символов';
-        return false;
-    }
-    const confirm = document.getElementById('registerConfirmPassword').value;
-    if (password !== confirm) {
-        document.getElementById('registerConfirmError').textContent = 'Пароли не совпадают';
-        return false;
-    }
-
-    console.log('🔐 Отправка регистрации:', { email, username, password: '***' });
-
-    try {
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, password })
-        });
-        
-        const data = await response.json();
-        console.log('📡 Ответ сервера:', response.status, data);
-        
-        if (response.ok) {
-            this.setSession(data);
-            this.showToast('Регистрация успешна!', 'success');
-            this.closeAuthModal();
-            return true;
-        } else {
-            // Обработка конкретных ошибок
-            const errorMsg = data.error || 'Ошибка регистрации';
-            if (errorMsg.includes('email') || errorMsg.includes('Email')) {
-                document.getElementById('registerEmailError').textContent = errorMsg;
-            } else if (errorMsg.includes('пользователь') || errorMsg.includes('существует')) {
-                document.getElementById('registerFormError').textContent = errorMsg;
-            } else {
-                document.getElementById('registerFormError').textContent = errorMsg;
-            }
-            this.showToast(errorMsg, 'error');
+            console.error('❌ Ошибка при получении пользователя:', error);
             return false;
         }
-    } catch (error) {
-        console.error('❌ Ошибка сети:', error);
-        document.getElementById('registerFormError').textContent = 'Ошибка соединения с сервером';
-        this.showToast('Ошибка соединения с сервером', 'error');
-        return false;
-    }
-}
-
-async login(email, password) {
-    // Очищаем предыдущие ошибки
-    document.getElementById('loginEmailError').textContent = '';
-    document.getElementById('loginPasswordError').textContent = '';
-    document.getElementById('loginFormError').textContent = '';
-
-    if (!email || !password) {
-        document.getElementById('loginFormError').textContent = 'Введите email и пароль';
-        return false;
     }
 
-    console.log('🔐 Отправка входа:', { email, password: '***' });
-
-    try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
+    async loadUserProfile() {
+        // Пытаемся загрузить профиль из localStorage
+        let profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
         
-        const data = await response.json();
-        console.log('📡 Ответ сервера:', response.status, data);
-        
-        if (response.ok) {
-            this.setSession(data);
-            this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
-            this.closeAuthModal();
-            return true;
-        } else {
-            const errorMsg = data.error || 'Ошибка входа';
-            if (errorMsg.includes('пароль') || errorMsg.includes('Password')) {
-                document.getElementById('loginPasswordError').textContent = 'Неверный пароль';
-            } else if (errorMsg.includes('email') || errorMsg.includes('Email') || errorMsg.includes('пользователь')) {
-                document.getElementById('loginEmailError').textContent = errorMsg;
-            } else {
-                document.getElementById('loginFormError').textContent = errorMsg;
+        // Если профиль пустой или username не совпадает - создаём новый
+        if (!profile.username || profile.username !== this.currentUser.username) {
+            // Запрашиваем актуальные данные с сервера
+            try {
+                const response = await fetch(`/api/users/${this.currentUser.id}`, {
+                    headers: { 'Authorization': `Bearer ${this.token}` }
+                });
+                if (response.ok) {
+                    profile = await response.json();
+                }
+            } catch (e) {
+                console.warn('Не удалось загрузить профиль с сервера');
             }
-            this.showToast(errorMsg, 'error');
+            
+            // Если сервер не вернул данные - создаём новый профиль с нуля
+            if (!profile.username) {
+                profile = {
+                    id: this.currentUser.id,
+                    username: this.currentUser.username,
+                    email: this.currentUser.email,
+                    balance: this.currentUser.balance || 0,
+                    rating: 0,
+                    reviewsCount: 0,
+                    productsCount: 0,
+                    purchasesCount: 0,
+                    salesCount: 0,
+                    activeOrders: 0,
+                    completedOrders: 0,
+                    joinedDate: new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
+                    verified: false,
+                    avatarUrl: this.currentUser.avatar_url || null
+                };
+            }
+            
+            localStorage.setItem('apex_profile', JSON.stringify(profile));
+        }
+        
+        // Обновляем баланс из currentUser (сервер мог изменить)
+        if (this.currentUser.balance !== undefined) {
+            profile.balance = this.currentUser.balance;
+            localStorage.setItem('apex_profile', JSON.stringify(profile));
+        }
+    }
+
+    async register(email, username, password) {
+        // Очищаем ошибки
+        document.querySelectorAll('.auth-error-message').forEach(el => el.textContent = '');
+
+        if (!email || !username || !password) {
+            document.getElementById('registerFormError').textContent = 'Заполните все поля';
             return false;
         }
-    } catch (error) {
-        console.error('❌ Ошибка сети:', error);
-        document.getElementById('loginFormError').textContent = 'Ошибка соединения с сервером';
-        this.showToast('Ошибка соединения с сервером', 'error');
-        return false;
+        if (password.length < 6) {
+            document.getElementById('registerPasswordError').textContent = 'Пароль должен быть не менее 6 символов';
+            return false;
+        }
+        const confirm = document.getElementById('registerConfirmPassword').value;
+        if (password !== confirm) {
+            document.getElementById('registerConfirmError').textContent = 'Пароли не совпадают';
+            return false;
+        }
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                this.setSession(data);
+                this.showToast('Регистрация успешна!', 'success');
+                this.closeAuthModal();
+                return true;
+            } else {
+                const errorMsg = data.error || 'Ошибка регистрации';
+                document.getElementById('registerFormError').textContent = errorMsg;
+                this.showToast(errorMsg, 'error');
+                return false;
+            }
+        } catch (error) {
+            document.getElementById('registerFormError').textContent = 'Ошибка соединения с сервером';
+            this.showToast('Ошибка соединения с сервером', 'error');
+            return false;
+        }
     }
-}
+
     async login(email, password) {
+        document.querySelectorAll('.auth-error-message').forEach(el => el.textContent = '');
+
+        if (!email || !password) {
+            document.getElementById('loginFormError').textContent = 'Введите email и пароль';
+            return false;
+        }
+
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -499,111 +519,59 @@ async login(email, password) {
             });
             
             const data = await response.json();
+            
             if (response.ok) {
                 this.setSession(data);
                 this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
                 this.closeAuthModal();
                 return true;
             } else {
-                this.showToast(data.error || 'Неверный email или пароль', 'error');
+                const errorMsg = data.error || 'Ошибка входа';
+                document.getElementById('loginFormError').textContent = errorMsg;
+                this.showToast(errorMsg, 'error');
                 return false;
             }
         } catch (error) {
-            this.showToast('Ошибка соединения', 'error');
+            document.getElementById('loginFormError').textContent = 'Ошибка соединения с сервером';
+            this.showToast('Ошибка соединения с сервером', 'error');
             return false;
         }
-    }
-
-    async loginWithGoogle() {
-        if (!window.google) {
-            this.showToast('Сервисы Google загружаются...', 'info');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-
-        window.google?.accounts.id.initialize({
-            client_id: this.GOOGLE_CLIENT_ID,
-            callback: async (response) => {
-                try {
-                    const res = await fetch('/api/auth/google', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ credential: response.credential })
-                    });
-                    
-                    const data = await res.json();
-                    if (res.ok) {
-                        this.setSession(data);
-                        this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
-                        this.closeAuthModal();
-                    } else {
-                        this.showToast(data.error || 'Ошибка входа через Google', 'error');
-                    }
-                } catch (error) {
-                    this.showToast('Ошибка соединения', 'error');
-                }
-            }
-        });
-        
-        window.google?.accounts.id.prompt();
-    }
-
-    async loginWithVK() {
-        if (!window.VK) {
-            this.showToast('Сервисы VK загружаются...', 'info');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-
-        window.VK.init({ apiId: this.VK_APP_ID });
-        
-        window.VK.Auth.login(async (response) => {
-            if (response.session) {
-                const vkId = response.session.mid;
-                
-                window.VK.Api.call('users.get', {
-                    user_ids: vkId,
-                    fields: 'photo_200',
-                    v: '5.131'
-                }, async (userData) => {
-                    if (userData.response) {
-                        const user = userData.response[0];
-                        try {
-                            const res = await fetch('/api/auth/vk', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    vkId: vkId,
-                                    username: `${user.first_name} ${user.last_name}`,
-                                    avatarUrl: user.photo_200
-                                })
-                            });
-                            
-                            const data = await res.json();
-                            if (res.ok) {
-                                this.setSession(data);
-                                this.showToast(`Добро пожаловать, ${data.user.username}!`, 'success');
-                                this.closeAuthModal();
-                            } else {
-                                this.showToast(data.error || 'Ошибка входа через VK', 'error');
-                            }
-                        } catch (error) {
-                            this.showToast('Ошибка соединения', 'error');
-                        }
-                    }
-                });
-            }
-        }, 2);
     }
 
     setSession(data) {
         this.token = data.token;
         this.currentUser = data.user;
+        
+        // Сохраняем токен
         localStorage.setItem('auth_token', this.token);
         localStorage.setItem('apex_user', data.user.username);
         localStorage.setItem('apex_user_id', data.user.id);
         localStorage.setItem('apex_user_email', data.user.email);
+        
         if (data.user.avatar_url) {
             localStorage.setItem('apex_user_picture', data.user.avatar_url);
         }
+        
+        // Создаём/обновляем профиль
+        const profile = {
+            id: data.user.id,
+            username: data.user.username,
+            email: data.user.email,
+            balance: data.user.balance || 0,
+            rating: data.user.rating || 0,
+            reviewsCount: data.user.reviews_count || 0,
+            productsCount: 0,
+            purchasesCount: 0,
+            salesCount: 0,
+            activeOrders: 0,
+            completedOrders: 0,
+            joinedDate: new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }),
+            verified: false,
+            avatarUrl: data.user.avatar_url || null
+        };
+        
+        localStorage.setItem('apex_profile', JSON.stringify(profile));
+        
         this.updateUI();
         this.checkGuestPages();
     }
@@ -620,61 +588,69 @@ async login(email, password) {
         
         this.token = null;
         this.currentUser = null;
+        
+        // Очищаем localStorage
         localStorage.removeItem('auth_token');
         localStorage.removeItem('apex_user');
         localStorage.removeItem('apex_user_id');
         localStorage.removeItem('apex_user_email');
         localStorage.removeItem('apex_user_picture');
+        localStorage.removeItem('apex_profile');
         
         this.updateUI();
         this.checkGuestPages();
-        if (showMessage) this.showToast('Вы вышли из аккаунта', 'success');
+        
+        if (showMessage) {
+            this.showToast('Вы вышли из аккаунта', 'success');
+        }
         
         this.modalAutoShown = false;
-        
-        setTimeout(() => {
-            if (!this.currentUser && !this.modalAutoShown) {
-                this.showAuthModal('register');
-                this.modalAutoShown = true;
-            }
-        }, 500);
     }
 
     updateUI() {
         const isLoggedIn = !!this.currentUser;
         
+        // Обновляем кнопку входа
         const loginBtn = document.getElementById('loginBtn');
-        const userMenu = document.getElementById('userMenu');
-        const usernameDisplay = document.getElementById('usernameDisplay');
-        const userAvatar = document.getElementById('userAvatar');
-        const profileUsername = document.getElementById('profileUsername');
-        const avatarCircle = document.getElementById('profileAvatarCircle');
-
-        if (loginBtn) loginBtn.style.display = isLoggedIn ? 'none' : 'flex';
-        if (userMenu) userMenu.style.display = isLoggedIn ? 'flex' : 'none';
+        if (loginBtn) {
+            loginBtn.style.display = isLoggedIn ? 'none' : 'flex';
+        }
         
-        if (this.currentUser) {
-            if (usernameDisplay) usernameDisplay.textContent = this.currentUser.username;
-            if (profileUsername) profileUsername.textContent = this.currentUser.username;
-            
-            if (this.currentUser.avatar_url) {
-                if (userAvatar) { userAvatar.src = this.currentUser.avatar_url; userAvatar.style.display = 'block'; }
-                if (avatarCircle) {
-                    avatarCircle.style.backgroundImage = `url(${this.currentUser.avatar_url})`;
-                    avatarCircle.style.backgroundSize = 'cover';
-                    avatarCircle.classList.add('has-bg');
-                }
-            }
-        } else {
-            if (profileUsername) profileUsername.textContent = 'Гость';
-            if (avatarCircle) {
+        // Обновляем меню пользователя
+        const userMenu = document.getElementById('userMenu');
+        if (userMenu) {
+            userMenu.style.display = isLoggedIn ? 'flex' : 'none';
+        }
+        
+        // Обновляем имя пользователя в хедере
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        if (usernameDisplay && this.currentUser) {
+            usernameDisplay.textContent = this.currentUser.username;
+        }
+        
+        // Обновляем аватар
+        const userAvatar = document.getElementById('userAvatar');
+        if (userAvatar && this.currentUser?.avatar_url) {
+            userAvatar.src = this.currentUser.avatar_url;
+            userAvatar.style.display = 'block';
+        }
+        
+        // Обновляем профиль
+        const profileUsername = document.getElementById('profileUsername');
+        if (profileUsername) {
+            profileUsername.textContent = this.currentUser?.username || 'Гость';
+        }
+        
+        const avatarCircle = document.getElementById('profileAvatarCircle');
+        if (avatarCircle) {
+            if (this.currentUser?.avatar_url) {
+                avatarCircle.style.backgroundImage = `url(${this.currentUser.avatar_url})`;
+                avatarCircle.style.backgroundSize = 'cover';
+                avatarCircle.classList.add('has-bg');
+            } else {
                 avatarCircle.style.backgroundImage = '';
                 avatarCircle.classList.remove('has-bg');
             }
-        }
-
-        if (isLoggedIn && typeof window.loadUserProductsInProfile === 'function') {
-            window.loadUserProductsInProfile();
         }
     }
 
@@ -689,8 +665,6 @@ async login(email, password) {
     }
 
     showGuestScreens() {
-        const self = this;
-        
         this.replacePageContent('chat', this.createGuestChatScreen());
         this.replacePageContent('products-manage', this.createGuestProductsScreen());
         this.replacePageContent('profile', this.createGuestProfileScreen());
@@ -699,10 +673,9 @@ async login(email, password) {
             document.querySelectorAll('.guest-login-btn').forEach(btn => {
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
-                newBtn.addEventListener('click', function(e) {
+                newBtn.addEventListener('click', (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    self.showAuthModal('register');
+                    this.showAuthModal('register');
                 });
             });
         }, 100);
@@ -760,19 +733,22 @@ async login(email, password) {
         `;
     }
 
-showAuthModal(tab = 'register') {
-    const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.classList.add('active');
-        this.switchAuthTab(tab);
-        // Очистка ошибок
-        document.querySelectorAll('.auth-error-message').forEach(el => el.textContent = '');
+    showAuthModal(tab = 'register') {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            this.switchAuthTab(tab);
+            document.querySelectorAll('.auth-error-message').forEach(el => el.textContent = '');
+        }
     }
-}
 
     closeAuthModal() {
         const modal = document.getElementById('authModal');
-        if (modal) modal.classList.remove('active');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+        }
     }
 
     switchAuthTab(tab) {
@@ -795,6 +771,7 @@ showAuthModal(tab = 'register') {
     }
 
     setupEventListeners() {
+        // Кнопка входа в хедере
         const loginBtn = document.getElementById('loginBtn');
         if (loginBtn) {
             const newBtn = loginBtn.cloneNode(true);
@@ -802,6 +779,7 @@ showAuthModal(tab = 'register') {
             newBtn.addEventListener('click', () => this.showAuthModal('register'));
         }
 
+        // Кнопка выхода
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             const newBtn = logoutBtn.cloneNode(true);
@@ -816,11 +794,13 @@ showAuthModal(tab = 'register') {
             newBtn.addEventListener('click', () => this.logout());
         }
 
+        // Табы
         document.getElementById('loginTab')?.addEventListener('click', () => this.switchAuthTab('login'));
         document.getElementById('registerTab')?.addEventListener('click', () => this.switchAuthTab('register'));
         document.getElementById('switchToRegister')?.addEventListener('click', (e) => { e.preventDefault(); this.switchAuthTab('register'); });
         document.getElementById('switchToLogin')?.addEventListener('click', (e) => { e.preventDefault(); this.switchAuthTab('login'); });
 
+        // Формы
         document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -846,22 +826,24 @@ showAuthModal(tab = 'register') {
             await this.register(email, username, password);
         });
 
+        // Социальные кнопки
         document.getElementById('googleLoginBtn2')?.addEventListener('click', () => this.loginWithGoogle());
         document.getElementById('googleRegisterBtn2')?.addEventListener('click', () => this.loginWithGoogle());
         document.getElementById('vkLoginBtn2')?.addEventListener('click', () => this.loginWithVK());
         document.getElementById('vkRegisterBtn2')?.addEventListener('click', () => this.loginWithVK());
         
+        // Закрытие модалки
         const modal = document.getElementById('authModal');
         modal?.addEventListener('click', (e) => { if (e.target === modal) this.closeAuthModal(); });
         document.getElementById('authModalCloseBtn')?.addEventListener('click', () => this.closeAuthModal());
+    }
 
-        const originalShowPage = window.showPage;
-        if (originalShowPage) {
-            window.showPage = (pageId) => {
-                originalShowPage(pageId);
-                setTimeout(() => this.checkGuestPages(), 50);
-            };
-        }
+    async loginWithGoogle() {
+        this.showToast('Вход через Google (демо)', 'info');
+    }
+
+    async loginWithVK() {
+        this.showToast('Вход через VK (демо)', 'info');
     }
 
     showToast(message, type = 'success') {
