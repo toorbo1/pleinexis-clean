@@ -366,7 +366,7 @@ if (!userProfile.username) {
   }
   
   // ===== КНОПКА ПОДКЛЮЧЕНИЯ ВИТРИНЫ =====
-  function setupShopButton() {
+function setupShopButton() {
     const shopBtn = document.getElementById('connectShopBtn');
     if (!shopBtn) return;
     
@@ -374,36 +374,41 @@ if (!userProfile.username) {
     shopBtn.parentNode.replaceChild(newBtn, shopBtn);
     
     newBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
-      const application = JSON.parse(localStorage.getItem(`shop_application_${currentUser}`) || 'null');
-      
-      if (sellers.includes(currentUser)) {
-        if (typeof window.showPage === 'function') {
-          window.showPage('products-manage');
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🛒 КЛИК ПО КНОПКЕ ВИТРИНЫ');
+        
+        const user = localStorage.getItem('apex_user') || 'Гость';
+        const sellers = JSON.parse(localStorage.getItem('apex_verified_sellers') || '[]');
+        const application = JSON.parse(localStorage.getItem(`shop_application_${user}`) || 'null');
+        
+        if (sellers.includes(user)) {
+            if (typeof window.showPage === 'function') window.showPage('products-manage');
+            return;
         }
-      } else if (application && application.status === 'pending') {
-        if (typeof window.showPage === 'function') {
-          window.showPage('shopConnectPage');
-          setTimeout(() => {
-            if (typeof window.initShopConnectPage === 'function') {
-              window.initShopConnectPage();
+        
+        if (application && application.status === 'pending') {
+            if (typeof window.showPage === 'function') {
+                window.showPage('shopConnectPage');
+                setTimeout(() => {
+                    if (typeof window.initShopConnectPage === 'function') {
+                        window.initShopConnectPage();
+                    }
+                }, 50);
             }
-          }, 50);
+            return;
         }
-      } else {
+        
         if (typeof window.showPage === 'function') {
-          window.showPage('shopConnectPage');
-          setTimeout(() => {
-            if (typeof window.initShopConnectPage === 'function') {
-              window.initShopConnectPage();
-            }
-          }, 50);
+            window.showPage('shopConnectPage');
+            setTimeout(() => {
+                if (typeof window.initShopConnectPage === 'function') {
+                    window.initShopConnectPage();
+                }
+            }, 50);
         }
-      }
     });
-  }
+}
   
   function logout() {
     if (confirm('Вы уверены, что хотите выйти из аккаунта?')) {

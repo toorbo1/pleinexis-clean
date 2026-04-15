@@ -1183,9 +1183,9 @@ body::after {
           <button class="btn-gradient" id="adminProfileBtn">
             <i class="fas fa-user-shield"></i> Админ-панель
           </button>
-          <button class="btn-glass" id="connectShopBtn">
-            <i class="fas fa-store"></i> Подключить витрину
-          </button>
+<button class="btn-glass" id="connectShopBtn">
+    <i class="fas fa-store"></i> Подключить витрину
+</button>
           <button class="btn-logout" id="profileLogoutBtn">
             <i class="fas fa-sign-out-alt"></i> Выйти
           </button>
@@ -4073,55 +4073,7 @@ window.quickTopup = async function(amount) {
 };
 
 console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
-// Добавляем обработчик на кнопку + после загрузки DOM
-(function() {
-    function bindTopupButton() {
-        var topupBtn = document.getElementById('quickTopupBtn');
-        if (!topupBtn) {
-            console.warn('⚠️ Кнопка quickTopupBtn не найдена, повторная попытка через 300ms');
-            setTimeout(bindTopupButton, 300);
-            return;
-        }
-        
-        console.log('✅ Кнопка пополнения найдена, привязываем обработчик');
-        
-        // Полностью пересоздаём кнопку, чтобы удалить ВСЕ старые обработчики
-        var newBtn = topupBtn.cloneNode(true);
-        topupBtn.parentNode.replaceChild(newBtn, topupBtn);
-        
-        // Вешаем новый обработчик
-        newBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            console.log('🖱️ КЛИК ПО КНОПКЕ +');
-            
-            var modal = document.getElementById('quickTopupModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.style.zIndex = '999999'; // Максимальный z-index
-                console.log('✅ Модальное окно показано');
-            } else {
-                console.error('❌ Модальное окно quickTopupModal не найдено!');
-            }
-            
-            return false;
-        });
-        
-        console.log('✅ Обработчик привязан');
-    }
-    
-    // Запускаем после полной загрузки DOM
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(bindTopupButton, 800);
-        });
-    } else {
-        setTimeout(bindTopupButton, 800);
-    }
-})();
 
-console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
 </script>
 
 </body>
