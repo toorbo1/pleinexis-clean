@@ -53,6 +53,24 @@ function updateActiveNavButton(pageId) {
     });
 }
 
+if (pageId === 'profile') {
+    setTimeout(() => {
+        if (typeof window.initProfilePage === 'function') {
+            window.initProfilePage();
+        }
+        // Дополнительно привязываем кнопку, если вдруг не сработало
+        const topupBtn = document.getElementById('quickTopupBtn');
+        if (topupBtn && !topupBtn._listener) {
+            topupBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                document.getElementById('quickTopupModal').style.display = 'flex';
+            });
+            topupBtn._listener = true;
+        }
+    }, 100);
+}
+
 // ========== ИНИЦИАЛИЗАЦИЯ НАВИГАЦИИ ==========
 function initNavigation() {
     console.log('🔵 initNavigation started');

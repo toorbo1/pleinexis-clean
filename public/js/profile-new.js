@@ -32,7 +32,6 @@ if (!userProfile.username) {
   // ===== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ =====
   function initProfilePage() {
     console.log('🔄 Инициализация профиля...');
-    updateProfileInfo();
     updateBalance();
     updateStats();
     updateTabs();
@@ -40,27 +39,31 @@ if (!userProfile.username) {
     setupEventListeners();
     setupAdminButton();
     setupShopButton();
-    
+
     // Привязываем обработчик к кнопке "+" на балансе
     const topupBtn = document.getElementById('quickTopupBtn');
     if (topupBtn) {
-        // Удаляем старые обработчики
         const newBtn = topupBtn.cloneNode(true);
         topupBtn.parentNode.replaceChild(newBtn, topupBtn);
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (typeof window.showQuickTopupModal === 'function') {
-                window.showQuickTopupModal();
+            const modal = document.getElementById('quickTopupModal');
+            if (modal) {
+                modal.style.display = 'flex';
             } else {
-                // fallback
-                const modal = document.getElementById('quickTopupModal');
-                if (modal) modal.style.display = 'flex';
+                console.error('❌ Модальное окно quickTopupModal не найдено!');
             }
         });
+        console.log('✅ Обработчик на кнопку + привязан');
+    } else {
+        console.warn('⚠️ Кнопка quickTopupBtn не найдена при инициализации профиля');
     }
+
+    console.log('✅ Профиль инициализирован');
 }
-  
+
+
   // ===== ОБНОВЛЕНИЕ ИНФОРМАЦИИ ПРОФИЛЯ =====
   function updateProfileInfo() {
     const usernameEl = document.getElementById('profileUsername');
