@@ -1,9 +1,12 @@
 // ========== СТРАНИЦА ВЫВОДА СРЕДСТВ (ОБНОВЛЕННАЯ) ==========
 
 // Глобальные переменные
-let currentUser = localStorage.getItem('apex_user') || 'Гость';
-let userProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
-let currentBalance = userProfile.balance || 0;
+if (!window.withdrawInitialized) {
+    window.withdrawInitialized = true;
+    var withdrawCurrentUser = localStorage.getItem('apex_user') || 'Гость';
+    var withdrawUserProfile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+    var withdrawCurrentBalance = withdrawUserProfile.balance || 0;
+}
 
 // Методы вывода
 const withdrawMethods = [

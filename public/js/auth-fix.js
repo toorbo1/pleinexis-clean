@@ -378,38 +378,45 @@ class AuthManager {
         }
     }
 
-    async fetchCurrentUser() {
-        if (!this.token) return false;
+async fetchCurrentUser() {
+    if (!this.token) return false;
+    
+    try {
+        const response = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${this.token}` }
+        });
         
-        try {
-            const response = await fetch('/api/auth/me', {
-                headers: { 'Authorization': `Bearer ${this.token}` }
-            });
+        if (response.ok) {
+            this.currentUser = await response.json();
             
-            if (response.ok) {
-                this.currentUser = await response.json();
-                
-                // Сохраняем данные пользователя в localStorage
-                localStorage.setItem('apex_user', this.currentUser.username);
-                localStorage.setItem('apex_user_id', this.currentUser.id);
-                localStorage.setItem('apex_user_email', this.currentUser.email || '');
-                
-                // Загружаем или создаём профиль
-                await this.loadUserProfile();
-                
-                this.updateUI();
-                console.log('✅ Пользователь загружен:', this.currentUser.username);
-                return true;
-            } else {
-                console.warn('❌ Токен недействителен');
-                return false;
-            }
-        } catch (error) {
-            console.error('❌ Ошибка при получении пользователя:', error);
+            // Сохраняем данные пользователя
+            localStorage.setItem('apex_user', this.currentUser.username);
+            localStorage.setItem('apex_user_id', this.currentUser.id);
+            localStorage.setItem('apex_user_email', this.currentUser.email || '');
+            
+            await this.loadUserProfile();
+            this.updateUI();
+            console.log('✅ Пользователь загружен:', this.currentUser.username);
+            return true;
+        } else if (response.status === 401) {
+            // Токен истёк или недействителен
+            console.warn('❌ Токен недействителен, очищаем...');
+            this.token = null;
+            this.currentUser = null;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('apex_user');
+            localStorage.removeItem('apex_user_id');
+            localStorage.removeItem('apex_user_email');
+            localStorage.removeItem('apex_user_picture');
+            localStorage.removeItem('apex_profile');
             return false;
         }
+        return false;
+    } catch (error) {
+        console.error('❌ Ошибка при получении пользователя:', error);
+        return false;
     }
-
+}
     async loadUserProfile() {
         // Пытаемся загрузить профиль из localStorage
         let profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');

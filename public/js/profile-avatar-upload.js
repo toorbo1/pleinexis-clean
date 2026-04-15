@@ -5,13 +5,11 @@
   function uploadImageFromFile(file, type) {
     if (!file) return;
     
-    // Проверка типа файла
     if (!file.type.startsWith('image/')) {
       showToast('Пожалуйста, выберите изображение', 'error');
       return;
     }
     
-    // Проверка размера (максимум 5MB)
     if (file.size > 5 * 1024 * 1024) {
       showToast('Изображение не должно превышать 5MB', 'error');
       return;
@@ -22,7 +20,6 @@
       const imageUrl = e.target.result;
       
       if (type === 'avatar') {
-        // Сохраняем аватар
         const avatarCircle = document.getElementById('profileAvatarCircle');
         if (avatarCircle) {
           avatarCircle.style.backgroundImage = `url(${imageUrl})`;
@@ -30,22 +27,18 @@
           avatarCircle.style.backgroundPosition = 'center';
           avatarCircle.style.backgroundRepeat = 'no-repeat';
           avatarCircle.classList.add('has-bg');
-          // Скрываем текст внутри
           const span = avatarCircle.querySelector('span');
           if (span) span.style.display = 'none';
-          // Сохраняем в localStorage как base64
           localStorage.setItem('profileAvatarImage', imageUrl);
-          localStorage.removeItem('profileAvatarBg'); // убираем градиентный фон
+          localStorage.removeItem('profileAvatarBg');
         }
       } else if (type === 'hero') {
-        // Сохраняем фон hero секции
         const heroSection = document.getElementById('profileHeroSection');
         if (heroSection) {
           heroSection.style.backgroundImage = `url(${imageUrl})`;
           heroSection.style.backgroundSize = 'cover';
           heroSection.style.backgroundPosition = 'center';
           heroSection.style.backgroundRepeat = 'no-repeat';
-          // Сохраняем в localStorage
           localStorage.setItem('profileHeroImage', imageUrl);
           localStorage.removeItem('profileHeroBg');
         }
@@ -61,7 +54,6 @@
     reader.readAsDataURL(file);
   }
   
-  // Функция для создания модального окна выбора файла
   function createFilePickerModal(type, title) {
     let modal = document.getElementById(`${type}FilePickerModal`);
     if (modal) {
@@ -100,10 +92,8 @@
     const uploadArea = modal.querySelector('.file-upload-area');
     const fileInput = modal.querySelector(`#${type}FileInput`);
     
-    // Клик по области для выбора файла
     uploadArea.addEventListener('click', () => fileInput.click());
     
-    // Обработка drag & drop
     uploadArea.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadArea.style.borderColor = '#22c55e';
@@ -127,7 +117,6 @@
       }
     });
     
-    // Выбор файла через input
     fileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -147,9 +136,6 @@
     modal.classList.add('active');
   }
   
-  // Модифицируем функцию setupAvatarChangeButton для добавления загрузки из файла
-  const originalSetupAvatarChangeButton = window.setupAvatarChangeButton;
-  
   function enhancedSetupAvatarChangeButton() {
     const avatarWrapper = document.querySelector('.avatar-wrapper');
     if (!avatarWrapper) return;
@@ -161,7 +147,6 @@
       changeBtn.title = 'Сменить аватар';
       avatarWrapper.appendChild(changeBtn);
       
-      // Создаем меню выбора
       changeBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         showAvatarOptions();
@@ -207,7 +192,7 @@
     
     modal.querySelector('#gradientAvatarBtn').addEventListener('click', () => {
       modal.classList.remove('active');
-      openAvatarBgModal();
+      window.openAvatarBgModal();
     });
     
     modal.querySelector('#resetAvatarBtn').addEventListener('click', () => {
@@ -274,7 +259,7 @@
     
     modal.querySelector('#gradientHeroBtn').addEventListener('click', () => {
       modal.classList.remove('active');
-      openHeroBgModal();
+      window.openHeroBgModal();
     });
     
     modal.querySelector('#resetHeroBtn').addEventListener('click', () => {
@@ -300,7 +285,6 @@
     modal.classList.add('active');
   }
   
-  // Переопределяем setupHeroBgButton
   function enhancedSetupHeroBgButton() {
     const changeBtn = document.getElementById('changeHeroBgBtn');
     if (!changeBtn) return;
@@ -314,7 +298,6 @@
     });
   }
   
-  // Загрузка сохраненных изображений
   function loadSavedImages() {
     const savedAvatar = localStorage.getItem('profileAvatarImage');
     if (savedAvatar) {
@@ -340,7 +323,6 @@
     }
   }
   
-  // Toast уведомление
   function showToast(message, type = 'success') {
     let toast = document.querySelector('.toast-notification');
     if (!toast) {
@@ -359,115 +341,115 @@
       toast.classList.remove('show');
     }, 3000);
   }
+
+  // ========== ОПРЕДЕЛЯЕМ ФУНКЦИИ ДО ИХ ИСПОЛЬЗОВАНИЯ ==========
+  window.openAvatarBgModal = function() {
+    console.log('🎨 openAvatarBgModal');
+    let modal = document.getElementById('profileAvatarBgModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'profileAvatarBgModal';
+      modal.className = 'profile-modal';
+      modal.innerHTML = `
+        <div class="profile-modal-card" style="max-width: 320px;">
+          <h4>🎨 Выберите аватар</h4>
+          <div id="avatarBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
+          <button class="modal-btn" id="closeAvatarBgModalBtn">Закрыть</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      const presets = [
+        'linear-gradient(135deg, #667eea, #764ba2)',
+        'linear-gradient(135deg, #f093fb, #f5576c)',
+        'linear-gradient(135deg, #4facfe, #00f2fe)',
+        'linear-gradient(135deg, #43e97b, #38f9d7)',
+        'radial-gradient(circle, #1a0f2e, #1e1b4b)'
+      ];
+      
+      const container = modal.querySelector('#avatarBgOptionsList');
+      presets.forEach(preset => {
+        const div = document.createElement('div');
+        div.style.cssText = `width: 70px; height: 70px; border-radius: 50%; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
+        div.onmouseenter = () => div.style.borderColor = '#3b82f6';
+        div.onmouseleave = () => div.style.borderColor = 'transparent';
+        div.onclick = () => {
+          const avatar = document.getElementById('profileAvatarCircle');
+          if (avatar) {
+            avatar.style.background = preset;
+            avatar.style.backgroundImage = 'none';
+            avatar.classList.add('has-bg');
+            localStorage.setItem('profileAvatarBg', preset);
+          }
+          modal.classList.remove('active');
+        };
+        container.appendChild(div);
+      });
+      
+      modal.querySelector('#closeAvatarBgModalBtn').onclick = () => modal.classList.remove('active');
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+    }
+    modal.classList.add('active');
+  };
+
+  window.openHeroBgModal = function() {
+    console.log('🎨 openHeroBgModal');
+    let modal = document.getElementById('profileHeroBgModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'profileHeroBgModal';
+      modal.className = 'profile-modal';
+      modal.innerHTML = `
+        <div class="profile-modal-card" style="max-width: 320px;">
+          <h4>🎨 Выберите фон</h4>
+          <div id="heroBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
+          <button class="modal-btn" id="closeHeroBgModalBtn">Закрыть</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      
+      const presets = [
+        'linear-gradient(135deg, #11131f, #0a0c16)',
+        'radial-gradient(circle at 30% 20%, #0f0c29, #24243e)',
+        'linear-gradient(145deg, #2b0f1c, #5e2a3e)',
+        'linear-gradient(125deg, #001f3f, #0a2f44)'
+      ];
+      
+      const container = modal.querySelector('#heroBgOptionsList');
+      presets.forEach(preset => {
+        const div = document.createElement('div');
+        div.style.cssText = `width: 70px; height: 70px; border-radius: 12px; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
+        div.onmouseenter = () => div.style.borderColor = '#3b82f6';
+        div.onmouseleave = () => div.style.borderColor = 'transparent';
+        div.onclick = () => {
+          const hero = document.getElementById('profileHeroSection');
+          if (hero) {
+            hero.style.background = preset;
+            localStorage.setItem('profileHeroBg', preset);
+          }
+          modal.classList.remove('active');
+        };
+        container.appendChild(div);
+      });
+      
+      modal.querySelector('#closeHeroBgModalBtn').onclick = () => modal.classList.remove('active');
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+    }
+    modal.classList.add('active');
+  };
   
   // Экспорт функций
   window.setupAvatarChangeButton = enhancedSetupAvatarChangeButton;
   window.setupHeroBgButton = enhancedSetupHeroBgButton;
   window.loadSavedImages = loadSavedImages;
   window.showToast = showToast;
-  window.openAvatarBgModal = openAvatarBgModal;
-  window.openHeroBgModal = openHeroBgModal;
   
-  // Загружаем сохраненные изображения при инициализации
+  // Загружаем сохраненные изображения
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadSavedImages);
   } else {
     loadSavedImages();
   }
-
-// Добавляем недостающие функции прямо в консоль
-window.openAvatarBgModal = function() {
-    console.log('🎨 openAvatarBgModal');
-    let modal = document.getElementById('profileAvatarBgModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'profileAvatarBgModal';
-        modal.className = 'profile-modal';
-        modal.innerHTML = `
-            <div class="profile-modal-card" style="max-width: 320px;">
-                <h4>🎨 Выберите аватар</h4>
-                <div id="avatarBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
-                <button class="modal-btn" id="closeAvatarBgModalBtn">Закрыть</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        const presets = [
-            'linear-gradient(135deg, #667eea, #764ba2)',
-            'linear-gradient(135deg, #f093fb, #f5576c)',
-            'linear-gradient(135deg, #4facfe, #00f2fe)',
-            'linear-gradient(135deg, #43e97b, #38f9d7)',
-            'radial-gradient(circle, #1a0f2e, #1e1b4b)'
-        ];
-        
-        const container = modal.querySelector('#avatarBgOptionsList');
-        presets.forEach(preset => {
-            const div = document.createElement('div');
-            div.style.cssText = `width: 70px; height: 70px; border-radius: 50%; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
-            div.onmouseenter = () => div.style.borderColor = '#3b82f6';
-            div.onmouseleave = () => div.style.borderColor = 'transparent';
-            div.onclick = () => {
-                const avatar = document.getElementById('profileAvatarCircle');
-                if (avatar) {
-                    avatar.style.backgroundImage = preset;
-                    avatar.style.backgroundSize = 'cover';
-                    avatar.classList.add('has-bg');
-                    localStorage.setItem('profileAvatarBg', preset);
-                }
-                modal.classList.remove('active');
-            };
-            container.appendChild(div);
-        });
-        
-        modal.querySelector('#closeAvatarBgModalBtn').onclick = () => modal.classList.remove('active');
-    }
-    modal.classList.add('active');
-};
-
-window.openHeroBgModal = function() {
-    console.log('🎨 openHeroBgModal');
-    let modal = document.getElementById('profileHeroBgModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'profileHeroBgModal';
-        modal.className = 'profile-modal';
-        modal.innerHTML = `
-            <div class="profile-modal-card" style="max-width: 320px;">
-                <h4>🎨 Выберите фон</h4>
-                <div id="heroBgOptionsList" style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;"></div>
-                <button class="modal-btn" id="closeHeroBgModalBtn">Закрыть</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        const presets = [
-            'linear-gradient(135deg, #11131f, #0a0c16)',
-            'radial-gradient(circle at 30% 20%, #0f0c29, #24243e)',
-            'linear-gradient(145deg, #2b0f1c, #5e2a3e)',
-            'linear-gradient(125deg, #001f3f, #0a2f44)'
-        ];
-        
-        const container = modal.querySelector('#heroBgOptionsList');
-        presets.forEach(preset => {
-            const div = document.createElement('div');
-            div.style.cssText = `width: 70px; height: 70px; border-radius: 12px; background: ${preset}; cursor: pointer; border: 2px solid transparent;`;
-            div.onmouseenter = () => div.style.borderColor = '#3b82f6';
-            div.onmouseleave = () => div.style.borderColor = 'transparent';
-            div.onclick = () => {
-                const hero = document.getElementById('profileHeroSection');
-                if (hero) {
-                    hero.style.background = preset;
-                    localStorage.setItem('profileHeroBg', preset);
-                }
-                modal.classList.remove('active');
-            };
-            container.appendChild(div);
-        });
-        
-        modal.querySelector('#closeHeroBgModalBtn').onclick = () => modal.classList.remove('active');
-    }
-    modal.classList.add('active');
-};
-
-console.log('✅ Функции добавлены, теперь кликайте на баланс!');
+  
+  console.log('✅ profile-avatar-upload.js загружен');
 })();

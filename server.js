@@ -102,7 +102,11 @@ async function ensureTables() {
             CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
             CREATE INDEX IF NOT EXISTS idx_users_provider ON users(auth_provider, provider_id);
         `);
-        
+        // В server.js, внутри ensureTables(), после создания таблицы users
+await client.query(`
+    ALTER TABLE users 
+    ADD COLUMN IF NOT EXISTS products_count INTEGER DEFAULT 0
+`);
         // Таблица сессий
         await client.query(`
             CREATE TABLE IF NOT EXISTS sessions (
@@ -214,6 +218,7 @@ async function ensureTables() {
                 updated_at TIMESTAMP DEFAULT NOW()
             )
         `);
+        
         // В server.js, внутри ensureTables() после создания других таблиц
 await client.query(`
     CREATE TABLE IF NOT EXISTS deals (

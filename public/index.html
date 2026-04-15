@@ -2144,7 +2144,7 @@ body::after {
 <script src="js/reviews.js?v=2"></script>
 <script src="js/reviews-shop.js?v=2"></script>
 <script src="js/shop-connect.js?v=2"></script>
-<script src="topup.js"></script>
+<script src="topup.js?v=2"></script>
 <script>
   
 // ===== ОБНОВЛЕНИЕ ЦЕНЫ НА КНОПКЕ =====
@@ -3821,7 +3821,22 @@ document.addEventListener('DOMContentLoaded', function() {
         initCarousel();
     }
 })();
-
+// Принудительно очищаем невалидный токен
+if (localStorage.getItem('auth_token')) {
+    fetch('/api/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('auth_token') }
+    }).then(res => {
+        if (!res.ok) {
+            console.log('🧹 Очистка невалидного токена');
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('apex_user');
+            localStorage.removeItem('apex_user_id');
+            localStorage.removeItem('apex_user_email');
+            localStorage.removeItem('apex_profile');
+            location.reload();
+        }
+    });
+}
 </script>
 
 </body>
