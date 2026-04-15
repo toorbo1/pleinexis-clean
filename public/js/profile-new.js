@@ -546,37 +546,50 @@ async function topUpBalance(amount) {
 
 // Добавить кнопку пополнения в профиль
 function addTopUpButton() {
+  const balanceCard = document.querySelector('.balance-card');
+if (balanceCard) {
+    balanceCard.addEventListener('click', function(e) {
+        // Если клик был по кнопке пополнения - не переходим
+        if (e.target.closest('#topUpBtn')) return;
+        
+        if (typeof window.showPage === 'function') {
+            window.showPage('topupPage');
+        }
+    });
+}}
+
+// Добавить кнопку быстрого пополнения
+function addTopUpButton() {
     const balanceCard = document.querySelector('.balance-card');
     if (!balanceCard) return;
-    
-    // Проверяем, нет ли уже кнопки
     if (document.getElementById('topUpBtn')) return;
     
     const topUpBtn = document.createElement('button');
     topUpBtn.id = 'topUpBtn';
-    topUpBtn.className = 'topup-btn';
-    topUpBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Пополнить';
+    topUpBtn.innerHTML = '<i class="fas fa-plus-circle"></i>';
+    topUpBtn.title = 'Пополнить баланс';
     topUpBtn.style.cssText = `
         position: absolute;
         right: 60px;
         top: 50%;
         transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
         background: linear-gradient(135deg, #22c55e, #16a34a);
         border: none;
-        padding: 8px 16px;
-        border-radius: 40px;
+        border-radius: 50%;
         color: white;
-        font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 1.2rem;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
         transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
     `;
     
     topUpBtn.addEventListener('mouseenter', () => {
-        topUpBtn.style.transform = 'translateY(-50%) scale(1.05)';
+        topUpBtn.style.transform = 'translateY(-50%) scale(1.1)';
     });
     topUpBtn.addEventListener('mouseleave', () => {
         topUpBtn.style.transform = 'translateY(-50%) scale(1)';
@@ -584,7 +597,9 @@ function addTopUpButton() {
     
     topUpBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        showTopUpModal();
+        if (typeof window.showPage === 'function') {
+            window.showPage('topupPage');
+        }
     });
     
     balanceCard.style.position = 'relative';

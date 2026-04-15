@@ -42,7 +42,7 @@
 <!-- 6. ФИКСЫ (самые последние) -->
 <link rel="stylesheet" href="home-steam-fix.css?v=2">
 <link rel="stylesheet" href="profile-fix.css?v=2">
-
+<link rel="stylesheet" href="topup.css">
 <style>
   .guest-banner {
     position: fixed;
@@ -1878,7 +1878,86 @@ body::after {
     </div>
   </div>
 </div>
-
+<!-- ==================== СТРАНИЦА ПОПОЛНЕНИЯ БАЛАНСА ==================== -->
+<div class="page" id="topupPage">
+    <div class="topup-container">
+        <!-- Хедер -->
+        <div class="topup-header">
+            <button class="back-btn" onclick="showPage('profile')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1><i class="fas fa-wallet"></i> Пополнение</h1>
+        </div>
+        
+        <!-- Текущий баланс -->
+        <div class="balance-preview-card">
+            <div class="balance-preview-label">Текущий баланс</div>
+            <div class="balance-preview-amount" id="topupBalanceAmount">0 ₽</div>
+        </div>
+        
+        <!-- Выбор суммы -->
+        <div class="amount-grid">
+            <div class="amount-card" data-amount="100">
+                <div class="amount-value">100 ₽</div>
+            </div>
+            <div class="amount-card" data-amount="500">
+                <div class="amount-value">500 ₽</div>
+                <div class="amount-bonus">+5% бонус</div>
+            </div>
+            <div class="amount-card" data-amount="1000">
+                <div class="amount-value">1 000 ₽</div>
+                <div class="amount-bonus">+10% бонус</div>
+            </div>
+            <div class="amount-card" data-amount="5000">
+                <div class="amount-value">5 000 ₽</div>
+                <div class="amount-bonus">+15% бонус</div>
+            </div>
+        </div>
+        
+        <!-- Своя сумма -->
+        <div class="custom-amount-section">
+            <div class="custom-amount-label">
+                <i class="fas fa-pencil-alt"></i> Или введите свою сумму
+            </div>
+            <div class="custom-amount-input-wrapper">
+                <input type="text" id="customAmountInput" placeholder="Минимум 100 ₽">
+                <span class="currency-label">₽</span>
+            </div>
+        </div>
+        
+        <!-- Способы оплаты -->
+        <div class="payment-methods-section">
+            <div class="section-title">
+                <i class="fas fa-credit-card"></i> Способ оплаты
+            </div>
+            <div class="payment-methods-grid">
+                <div class="payment-method card selected" data-method="card">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Банковская карта</span>
+                </div>
+                <div class="payment-method sbp" data-method="sbp">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>СБП</span>
+                </div>
+                <div class="payment-method qiwi" data-method="qiwi">
+                    <i class="fas fa-wallet"></i>
+                    <span>QIWI</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Кнопка пополнения -->
+        <button class="topup-submit-btn" id="topupSubmitBtn">
+            <i class="fas fa-plus-circle"></i> Пополнить баланс
+        </button>
+        
+        <!-- Информация -->
+        <div class="info-note">
+            <i class="fas fa-shield-alt"></i>
+            <span>Безопасное пополнение • Моментальное зачисление</span>
+        </div>
+    </div>
+</div>
 <!-- ==================== МОДАЛКА НАПИСАНИЯ ОТЗЫВА ==================== -->
 <div class="modal-glass" id="writeReviewModal">
   <div class="modal-content review-modal">
@@ -2065,6 +2144,7 @@ body::after {
 <script src="js/reviews.js?v=2"></script>
 <script src="js/reviews-shop.js?v=2"></script>
 <script src="js/shop-connect.js?v=2"></script>
+<script src="topup.js"></script>
 <script>
   
 // ===== ОБНОВЛЕНИЕ ЦЕНЫ НА КНОПКЕ =====
