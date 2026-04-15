@@ -1980,121 +1980,8 @@ body::after {
         </div>
     </div>
 </div>
-<!-- ==================== МОДАЛКА НАПИСАНИЯ ОТЗЫВА ==================== -->
-<div class="modal-glass" id="writeReviewModal">
-  <div class="modal-content review-modal">
-    <h3><i class="fas fa-star"></i> Написать отзыв</h3>
-    
-    <div class="rating-select">
-      <label>Ваша оценка</label>
-      <div class="stars-select" id="reviewStarsSelect">
-        <i class="far fa-star" data-rating="1"></i>
-        <i class="far fa-star" data-rating="2"></i>
-        <i class="far fa-star" data-rating="3"></i>
-        <i class="far fa-star" data-rating="4"></i>
-        <i class="far fa-star" data-rating="5"></i>
-      </div>
-      <input type="hidden" id="reviewRating" value="0">
-    </div>
-    
-    <div class="form-group">
-      <label>Ваше имя</label>
-      <input type="text" id="reviewAuthor" class="input-modern" placeholder="Как вас зовут?">
-    </div>
-    
-    <div class="form-group">
-      <label>Текст отзыва</label>
-      <textarea id="reviewText" class="input-modern" rows="4" placeholder="Поделитесь вашим опытом использования..."></textarea>
-      <div class="char-counter" id="reviewCharCounter">0/500</div>
-    </div>
-    
-    <div class="form-group">
-      <label>Фото (опционально)</label>
-      <div class="review-photo-upload" id="reviewPhotoUpload">
-        <i class="fas fa-camera"></i>
-        <span>Добавить фото</span>
-        <input type="file" id="reviewPhotoInput" accept="image/jpeg,image/png,image/gif" style="display: none;">
-      </div>
-      <div id="reviewPhotoPreview" class="review-photo-preview"></div>
-    </div>
-    
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeWriteReviewModal()">Отмена</button>
-      <button class="btn-primary" onclick="submitReview()">Опубликовать</button>
-    </div>
-  </div>
-</div>
 
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
-<div class="page" id="withdrawPage">
-    <div class="withdraw-header">
-        <button class="back-btn" onclick="showPage('profile')">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
-    </div>
-    
-    <div class="withdraw-container">
-        <!-- Баланс -->
-        <div class="balance-card">
-            <div class="balance-label">Доступно для вывода</div>
-            <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-            <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
-        </div>
 
-        <!-- Способ вывода -->
-        <div class="section-card">
-            <div class="section-title">
-                <i class="fas fa-wallet"></i> Способ вывода
-            </div>
-            <div class="methods-grid" id="methodsList"></div>
-        </div>
-
-        <!-- Реквизиты -->
-        <div class="section-card" id="detailsSection">
-            <div class="section-title">
-                <i class="fas fa-address-card"></i> Реквизиты
-            </div>
-            <div class="input-group">
-                <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
-                <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты для вывода">
-            </div>
-        </div>
-
-        <!-- Сумма -->
-        <div class="section-card">
-            <div class="section-title">
-                <i class="fas fa-coins"></i> Сумма вывода
-            </div>
-            <div class="amount-row">
-                <input type="number" id="withdrawAmount" placeholder="Введите сумму" step="10" min="100">
-                <div class="amount-presets">
-                    <button class="preset-btn" data-amount="500">500₽</button>
-                    <button class="preset-btn" data-amount="1000">1000₽</button>
-                    <button class="preset-btn" data-amount="5000">5000₽</button>
-                </div>
-            </div>
-            
-            <div class="commission-info" id="commissionInfo">
-                <span>Комиссия системы:</span>
-                <span id="commissionValue">0 ₽</span>
-            </div>
-            <div class="commission-info">
-                <span>Итого к списанию:</span>
-                <span id="totalWithdraw">0 ₽</span>
-            </div>
-        </div>
-
-        <button class="withdraw-btn" id="submitWithdrawBtn">
-            <i class="fas fa-paper-plane"></i> Запросить вывод
-        </button>
-        <div class="warning-text">
-            <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов.
-        </div>
-    </div>
-</div>
-<!-- ==================== КОНЕЦ СТРАНИЦЫ ВЫВОДА ==================== -->
 <!-- ==================== ФУТЕР ==================== -->
 <footer class="site-footer">
   <div class="footer-container">
@@ -2139,7 +2026,8 @@ body::after {
   </div>
 </footer>
 <!-- Модальное окно быстрого пополнения -->
-<div id="quickTopupModal" class="modal-glass" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center;" onclick="if(event.target===this) this.style.display='none'">    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
+<div id="quickTopupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2147483647; align-items: center; justify-content: center;" onclick="if(event.target===this){ this.style.display='none'; document.body.style.overflow=''; }">
+    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
         <h3 style="margin-bottom: 20px; color: white;">
             <i class="fas fa-wallet" style="color: #22c55e;"></i> Пополнение баланса
         </h3>
@@ -2150,7 +2038,7 @@ body::after {
             <button onclick="quickTopup(1000)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">1000 ₽</button>
             <button onclick="quickTopup(5000)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">5000 ₽</button>
         </div>
-        <button onclick="document.getElementById('quickTopupModal').style.display='none'" style="padding: 12px; background: rgba(255,255,255,0.1); border: none; border-radius: 40px; color: white; cursor: pointer; width: 100%;">Отмена</button>
+        <button onclick="document.getElementById('quickTopupModal').style.display='none'; document.body.style.overflow='';" style="padding: 12px; background: rgba(255,255,255,0.1); border: none; border-radius: 40px; color: white; cursor: pointer; width: 100%;">Отмена</button>
     </div>
 </div>
 <!-- ========== СКРИПТЫ (JS) ========== -->
@@ -2612,17 +2500,17 @@ function showToast(message, type = 'success') {
     }
     
     // Запускаем фикс после загрузки страницы
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(fixWithdrawPage, 100);
-            setTimeout(fixBalanceClick, 200);
-            setTimeout(initWithdrawPage, 300);
-        });
-    } else {
-        setTimeout(fixWithdrawPage, 100);
-        setTimeout(fixBalanceClick, 200);
-        setTimeout(initWithdrawPage, 300);
-    }
+    // if (document.readyState === 'loading') {
+    //     document.addEventListener('DOMContentLoaded', function() {
+    //         setTimeout(fixWithdrawPage, 100);
+    //         setTimeout(fixBalanceClick, 200);
+    //         setTimeout(initWithdrawPage, 300);
+    //     });
+    // } else {
+    //     setTimeout(fixWithdrawPage, 100);
+    //     setTimeout(fixBalanceClick, 200);
+    //     setTimeout(initWithdrawPage, 300);
+    // }
     
     window.initWithdrawPage = initWithdrawPage;
     window.fixWithdrawPage = fixWithdrawPage;
@@ -4115,7 +4003,6 @@ window.showQuickTopupModal = function() {
     console.log('🟢 showQuickTopupModal вызвана');
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
-        // Принудительно сбрасываем все стили, которые могут мешать
         modal.style.cssText = `
             display: flex !important;
             position: fixed !important;
@@ -4125,7 +4012,7 @@ window.showQuickTopupModal = function() {
             bottom: 0 !important;
             background: rgba(0,0,0,0.8) !important;
             backdrop-filter: blur(8px) !important;
-            z-index: 999999 !important;
+            z-index: 2147483647 !important;
             align-items: center !important;
             justify-content: center !important;
             width: 100% !important;
@@ -4133,23 +4020,19 @@ window.showQuickTopupModal = function() {
             margin: 0 !important;
             padding: 0 !important;
         `;
-        // Также убираем возможные transform у родительских элементов
         document.body.style.overflow = 'hidden';
         console.log('✅ Модальное окно показано');
     } else {
         console.error('❌ Модальное окно не найдено!');
     }
 };
-
 window.quickTopup = async function(amount) {
     console.log('💰 Пополнение на сумму:', amount);
-        var modal = document.getElementById('quickTopupModal');
+    var modal = document.getElementById('quickTopupModal');
     if (modal) {
         modal.style.display = 'none';
-        document.body.style.overflow = ''; // восстанавливаем прокрутку
+        document.body.style.overflow = '';
     }
-    var modal = document.getElementById('quickTopupModal');
-    if (modal) modal.style.display = 'none';
     
     var token = localStorage.getItem('auth_token');
     var user = localStorage.getItem('apex_user');
@@ -4159,7 +4042,6 @@ window.quickTopup = async function(amount) {
         return;
     }
     
-    // Создаём уведомление о загрузке
     var toast = document.createElement('div');
     toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:12px 24px;border-radius:60px;z-index:99999;';
     toast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Пополнение...';
@@ -4178,12 +4060,10 @@ window.quickTopup = async function(amount) {
         var data = await response.json();
         
         if (response.ok) {
-            // Обновляем профиль в localStorage
             var profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
             profile.balance = data.balance;
             localStorage.setItem('apex_profile', JSON.stringify(profile));
             
-            // Обновляем отображение баланса
             var balanceEl = document.getElementById('profileBalance');
             if (balanceEl) {
                 var bal = data.balance;
@@ -4195,15 +4075,11 @@ window.quickTopup = async function(amount) {
             toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> ' + (data.error || 'Ошибка');
         }
     } catch (error) {
-        console.error('Ошибка пополнения:', error);
         toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Ошибка соединения';
     }
     
-    setTimeout(function() { 
-        toast.remove(); 
-    }, 3000);
+    setTimeout(function() { toast.remove(); }, 3000);
 };
-
 // Добавляем обработчик на кнопку + после загрузки DOM
 (function() {
     function bindTopupButton() {
