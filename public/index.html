@@ -1187,22 +1187,43 @@ body::after {
     <!-- ОСНОВНАЯ ОБЛАСТЬ -->
     <main class="profile-main">
       
-      <!-- Карточка баланса -->
-      <div class="balance-card">
-        <div class="balance-left">
-          <div class="balance-icon">
+<!-- Карточка баланса -->
+<div class="balance-card" style="position: relative; cursor: pointer;" onclick="showPage('topupPage')">
+    <div class="balance-left">
+        <div class="balance-icon">
             <i class="fas fa-coins"></i>
-          </div>
-          <div class="balance-info">
+        </div>
+        <div class="balance-info">
             <span class="balance-label">Доступный баланс</span>
-            <span class="balance-amount" id="profileBalance">12.4K ₽</span>
-            <span class="balance-trend"><i class="fas fa-arrow-up"></i> +18% за месяц</span>
-          </div>
+            <span class="balance-amount" id="profileBalance">0 ₽</span>
+            <span class="balance-trend" id="balanceTrend"><i class="fas fa-arrow-up"></i> +0% за месяц</span>
         </div>
-        <div class="balance-chevron">
-          <i class="fas fa-chevron-right"></i>
-        </div>
-      </div>
+    </div>
+    <button id="quickTopupBtn" style="
+        position: absolute;
+        right: 50px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        z-index: 10;
+    " onclick="event.stopPropagation(); showQuickTopupModal()">
+        <i class="fas fa-plus"></i>
+    </button>
+    <div class="balance-chevron">
+        <i class="fas fa-chevron-right"></i>
+    </div>
+</div>
       
       <!-- Сетка статистики -->
       <div class="stats-grid">
@@ -2116,7 +2137,21 @@ body::after {
     <p>2026 © Плейнексис — маркетплейс цифровых товаров и услуг. Все права защищены.</p>
   </div>
 </footer>
-
+<div id="quickTopupModal" class="modal-glass" style="display: none;" onclick="if(event.target===this) this.style.display='none'">
+    <div class="modal-content" style="max-width: 320px; text-align: center;">
+        <h3 style="margin-bottom: 20px; color: white;">
+            <i class="fas fa-wallet" style="color: #22c55e;"></i> Пополнение баланса
+        </h3>
+        <p style="color: #94a3b8; margin-bottom: 20px;">Выберите сумму:</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px;">
+            <button onclick="quickTopup(100)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">100 ₽</button>
+            <button onclick="quickTopup(500)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">500 ₽</button>
+            <button onclick="quickTopup(1000)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">1000 ₽</button>
+            <button onclick="quickTopup(5000)" style="padding: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(59,130,246,0.3); border-radius: 16px; color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;">5000 ₽</button>
+        </div>
+        <button onclick="document.getElementById('quickTopupModal').style.display='none'" style="padding: 12px; background: rgba(255,255,255,0.1); border: none; border-radius: 40px; color: white; cursor: pointer; width: 100%;">Отмена</button>
+    </div>
+</div>
 <!-- ========== СКРИПТЫ (JS) ========== -->
 <!-- 1. API и глобальные фиксы (ДОЛЖНЫ БЫТЬ ПЕРВЫМИ) -->
 <script src="js/api.js?v=2"></script>
@@ -2146,7 +2181,83 @@ body::after {
 <script src="js/shop-connect.js?v=2"></script>
 
 <script>
-  
+  function showQuickTopupModal() {
+    var modal = document.getElementById('quickTopupModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+async function quickTopup(amount) {
+    var modal = document.getElementById('quickTopupModal');
+    if (modal) modal.style.display = 'none';
+    
+    var token = localStorage.getItem('auth_token');
+    var user = localStorage.getItem('apex_user');
+    
+    if (!token || !user || user === 'Гость') {
+        alert('Для пополнения необходимо войти в аккаунт');
+        if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
+            window.auth.showAuthModal('login');
+        }
+        return;
+    }
+    
+    // Показываем загрузку
+    var toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:12px 24px;border-radius:60px;z-index:9999;';
+    toast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Пополнение...';
+    document.body.appendChild(toast);
+    
+    try {
+        var response = await fetch('/api/user/topup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ amount: amount, method: 'card' })
+        });
+        
+        var data = await response.json();
+        
+        if (response.ok) {
+            // Обновляем профиль
+            var profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+            profile.balance = data.balance;
+            localStorage.setItem('apex_profile', JSON.stringify(profile));
+            
+            // Обновляем отображение баланса
+            var balanceEl = document.getElementById('profileBalance');
+            if (balanceEl) {
+                var bal = data.balance;
+                balanceEl.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
+            }
+            
+            toast.innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e;"></i> Баланс пополнен на ' + amount + ' ₽';
+        } else {
+            toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> ' + (data.error || 'Ошибка');
+        }
+    } catch (error) {
+        toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Ошибка соединения';
+    }
+    
+    setTimeout(function() { toast.remove(); }, 3000);
+}
+
+// Обновление баланса при загрузке профиля
+var originalInitProfile = window.initProfilePage;
+if (typeof originalInitProfile === 'function') {
+    window.initProfilePage = function() {
+        originalInitProfile();
+        setTimeout(function() {
+            var profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance":0}');
+            var balanceEl = document.getElementById('profileBalance');
+            if (balanceEl) {
+                var bal = profile.balance || 0;
+                balanceEl.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
+            }
+        }, 200);
+    };
+}
 // ===== ОБНОВЛЕНИЕ ЦЕНЫ НА КНОПКЕ =====
 const amountInput = document.getElementById('amountInput');
 const payBtnText = document.getElementById('payBtnText');
