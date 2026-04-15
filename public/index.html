@@ -2122,7 +2122,7 @@ body::after {
 <script src="js/api.js?v=2"></script>
 <script src="js/global-fix.js?v=2"></script>
 <script src="js/auth-fix.js?v=2"></script>
-<script src="topup.js?v=2"></script>
+
 <!-- 2. Утилиты и анимации -->
 <script src="js/typewriter.js?v=2"></script>
 <script src="js/blob-new.js?v=2"></script>
@@ -3838,7 +3838,163 @@ if (localStorage.getItem('auth_token')) {
     });
 }
 
+// ========== СТРАНИЦА ПОПОЛНЕНИЯ БАЛАНСА ==========
+console.log('💰 TOPUP МОДУЛЬ ЗАГРУЖЕН');
 
+var topupSelectedAmount = 500;
+var topupSelectedMethod = 'card';
+
+function initTopupPage() {
+    console.log('💰 initTopupPage вызвана');
+    
+    // Обновляем баланс
+    updateTopupBalance();
+    
+    // Суммы
+    document.querySelectorAll('.amount-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.amount-card').forEach(function(c) { c.classList.remove('selected'); });
+            this.classList.add('selected');
+            topupSelectedAmount = parseInt(this.dataset.amount);
+            var customInput = document.getElementById('customAmountInput');
+            if (customInput) customInput.value = '';
+        });
+    });
+    
+    // Способы оплаты
+    document.querySelectorAll('.payment-method').forEach(function(m) {
+        m.addEventListener('click', function() {
+            document.querySelectorAll('.payment-method').forEach(function(p) { p.classList.remove('selected'); });
+            this.classList.add('selected');
+            topupSelectedMethod = this.dataset.method;
+        });
+    });
+    
+    // Своя сумма
+    var customInput = document.getElementById('customAmountInput');
+    if (customInput) {
+        customInput.addEventListener('input', function() {
+            var val = parseInt(this.value.replace(/[^0-9]/g, '')) || 0;
+            if (val >= 100) {
+                topupSelectedAmount = val;
+                document.querySelectorAll('.amount-card').forEach(function(c) { c.classList.remove('selected'); });
+            }
+        });
+    }
+    
+    // Кнопка пополнения
+    var submitBtn = document.getElementById('topupSubmitBtn');
+    if (submitBtn) {
+        var newBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+        newBtn.addEventListener('click', processTopup);
+    }
+}
+
+function updateTopupBalance() {
+    var profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance":0}');
+    var el = document.getElementById('topupBalanceAmount');
+    if (el) {
+        el.textContent = (profile.balance || 0).toLocaleString('ru-RU') + ' ₽';
+    }
+}
+
+async function processTopup() {
+    console.log('💰 processTopup вызвана, сумма:', topupSelectedAmount);
+    
+    var token = localStorage.getItem('auth_token');
+    var user = localStorage.getItem('apex_user');
+    
+    if (!token || !user || user === 'Гость') {
+        alert('Для пополнения необходимо войти в аккаунт');
+        if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
+            window.auth.showAuthModal('login');
+        }
+        return;
+    }
+    
+    if (topupSelectedAmount < 100) {
+        alert('Минимальная сумма пополнения 100 ₽');
+        return;
+    }
+    
+    var btn = document.getElementById('topupSubmitBtn');
+    var originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
+    btn.disabled = true;
+    
+    try {
+        var response = await fetch('/api/user/topup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ 
+                amount: topupSelectedAmount, 
+                method: topupSelectedMethod 
+            })
+        });
+        
+        var data = await response.json();
+        
+        if (response.ok) {
+            // Обновляем профиль
+            var profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+            profile.balance = data.balance;
+            localStorage.setItem('apex_profile', JSON.stringify(profile));
+            
+            // Обновляем отображение
+            updateTopupBalance();
+            
+            // Обновляем баланс в профиле если открыт
+            var profileBalance = document.getElementById('profileBalance');
+            if (profileBalance) {
+                var bal = profile.balance || 0;
+                profileBalance.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
+            }
+            
+            alert('✅ Баланс пополнен на ' + topupSelectedAmount + ' ₽');
+            
+            // Сбрасываем выбор
+            document.querySelectorAll('.amount-card').forEach(function(c) { c.classList.remove('selected'); });
+            var defaultCard = document.querySelector('[data-amount="500"]');
+            if (defaultCard) defaultCard.classList.add('selected');
+            topupSelectedAmount = 500;
+            var customInput = document.getElementById('customAmountInput');
+            if (customInput) customInput.value = '';
+            
+        } else {
+            alert('❌ ' + (data.error || 'Ошибка пополнения'));
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Ошибка соединения с сервером');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// Экспорт в глобальную область
+window.initTopupPage = initTopupPage;
+window.processTopup = processTopup;
+
+// Автоинициализация при открытии страницы
+var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.target.id === 'topupPage' && mutation.target.classList.contains('active')) {
+            setTimeout(initTopupPage, 100);
+        }
+    });
+});
+
+var topupPage = document.getElementById('topupPage');
+if (topupPage) {
+    observer.observe(topupPage, { attributes: true, attributeFilter: ['class'] });
+}
+
+console.log('✅ TOPUP МОДУЛЬ ГОТОВ');
 
 </script>
 

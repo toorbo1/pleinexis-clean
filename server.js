@@ -1617,7 +1617,6 @@ app.post('/api/user/topup', authenticateToken, async (req, res) => {
             [amount, userId]
         );
         
-        // Получаем обновлённый баланс
         const result = await pool.query(
             'SELECT balance FROM users WHERE id = $1',
             [userId]
