@@ -47,7 +47,7 @@ if (!userProfile.username) {
         topupBtn.parentNode.replaceChild(newBtn, topupBtn);
         newBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
+            e.stopPropagation(); 
             e.stopImmediatePropagation();
             const modal = document.getElementById('quickTopupModal');
             if (modal) {
