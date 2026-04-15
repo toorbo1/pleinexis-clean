@@ -394,7 +394,7 @@ async fetchCurrentUser() {
             this.updateUI();
             return true;
         } else if (response.status === 401) {
-            // Токен недействителен - очищаем всё
+            // Токен недействителен - очищаем всё, но НЕ выходим молча, перезагружаем страницу для чистого состояния
             console.warn('❌ Токен недействителен, очищаем...');
             this.token = null;
             this.currentUser = null;
@@ -403,11 +403,13 @@ async fetchCurrentUser() {
             localStorage.removeItem('apex_user_id');
             localStorage.removeItem('apex_user_email');
             localStorage.removeItem('apex_profile');
+            // Принудительно перезагружаем страницу, чтобы сбросить UI до гостевого состояния
+            window.location.reload();
             return false;
         }
         return false;
     } catch (error) {
-        console.error('❌ Ошибка:', error);
+        console.error('❌ Ошибка сети при проверке токена:', error);
         return false;
     }
 }

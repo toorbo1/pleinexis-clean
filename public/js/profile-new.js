@@ -32,7 +32,6 @@ if (!userProfile.username) {
   // ===== ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ =====
   function initProfilePage() {
     console.log('🔄 Инициализация профиля...');
-    addTopUpButton();
     updateProfileInfo();
     updateBalance();
     updateStats();
@@ -42,8 +41,25 @@ if (!userProfile.username) {
     setupAdminButton();
     setupShopButton();
     
-    console.log('✅ Профиль инициализирован');
-  }
+    // Привязываем обработчик к кнопке "+" на балансе
+    const topupBtn = document.getElementById('quickTopupBtn');
+    if (topupBtn) {
+        // Удаляем старые обработчики
+        const newBtn = topupBtn.cloneNode(true);
+        topupBtn.parentNode.replaceChild(newBtn, topupBtn);
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof window.showQuickTopupModal === 'function') {
+                window.showQuickTopupModal();
+            } else {
+                // fallback
+                const modal = document.getElementById('quickTopupModal');
+                if (modal) modal.style.display = 'flex';
+            }
+        });
+    }
+}
   
   // ===== ОБНОВЛЕНИЕ ИНФОРМАЦИИ ПРОФИЛЯ =====
   function updateProfileInfo() {
