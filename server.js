@@ -338,18 +338,15 @@ async function authenticateToken(req, res, next) {
     }
     
     try {
-        // Проверяем JWT токен
+        // Проверяем только JWT токен, без БД
         const decoded = jwt.verify(token, JWT_SECRET);
-        
-        // НЕ проверяем сессию в БД, просто доверяем JWT
-        // JWT уже содержит всю нужную информацию и имеет срок действия
         
         req.userId = decoded.userId;
         req.username = decoded.username;
         next();
     } catch (error) {
         console.error('JWT verification error:', error.message);
-        return res.status(401).json({ error: 'Недействительный токен' });
+        return res.status(401).json({ error: 'Недействительный или истекший токен' });
     }
 }
 
@@ -706,7 +703,7 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 app.post('/api/auth/logout', authenticateToken, async (req, res) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
-    
+    res.json({ success: true });
     try {
         await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
         res.json({ success: true });
