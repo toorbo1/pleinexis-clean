@@ -2139,8 +2139,7 @@ body::after {
   </div>
 </footer>
 <!-- Модальное окно быстрого пополнения -->
-<div id="quickTopupModal" class="modal-glass" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center;" onclick="if(event.target===this) this.style.display='none'">
-    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
+<div id="quickTopupModal" class="modal-glass" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 999999; align-items: center; justify-content: center;" onclick="if(event.target===this) this.style.display='none'">    <div style="background: linear-gradient(145deg, #0f1322, #0a0d18); border-radius: 32px; padding: 28px; max-width: 320px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.3);">
         <h3 style="margin-bottom: 20px; color: white;">
             <i class="fas fa-wallet" style="color: #22c55e;"></i> Пополнение баланса
         </h3>
@@ -2246,20 +2245,20 @@ async function quickTopup(amount) {
 }
 
 // Обновление баланса при загрузке профиля
-var originalInitProfile = window.initProfilePage;
-if (typeof originalInitProfile === 'function') {
-    window.initProfilePage = function() {
-        originalInitProfile();
-        setTimeout(function() {
-            var profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance":0}');
-            var balanceEl = document.getElementById('profileBalance');
-            if (balanceEl) {
-                var bal = profile.balance || 0;
-                balanceEl.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
-            }
-        }, 200);
-    };
-}
+// var originalInitProfile = window.initProfilePage;
+// if (typeof originalInitProfile === 'function') {
+//     window.initProfilePage = function() {
+//         originalInitProfile();
+//         setTimeout(function() {
+//             var profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance":0}');
+//             var balanceEl = document.getElementById('profileBalance');
+//             if (balanceEl) {
+//                 var bal = profile.balance || 0;
+//                 balanceEl.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
+//             }
+//         }, 200);
+//     };
+// }
 // ===== ОБНОВЛЕНИЕ ЦЕНЫ НА КНОПКЕ =====
 const amountInput = document.getElementById('amountInput');
 const payBtnText = document.getElementById('payBtnText');
@@ -4117,6 +4116,7 @@ window.showQuickTopupModal = function() {
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
         modal.style.display = 'flex';
+        modal.style.zIndex = '999999';
     } else {
         console.error('❌ Модальное окно не найдено!');
     }
@@ -4182,27 +4182,52 @@ window.quickTopup = async function(amount) {
 };
 
 // Добавляем обработчик на кнопку + после загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 Ищем кнопку пополнения...');
-    
-    // Ждём немного, чтобы профиль точно загрузился
-    setTimeout(function() {
+(function() {
+    function bindTopupButton() {
         var topupBtn = document.getElementById('quickTopupBtn');
-        if (topupBtn) {
-            console.log('✅ Кнопка пополнения найдена');
-            
-            // Убираем старый onclick и вешаем новый
-            topupBtn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🖱️ КЛИК ПО КНОПКЕ +');
-                window.showQuickTopupModal();
-            };
-        } else {
-            console.warn('⚠️ Кнопка quickTopupBtn не найдена');
+        if (!topupBtn) {
+            console.warn('⚠️ Кнопка quickTopupBtn не найдена, повторная попытка через 300ms');
+            setTimeout(bindTopupButton, 300);
+            return;
         }
-    }, 500);
-});
+        
+        console.log('✅ Кнопка пополнения найдена, привязываем обработчик');
+        
+        // Полностью пересоздаём кнопку, чтобы удалить ВСЕ старые обработчики
+        var newBtn = topupBtn.cloneNode(true);
+        topupBtn.parentNode.replaceChild(newBtn, topupBtn);
+        
+        // Вешаем новый обработчик
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🖱️ КЛИК ПО КНОПКЕ +');
+            
+            var modal = document.getElementById('quickTopupModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.zIndex = '999999'; // Максимальный z-index
+                console.log('✅ Модальное окно показано');
+            } else {
+                console.error('❌ Модальное окно quickTopupModal не найдено!');
+            }
+            
+            return false;
+        });
+        
+        console.log('✅ Обработчик привязан');
+    }
+    
+    // Запускаем после полной загрузки DOM
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(bindTopupButton, 800);
+        });
+    } else {
+        setTimeout(bindTopupButton, 800);
+    }
+})();
 
 console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
 </script>
