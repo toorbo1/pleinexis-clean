@@ -4066,55 +4066,6 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
     }
 })();
 
-// Принудительное открытие модального окна пополнения со страницы вывода
-(function() {
-    function initWithdrawTopupButton() {
-        var topupBtn = document.querySelector('#withdrawPage .topup-btn');
-        if (!topupBtn) {
-            console.warn('⚠️ Кнопка пополнения на странице вывода не найдена, повтор через 300ms');
-            setTimeout(initWithdrawTopupButton, 300);
-            return;
-        }
-        // Удаляем старые обработчики через замену кнопки
-        var newBtn = topupBtn.cloneNode(true);
-        topupBtn.parentNode.replaceChild(newBtn, topupBtn);
-        
-        newBtn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🟢 Кнопка "Пополнить баланс" нажата → открываем модалку');
-            var modal = document.getElementById('quickTopupModal');
-            if (modal) {
-                // Принудительно устанавливаем стили для показа
-                modal.style.display = 'flex';
-                modal.style.position = 'fixed';
-                modal.style.top = '0';
-                modal.style.left = '0';
-                modal.style.width = '100%';
-                modal.style.height = '100%';
-                modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-                modal.style.backdropFilter = 'blur(8px)';
-                modal.style.zIndex = '999999';
-                modal.style.alignItems = 'center';
-                modal.style.justifyContent = 'center';
-                document.body.style.overflow = 'hidden';
-                console.log('✅ Модальное окно открыто');
-            } else {
-                console.error('❌ Модальное окно quickTopupModal не найдено');
-                alert('Модальное окно не найдено. Пожалуйста, обновите страницу.');
-            }
-        };
-        console.log('✅ Обработчик для кнопки пополнения на странице вывода установлен');
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initWithdrawTopupButton, 500);
-        });
-    } else {
-        setTimeout(initWithdrawTopupButton, 500);
-    }
-})();
 // Обработчик пополнения на странице вывода
 (function() {
     function initTopupOnWithdraw() {
