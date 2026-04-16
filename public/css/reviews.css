@@ -413,9 +413,8 @@
 .review-reply {
   margin-top: 16px;
   padding: 16px;
-  background: rgba(59, 130, 246, 0.08);
   border-radius: 16px;
-  border-left: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
 }
 
 .reply-header {

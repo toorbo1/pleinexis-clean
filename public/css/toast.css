@@ -62,9 +62,6 @@
   color: #f59e0b;
 }
 
-.toast-notification.info {
-  border-left: 4px solid #3b82f6;
-}
 
 .toast-notification.info i {
   color: #3b82f6;
