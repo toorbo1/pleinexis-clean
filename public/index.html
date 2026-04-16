@@ -919,7 +919,7 @@ body::after {
         </div>
     </div>
     <div class="steam-info-row">
-        <span class="commission-badge"><i class="fas fa-percent"></i> Комиссия 5%</span>
+        <span class="commission-badge"><i class="fas fa-percent"></i> Комиссия 5</span>
         <button class="promo-btn" id="promoCodeBtn">
             <i class="fas fa-ticket-alt"></i> Ввести промокод
         </button>
@@ -1274,7 +1274,7 @@ body::after {
     </main>
   </div>
 </div>
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ + ПОПОЛНЕНИЕ ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
@@ -1284,27 +1284,41 @@ body::after {
   </div>
   
   <div class="withdraw-container">
-    <!-- Баланс -->
+    <!-- БАЛАНС -->
     <div class="balance-card">
       <div class="balance-label">Доступно для вывода</div>
       <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
       <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
-    <!-- КНОПКА ПОПОЛНЕНИЯ (ВЕДЁТ НА СТРАНИЦУ ПОПОЛНЕНИЯ) -->
-    <div class="section-card" style="margin-bottom: 20px;">
-      <button class="topup-btn" onclick="showPage('topupPage')" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-        <i class="fas fa-plus-circle"></i> Пополнить баланс
-      </button>
+    <!-- === НОВЫЙ БЛОК ПОПОЛНЕНИЯ (ПРЯМО НА СТРАНИЦЕ) === -->
+    <div class="section-card" style="margin-bottom: 20px; border: 1px solid rgba(34,197,94,0.3);">
+      <div class="section-title">
+        <i class="fas fa-plus-circle" style="color: #22c55e;"></i> Пополнить баланс
+      </div>
+      <div class="topup-simple">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+          <button class="topup-amount" data-amount="100" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">100 ₽</button>
+          <button class="topup-amount" data-amount="500" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">500 ₽</button>
+          <button class="topup-amount" data-amount="1000" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">1000 ₽</button>
+          <button class="topup-amount" data-amount="5000" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">5000 ₽</button>
+        </div>
+        <div class="custom-amount" style="margin-bottom: 15px;">
+          <input type="number" id="customTopupAmount" placeholder="Своя сумма (от 100 ₽)" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #3b82f6; border-radius: 40px; color: white; outline: none;">
+        </div>
+        <button id="doTopupBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer;">
+          <i class="fas fa-wallet"></i> Пополнить
+        </button>
+      </div>
     </div>
 
-    <!-- Способ вывода -->
+    <!-- СПОСОБ ВЫВОДА -->
     <div class="section-card">
       <div class="section-title"><i class="fas fa-wallet"></i> Способ вывода</div>
       <div class="methods-grid" id="methodsList"></div>
     </div>
 
-    <!-- Реквизиты -->
+    <!-- РЕКВИЗИТЫ -->
     <div class="section-card">
       <div class="section-title"><i class="fas fa-address-card"></i> Реквизиты</div>
       <div class="input-group">
@@ -1313,7 +1327,7 @@ body::after {
       </div>
     </div>
 
-    <!-- Сумма -->
+    <!-- СУММА ВЫВОДА -->
     <div class="section-card">
       <div class="section-title"><i class="fas fa-coins"></i> Сумма вывода</div>
       <div class="amount-row">
@@ -4099,6 +4113,89 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
         });
     } else {
         setTimeout(initWithdrawTopupButton, 500);
+    }
+})();
+// Обработчик пополнения на странице вывода
+(function() {
+    function initTopupOnWithdraw() {
+        // Выбор суммы из пресетов
+        const amountBtns = document.querySelectorAll('#withdrawPage .topup-amount');
+        const customInput = document.getElementById('customTopupAmount');
+        const doBtn = document.getElementById('doTopupBtn');
+        
+        if (!doBtn) return;
+        
+        let selectedAmount = 500;
+        
+        amountBtns.forEach(btn => {
+            btn.onclick = (e) => {
+                selectedAmount = parseInt(btn.dataset.amount);
+                if (customInput) customInput.value = '';
+                amountBtns.forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+                btn.style.background = 'rgba(34,197,94,0.3)';
+            };
+        });
+        
+        if (customInput) {
+            customInput.oninput = () => {
+                let val = parseInt(customInput.value);
+                if (val >= 100) {
+                    selectedAmount = val;
+                    amountBtns.forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+                }
+            };
+        }
+        
+        doBtn.onclick = async () => {
+            if (selectedAmount < 100) {
+                alert('Минимальная сумма 100 ₽');
+                return;
+            }
+            const token = localStorage.getItem('auth_token');
+            const user = localStorage.getItem('apex_user');
+            if (!token || !user || user === 'Гость') {
+                alert('Войдите в аккаунт для пополнения');
+                if (window.auth && window.auth.showAuthModal) window.auth.showAuthModal();
+                return;
+            }
+            
+            doBtn.disabled = true;
+            doBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
+            
+            try {
+                const response = await fetch('/api/user/topup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ amount: selectedAmount, method: 'card' })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    // Обновляем баланс
+                    let profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+                    profile.balance = data.balance;
+                    localStorage.setItem('apex_profile', JSON.stringify(profile));
+                    // Обновляем отображение баланса на странице
+                    const balanceEl = document.getElementById('profileBalance');
+                    if (balanceEl) balanceEl.textContent = data.balance >= 1000 ? (data.balance/1000).toFixed(1) + 'K ₽' : data.balance + ' ₽';
+                    const withdrawBalance = document.getElementById('withdrawBalanceAmount');
+                    if (withdrawBalance) withdrawBalance.textContent = data.balance + ' ₽';
+                    alert(`Баланс пополнен на ${selectedAmount} ₽`);
+                } else {
+                    alert(data.error || 'Ошибка пополнения');
+                }
+            } catch(e) {
+                alert('Ошибка соединения');
+            } finally {
+                doBtn.disabled = false;
+                doBtn.innerHTML = '<i class="fas fa-wallet"></i> Пополнить';
+            }
+        };
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(initTopupOnWithdraw, 200));
+    } else {
+        setTimeout(initTopupOnWithdraw, 200);
     }
 })();
 </script>
