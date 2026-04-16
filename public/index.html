@@ -1291,19 +1291,22 @@ body::after {
       <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
+    <!-- НОВАЯ КНОПКА ПОПОЛНЕНИЯ -->
+    <div class="section-card" style="margin-bottom: 20px;">
+      <button class="topup-btn" onclick="window.showQuickTopupModal()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <i class="fas fa-plus-circle"></i> Пополнить баланс
+      </button>
+    </div>
+
     <!-- Способ вывода -->
     <div class="section-card">
-      <div class="section-title">
-        <i class="fas fa-wallet"></i> Способ вывода
-      </div>
+      <div class="section-title"><i class="fas fa-wallet"></i> Способ вывода</div>
       <div class="methods-grid" id="methodsList"></div>
     </div>
 
     <!-- Реквизиты -->
     <div class="section-card">
-      <div class="section-title">
-        <i class="fas fa-address-card"></i> Реквизиты
-      </div>
+      <div class="section-title"><i class="fas fa-address-card"></i> Реквизиты</div>
       <div class="input-group">
         <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
         <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
@@ -1312,9 +1315,7 @@ body::after {
 
     <!-- Сумма -->
     <div class="section-card">
-      <div class="section-title">
-        <i class="fas fa-coins"></i> Сумма вывода
-      </div>
+      <div class="section-title"><i class="fas fa-coins"></i> Сумма вывода</div>
       <div class="amount-row">
         <input type="number" id="withdrawAmount" placeholder="Введите сумму" min="100" step="10">
         <div class="amount-presets">
