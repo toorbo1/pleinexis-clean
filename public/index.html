@@ -2927,23 +2927,23 @@ function showToast(message, type = 'success') {
         }
         
         // Применяем фиксы с задержкой
-        setTimeout(() => {
-            fixAdminButton();
-            fixShopButton();
-            fixHeaderAdminButton();
-            addCacheResetButton();
-            initCarousel();
+        // setTimeout(() => {
+        //     fixAdminButton();
+        //     fixShopButton();
+        //     fixHeaderAdminButton();
+        //     addCacheResetButton();
+        //     initCarousel();
             
-            // Дополнительная проверка кнопки админки
-            const adminBtn = document.getElementById('adminProfileBtn');
-            if (adminBtn) {
-                console.log('✅ Кнопка админки присутствует в DOM');
-            } else {
-                console.warn('⚠️ Кнопка админки НЕ НАЙДЕНА в DOM');
-                // Пробуем найти позже
-                setTimeout(fixAdminButton, 500);
-            }
-        }, 300);
+        //     // Дополнительная проверка кнопки админки
+        //     const adminBtn = document.getElementById('adminProfileBtn');
+        //     if (adminBtn) {
+        //         console.log('✅ Кнопка админки присутствует в DOM');
+        //     } else {
+        //         console.warn('⚠️ Кнопка админки НЕ НАЙДЕНА в DOM');
+        //         // Пробуем найти позже
+        //         setTimeout(fixAdminButton, 500);
+        //     }
+        // }, 300);
         
         // Еще одна проверка через секунду
         setTimeout(() => {
@@ -3511,7 +3511,7 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(document.body, { childList: true, subtree: true });
     
     // Периодическая проверка (на всякий случай)
-    setInterval(bindGuestButtons, 3000);
+    // setInterval(bindGuestButtons, 3000);
     
     console.log('✅ ФИНАЛЬНЫЙ ФИКС ЗАВЕРШЁН');
 })();
