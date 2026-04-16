@@ -4012,6 +4012,44 @@ window.quickTopup = async function(amount) {
 
 console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
 
+
+// ===== ГАРАНТИРОВАННЫЙ ОБРАБОТЧИК КНОПКИ «+» (ПОПОЛНЕНИЕ БАЛАНСА) =====
+(function() {
+    function initTopupButton() {
+        var btn = document.getElementById('quickTopupBtn');
+        if (!btn) {
+            console.warn('⚠️ Кнопка + не найдена, повтор через 300ms');
+            setTimeout(initTopupButton, 300);
+            return;
+        }
+        // Полностью заменяем кнопку, чтобы удалить все старые обработчики
+        var newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            console.log('🟢 Кнопка + нажата → открываем модалку');
+            var modal = document.getElementById('quickTopupModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error('❌ Модальное окно quickTopupModal не найдено!');
+            }
+        });
+        console.log('✅ Обработчик кнопки + успешно установлен');
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initTopupButton, 500);
+        });
+    } else {
+        setTimeout(initTopupButton, 500);
+    }
+})();
 </script>
 
 </body>
