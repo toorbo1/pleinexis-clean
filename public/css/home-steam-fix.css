@@ -58,9 +58,7 @@
 }
 
 .steam-fields-row .input-modern:focus {
-  border-color: #3b82f6 !important;
   background: #111111 !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
 }
 
 .steam-fields-row .input-modern::placeholder {

@@ -208,15 +208,12 @@
     opacity: 0.5;
     transform: scale(0.92);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(59, 130, 246, 0.2);
     cursor: pointer;
 }
-
 .my-carousel-slide.active {
     opacity: 1 !important;
     transform: scale(1) !important;
     box-shadow: 0 0 50px rgba(59, 130, 246, 0.7), 0 15px 35px rgba(0, 0, 0, 0.5) !important;
-    border: 1px solid rgba(96, 165, 250, 0.6) !important;
     z-index: 10;
 }
 
@@ -470,9 +467,8 @@ body::after {
 }
 
 .steam-fields-row .input-modern:focus {
-    border-color: #3b82f6 !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+  background: #111111 !important;
+  /* border-color и box-shadow убраны */
 }
 
 .steam-fields-row .input-modern::placeholder {
@@ -754,26 +750,22 @@ body::after {
 
 .smooth-slide {
     flex: 0 0 auto;
-    width: 380px; /* УМЕНЬШЕНО: чтобы влезало 2-3 штуки */
+    width: 380px;
     aspect-ratio: 16 / 9;
     border-radius: 24px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(59, 130, 246, 0.2);
     transition: all 0.4s ease;
-    opacity: 0.5; /* По умолчанию полупрозрачные */
+    opacity: 0.5;
     transform: scale(0.9);
     filter: brightness(0.7);
-    pointer-events: none; /* Отключаем клики */
+    pointer-events: none;
 }
-
-/* Центральный слайд - яркий */
 .smooth-slide.center {
     opacity: 1 !important;
     transform: scale(1) !important;
     filter: brightness(1.1) !important;
     box-shadow: 0 0 45px rgba(59, 130, 246, 0.7), 0 10px 30px rgba(0, 0, 0, 0.6) !important;
-    border-color: rgba(96, 165, 250, 0.7) !important;
     z-index: 10;
 }
 

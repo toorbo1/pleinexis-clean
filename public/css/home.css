@@ -291,9 +291,7 @@ body {
 }
 
 .steam-fields-row .input-modern:focus {
-  border-color: #3b82f6;
-  background: #111111;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+  background: #111111 !important;
 }
 
 .steam-info-row {

@@ -179,3 +179,41 @@ body::before {
   overflow: hidden;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
 }
+
+
+input:focus, textarea:focus, select:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: rgba(255,255,255,0.2) !important;
+}
+
+/* === ЖЁСТКОЕ УДАЛЕНИЕ СИНИХ РАМОК === */
+.header-search,
+.header-search:focus,
+.header-search:focus-within,
+.global-search-input,
+.global-search-input:focus,
+.steam-fields-row .input-modern,
+.steam-fields-row .input-modern:focus,
+#amountInput,
+#amountInput:focus,
+#steamLogin,
+#steamLogin:focus,
+.input-modern,
+.input-modern:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.global-search-input,
+.global-search-input:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
