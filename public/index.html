@@ -2078,67 +2078,6 @@ body::after {
 <script src="js/shop-connect.js?v=2"></script>
 
 <script>
-  function showQuickTopupModal() {
-    var modal = document.getElementById('quickTopupModal');
-    if (modal) modal.style.display = 'flex';
-}
-
-async function quickTopup(amount) {
-    var modal = document.getElementById('quickTopupModal');
-    if (modal) modal.style.display = 'none';
-    
-    var token = localStorage.getItem('auth_token');
-    var user = localStorage.getItem('apex_user');
-    
-    if (!token || !user || user === 'Гость') {
-        alert('Для пополнения необходимо войти в аккаунт');
-        if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
-            window.auth.showAuthModal('login');
-        }
-        return;
-    }
-    
-    // Показываем загрузку
-    var toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:12px 24px;border-radius:60px;z-index:9999;';
-    toast.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Пополнение...';
-    document.body.appendChild(toast);
-    
-    try {
-        var response = await fetch('/api/user/topup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ amount: amount, method: 'card' })
-        });
-        
-        var data = await response.json();
-        
-        if (response.ok) {
-            // Обновляем профиль
-            var profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
-            profile.balance = data.balance;
-            localStorage.setItem('apex_profile', JSON.stringify(profile));
-            
-            // Обновляем отображение баланса
-            var balanceEl = document.getElementById('profileBalance');
-            if (balanceEl) {
-                var bal = data.balance;
-                balanceEl.textContent = bal >= 1000 ? (bal/1000).toFixed(1) + 'K ₽' : bal + ' ₽';
-            }
-            
-            toast.innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e;"></i> Баланс пополнен на ' + amount + ' ₽';
-        } else {
-            toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> ' + (data.error || 'Ошибка');
-        }
-    } catch (error) {
-        toast.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Ошибка соединения';
-    }
-    
-    setTimeout(function() { toast.remove(); }, 3000);
-}
 
 // Обновление баланса при загрузке профиля
 // var originalInitProfile = window.initProfilePage;
@@ -4004,15 +3943,14 @@ if (topupPage) {
 
 console.log('✅ TOPUP МОДУЛЬ ГОТОВ');
 // ========== ФУНКЦИИ ПОПОЛНЕНИЯ ==========
-// ========== ФУНКЦИИ ПОПОЛНЕНИЯ (ИСПРАВЛЕННЫЕ) ==========
 window.showQuickTopupModal = function() {
-    console.log('🟢 showQuickTopupModal вызвана');
     var modal = document.getElementById('quickTopupModal');
     if (modal) {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 };
+
 
 window.quickTopup = async function(amount) {
     console.log('💰 Пополнение на сумму:', amount);
