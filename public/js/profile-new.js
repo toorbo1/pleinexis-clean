@@ -241,7 +241,7 @@ if (!userProfile.username) {
         <h3 class="empty-title">Ваша витрина пуста</h3>
         <p class="empty-desc">Начните зарабатывать на продаже игровых ключей и подписок. Ваши товары увидят тысячи геймеров.</p>
         <button class="btn-primary" onclick="window.showCreateProductForm()">
-          <i class="fas fa-plus"></i> Выставить товар
+           Выставить товар
         </button>
       </div>
     `;
