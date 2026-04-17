@@ -357,8 +357,6 @@ window.buyProduct = async function(productId) {
 
 // Функция открытия чата с привязкой к сделке
 function openChatForDeal(dealId, sellerUsername, productTitle) {
-    // Используем существующую систему диалогов из chats.js
-    // Нужно добавить dealId в диалог и специальные кнопки
     let dialogs = JSON.parse(localStorage.getItem('apex_dialogs') || '[]');
     const currentUser = localStorage.getItem('apex_user');
     
@@ -387,9 +385,14 @@ function openChatForDeal(dealId, sellerUsername, productTitle) {
         system: true
     });
     
-    localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
+  localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
     
-    // Переключаемся на чат
+    // Обновляем диалоги в памяти чатов
+    if (typeof window.refreshDialogs === 'function') {
+        window.refreshDialogs();
+    }
+    
+    // Переключаемся на чат и открываем диалог
     if (typeof window.showPage === 'function') {
         window.showPage('chat');
         setTimeout(() => {

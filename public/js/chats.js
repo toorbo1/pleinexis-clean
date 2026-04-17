@@ -288,14 +288,30 @@ async function loadDealInfo(dealId) {
 
 // Модифицируем openChatWithDialog
 async function openChatWithDialog(dialogId) {
-    // ... существующий код ...
+    // Принудительно обновляем диалоги из localStorage
+    refreshDialogs();
+    
     const dialog = dialogs.find(d => d.id === dialogId);
+    if (!dialog) {
+        console.warn(`Dialog ${dialogId} not found`);
+        return;
+    }
+    
+    // ... остальной код (обновление хедера, отображение окна чата) ...
+    
+    // Если есть привязка к сделке – показываем кнопки
     if (dialog.dealId) {
         const deal = await loadDealInfo(dialog.dealId);
         renderDealActions(dialogId, deal);
     }
 }
-
+function refreshDialogs() {
+    const saved = localStorage.getItem('apex_dialogs');
+    if (saved) {
+        dialogs = JSON.parse(saved);
+    }
+    renderDialogsList();
+}
 function renderDealActions(dialogId, deal) {
     const currentUser = localStorage.getItem('apex_user');
     const isBuyer = (deal.buyer_username === currentUser); // нужно получить username из user_id
@@ -414,7 +430,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+
 window.initChats = initChats;
 window.openChatWithDialog = openChatWithDialog;
 window.closeChatWindow = closeChatWindow;
 window.sendChatMessage = sendChatMessage;
+window.refreshDialogs = refreshDialogs;
