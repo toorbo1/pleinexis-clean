@@ -926,7 +926,55 @@ body::after {
     border: none !important;
   }
 
+    /* Стили для методов вывода */
+  .method-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .method-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+  .method-item.selected {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  .method-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+  .method-icon.card { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+  .method-icon.qiwi { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+  .method-icon.crypto { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+  .method-info { flex: 1; }
+  .method-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+  .method-desc { font-size: 0.75rem; color: #6b7280; }
+  .method-commission { font-size: 0.8rem; color: #22c55e; font-weight: 500; }
+
+  /* Убираем стрелки в Firefox */
+  #withdrawAmount {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
   
+  /* Активная кнопка переключения */
+  .mode-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    border: none !important;
+  }
 </style>
 </head>
 
@@ -1364,7 +1412,7 @@ body::after {
     </main>
   </div>
 </div>
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ФИНАЛЬНАЯ ВЕРСИЯ) ==================== -->
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ФИНАЛЬНАЯ) ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
@@ -1383,46 +1431,46 @@ body::after {
     </button>
   </div>
 
-  <div class="withdraw-container">
-    <!-- БАЛАНС (каждый элемент на новой строке, без рамки) -->
-    <div class="balance-card" style="text-align: center; padding: 24px 20px; background: transparent !important; border: none !important; box-shadow: none !important;">
-      <div class="balance-label" style="font-size: 0.9rem; color: #aaa; margin-bottom: 8px;">Доступно для вывода</div>
-      <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 12px;">0 ₽</div>
-      <div class="balance-hint" style="font-size: 0.75rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
+  <div class="withdraw-container" style="max-width: 600px; margin: 0 auto; width: 100%; padding: 0 16px;">
+    <!-- БАЛАНС - каждый элемент на новой строке, широкий -->
+    <div class="balance-card" style="text-align: center; padding: 32px 20px; background: rgba(255,255,255,0.03); border-radius: 28px; margin-bottom: 24px; width: 100%;">
+      <div class="balance-label" style="font-size: 0.9rem; color: #aaa; margin-bottom: 12px;">Доступно для вывода</div>
+      <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 16px;">0 ₽</div>
+      <div class="balance-hint" style="font-size: 0.8rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
-    <!-- СПОСОБ ВЫВОДА -->
-    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
-      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-wallet"></i> Способ вывода</div>
+    <!-- СПОСОБ ВЫВОДА - широкий, с карточками -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-wallet"></i> Способ вывода</div>
       <div class="methods-grid" id="methodsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
 
     <!-- РЕКВИЗИТЫ -->
-    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
-      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-address-card"></i> Реквизиты</div>
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-address-card"></i> Реквизиты</div>
       <div class="input-group">
-        <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
-        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 14px 20px; width: 100%; color: white;">
+        <label class="input-label" id="detailsLabel" style="display: block; margin-bottom: 8px; color: #aaa;">Номер карты / Счёт</label>
+        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 16px 20px; width: 100%; color: white; font-size: 1rem;">
       </div>
     </div>
 
-    <!-- СУММА ВЫВОДА (без пресетов и стрелок) -->
-    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
-      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-coins"></i> Сумма вывода</div>
+    <!-- СУММА ВЫВОДА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-coins"></i> Сумма вывода</div>
       <div class="amount-row">
-        <input type="number" id="withdrawAmount" placeholder="Введите сумму" min="100" step="1" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 14px 20px; width: 100%; color: white; outline: none; -moz-appearance: textfield;">
+        <input type="text" id="withdrawAmount" placeholder="Введите сумму (от 100 ₽)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 16px 20px; width: 100%; color: white; font-size: 1rem; -moz-appearance: textfield;">
       </div>
-      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 12px;">
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 16px; padding: 8px 0;">
         <span>Комиссия системы:</span>
         <span id="commissionValue">0 ₽</span>
       </div>
-      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 8px;">
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 8px; padding: 8px 0;">
         <span>Итого к списанию:</span>
         <span id="totalWithdraw">0 ₽</span>
       </div>
     </div>
 
-    <button class="withdraw-btn" id="submitWithdrawBtn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; border-radius: 60px; color: white; font-weight: 700; cursor: pointer;">
+    <button class="withdraw-btn" id="submitWithdrawBtn" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 8px;">
       <i class="fas fa-paper-plane"></i> Запросить вывод
     </button>
     <div class="warning-text" style="text-align: center; margin-top: 20px; font-size: 0.75rem; color: #6b7280;">
@@ -4258,13 +4306,11 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
   });
 
 
-   // ========== ЛОГИКА СТРАНИЦЫ ВЫВОДА ==========
+ // ========== ЛОГИКА СТРАНИЦЫ ВЫВОДА ==========
   (function() {
-    // Данные пользователя
     let currentBalance = 0;
     let currentUser = localStorage.getItem('apex_user') || 'Гость';
     
-    // Методы вывода
     const withdrawMethods = [
       { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', iconClass: 'card', placeholder: 'Номер карты (16 цифр)', commission: 0.02, minAmount: 100, detailsLabel: 'Номер карты' },
       { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', iconClass: 'qiwi', placeholder: 'Номер телефона QIWI', commission: 0.01, minAmount: 100, detailsLabel: 'QIWI номер' },
@@ -4388,7 +4434,7 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       validateWithdraw();
     }
     
-    function initWithdrawPage() {
+    function initFullWithdrawPage() {
       loadBalance();
       renderMethods();
       const detailsLabel = document.getElementById('detailsLabel');
@@ -4398,7 +4444,15 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       
       const amountInput = document.getElementById('withdrawAmount');
       if (amountInput) {
-        amountInput.addEventListener('input', () => { updateCommission(); validateWithdraw(); });
+        // Фильтрация только цифр
+        amountInput.addEventListener('input', function(e) {
+          let val = e.target.value.replace(/[^0-9]/g, '');
+          if (val === '') val = '';
+          else val = parseInt(val, 10);
+          e.target.value = val;
+          updateCommission();
+          validateWithdraw();
+        });
       }
       const detailsField = document.getElementById('withdrawDetails');
       if (detailsField) {
@@ -4414,7 +4468,7 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       validateWithdraw();
     }
     
-    window.initWithdrawPage = initWithdrawPage;
+    window.initWithdrawPage = initFullWithdrawPage;
     
     // Переключение между страницами
     document.addEventListener('DOMContentLoaded', function() {
@@ -4425,7 +4479,6 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
         topupBtn.addEventListener('click', function() {
           if (typeof window.showPage === 'function') {
             window.showPage('topupPage');
-            // Инициализируем страницу пополнения, если она существует
             setTimeout(() => {
               if (typeof window.initTopupPage === 'function') window.initTopupPage();
             }, 50);
@@ -4437,12 +4490,12 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
           if (typeof window.showPage === 'function') window.showPage('withdrawPage');
           withdrawBtn.classList.add('active');
           if (topupBtn) topupBtn.classList.remove('active');
-          setTimeout(initWithdrawPage, 50);
+          setTimeout(initFullWithdrawPage, 50);
         });
       }
+      initFullWithdrawPage();
     });
   })();
-
 
     // ========== ЛОГИКА СТРАНИЦЫ ПОПОЛНЕНИЯ ==========
   (function() {
