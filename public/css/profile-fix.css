@@ -190,11 +190,7 @@
   border: none !important;
 }
 
-#profile .btn-glass {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1.5px solid rgba(139, 92, 246, 0.4) !important;
-  color: #c4b5fd !important;
-}
+
 
 #profile .btn-logout {
   background: transparent !important;
