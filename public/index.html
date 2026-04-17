@@ -864,37 +864,59 @@ body::after {
 
 
 
-    /* Убираем фон у всех блоков на странице вывода */
+    /* Полностью убираем линии и фоны у всех блоков */
   #withdrawPage .balance-card,
   #withdrawPage .section-card,
-  #withdrawPage .withdraw-container .balance-card,
   #withdrawPage .methods-grid .method-item {
     background: transparent !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border: none !important;
   }
 
-  #withdrawPage .balance-card {
-    border: 1px solid rgba(34, 197, 94, 0.2) !important;
-  }
-
-  #withdrawPage .section-card {
-    background: transparent !important;
-    padding: 20px;
+  /* Стили для методов вывода */
+  .method-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.03) !important;
     border-radius: 24px;
-    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
   }
-
-  #withdrawPage .method-item {
-    background: rgba(255, 255, 255, 0.02) !important;
-    backdrop-filter: none !important;
+  .method-item.selected {
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
   }
+  .method-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+  .method-icon.card { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+  .method-icon.qiwi { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+  .method-icon.crypto { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+  .method-info { flex: 1; }
+  .method-name { font-weight: 600; margin-bottom: 4px; }
+  .method-desc { font-size: 0.7rem; color: #6b7280; }
+  .method-commission { font-size: 0.75rem; color: #22c55e; }
 
-  #withdrawPage .withdraw-btn {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    border: none;
-    margin-top: 20px;
+  /* Убираем стрелки в поле number */
+  #withdrawAmount::-webkit-outer-spin-button,
+  #withdrawAmount::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    
+  }
+  #withdrawAmount {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 
   /* Активная кнопка переключения */
@@ -903,6 +925,8 @@ body::after {
     color: white !important;
     border: none !important;
   }
+
+  
 </style>
 </head>
 
@@ -1340,7 +1364,7 @@ body::after {
     </main>
   </div>
 </div>
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ОБНОВЛЕННАЯ) ==================== -->
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ФИНАЛЬНАЯ ВЕРСИЯ) ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
@@ -1360,57 +1384,87 @@ body::after {
   </div>
 
   <div class="withdraw-container">
-    <!-- БАЛАНС (каждый элемент на новой строке) -->
-    <div class="balance-card" style="text-align: center; padding: 24px 20px;">
+    <!-- БАЛАНС (каждый элемент на новой строке, без рамки) -->
+    <div class="balance-card" style="text-align: center; padding: 24px 20px; background: transparent !important; border: none !important; box-shadow: none !important;">
       <div class="balance-label" style="font-size: 0.9rem; color: #aaa; margin-bottom: 8px;">Доступно для вывода</div>
       <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 12px;">0 ₽</div>
       <div class="balance-hint" style="font-size: 0.75rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
     <!-- СПОСОБ ВЫВОДА -->
-    <div class="section-card">
-      <div class="section-title"><i class="fas fa-wallet"></i> Способ вывода</div>
-      <div class="methods-grid" id="methodsList"></div>
+    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
+      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-wallet"></i> Способ вывода</div>
+      <div class="methods-grid" id="methodsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
 
     <!-- РЕКВИЗИТЫ -->
-    <div class="section-card">
-      <div class="section-title"><i class="fas fa-address-card"></i> Реквизиты</div>
+    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
+      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-address-card"></i> Реквизиты</div>
       <div class="input-group">
         <label class="input-label" id="detailsLabel">Номер карты / Счёт</label>
-        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты">
+        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 14px 20px; width: 100%; color: white;">
       </div>
     </div>
 
-    <!-- СУММА ВЫВОДА -->
-    <div class="section-card">
-      <div class="section-title"><i class="fas fa-coins"></i> Сумма вывода</div>
+    <!-- СУММА ВЫВОДА (без пресетов и стрелок) -->
+    <div class="section-card" style="background: transparent !important; border: none !important; padding: 0 0 20px 0;">
+      <div class="section-title" style="margin-bottom: 16px;"><i class="fas fa-coins"></i> Сумма вывода</div>
       <div class="amount-row">
-        <input type="number" id="withdrawAmount" placeholder="Введите сумму" min="100" step="10">
-        <div class="amount-presets">
-          <button class="preset-btn" data-amount="500">500₽</button>
-          <button class="preset-btn" data-amount="1000">1000₽</button>
-          <button class="preset-btn" data-amount="5000">5000₽</button>
-        </div>
+        <input type="number" id="withdrawAmount" placeholder="Введите сумму" min="100" step="1" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 14px 20px; width: 100%; color: white; outline: none; -moz-appearance: textfield;">
       </div>
-      <div class="commission-info">
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 12px;">
         <span>Комиссия системы:</span>
         <span id="commissionValue">0 ₽</span>
       </div>
-      <div class="commission-info">
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 8px;">
         <span>Итого к списанию:</span>
         <span id="totalWithdraw">0 ₽</span>
       </div>
     </div>
 
-    <button class="withdraw-btn" id="submitWithdrawBtn">
+    <button class="withdraw-btn" id="submitWithdrawBtn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; border-radius: 60px; color: white; font-weight: 700; cursor: pointer;">
       <i class="fas fa-paper-plane"></i> Запросить вывод
     </button>
-    <div class="warning-text">
+    <div class="warning-text" style="text-align: center; margin-top: 20px; font-size: 0.75rem; color: #6b7280;">
       <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов
     </div>
   </div>
 </div>
+<!-- ==================== СТРАНИЦА ПОПОЛНЕНИЯ (ПОЛНАЯ, РАБОЧАЯ) ==================== -->
+<div class="page" id="topupPage">
+  <div class="topup-container">
+    <div class="topup-header">
+      <button class="back-btn" onclick="showPage('profile')">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-wallet"></i> Пополнение баланса</h1>
+    </div>
+    <div class="balance-preview-card" style="text-align: center; margin-bottom: 24px;">
+      <div style="font-size: 0.8rem; color: #aaa;">Ваш баланс</div>
+      <div class="balance-preview-amount" id="topupBalanceAmount" style="font-size: 2rem; font-weight: 800;">0 ₽</div>
+    </div>
+    <div class="amount-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+      <div class="amount-card" data-amount="100" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">100 ₽</div>
+      <div class="amount-card" data-amount="500" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">500 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+5%</span></div>
+      <div class="amount-card" data-amount="1000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">1000 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+10%</span></div>
+      <div class="amount-card" data-amount="5000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">5000 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+15%</span></div>
+    </div>
+    <div class="custom-amount-section" style="margin-bottom: 24px;">
+      <input type="number" id="customTopupAmount" placeholder="Своя сумма (от 100 ₽)" style="width: 100%; padding: 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; color: white; outline: none;">
+    </div>
+    <div class="payment-methods-section" style="margin-bottom: 24px;">
+      <div class="section-title" style="margin-bottom: 12px;">Способ оплаты</div>
+      <div class="payment-methods-grid" style="display: flex; gap: 12px;">
+        <div class="payment-method card selected" data-method="card" style="flex: 1; background: rgba(59,130,246,0.2); border-radius: 40px; padding: 12px; text-align: center; cursor: pointer;"><i class="fas fa-credit-card"></i> Карта</div>
+        <div class="payment-method sbp" data-method="sbp" style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 40px; padding: 12px; text-align: center; cursor: pointer;"><i class="fas fa-mobile-alt"></i> СБП</div>
+      </div>
+    </div>
+    <button id="topupSubmitBtn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; cursor: pointer;">
+      <i class="fas fa-plus-circle"></i> Пополнить
+    </button>
+  </div>
+</div>
+
 <!-- ==================== СТРАНИЦА КЛЮЧЕВОГО СЛОВА ==================== -->
 <div class="page" id="keywordPage">
   <div class="keyword-page-header">
@@ -4202,6 +4256,280 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       });
     }
   });
+
+
+   // ========== ЛОГИКА СТРАНИЦЫ ВЫВОДА ==========
+  (function() {
+    // Данные пользователя
+    let currentBalance = 0;
+    let currentUser = localStorage.getItem('apex_user') || 'Гость';
+    
+    // Методы вывода
+    const withdrawMethods = [
+      { id: 'card', name: 'Банковская карта', icon: 'fas fa-credit-card', iconClass: 'card', placeholder: 'Номер карты (16 цифр)', commission: 0.02, minAmount: 100, detailsLabel: 'Номер карты' },
+      { id: 'qiwi', name: 'QIWI Кошелёк', icon: 'fab fa-qiwi', iconClass: 'qiwi', placeholder: 'Номер телефона QIWI', commission: 0.01, minAmount: 100, detailsLabel: 'QIWI номер' },
+      { id: 'crypto', name: 'Криптовалюта (USDT)', icon: 'fab fa-bitcoin', iconClass: 'crypto', placeholder: 'Адрес USDT (TRC20/ERC20)', commission: 0.03, minAmount: 500, detailsLabel: 'USDT адрес' }
+    ];
+    
+    let selectedMethod = withdrawMethods[0];
+    
+    function loadBalance() {
+      const profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+      currentBalance = profile.balance || 0;
+      const balanceEl = document.getElementById('withdrawBalanceAmount');
+      if (balanceEl) balanceEl.innerText = currentBalance.toFixed(2) + ' ₽';
+    }
+    
+    function renderMethods() {
+      const container = document.getElementById('methodsList');
+      if (!container) return;
+      container.innerHTML = '';
+      withdrawMethods.forEach(method => {
+        const div = document.createElement('div');
+        div.className = `method-item ${selectedMethod.id === method.id ? 'selected' : ''}`;
+        div.innerHTML = `
+          <div class="method-icon ${method.iconClass}">
+            <i class="${method.icon}"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">${method.name}</div>
+            <div class="method-desc">Комиссия: ${(method.commission * 100).toFixed(0)}%</div>
+          </div>
+          <div class="method-commission">от ${method.minAmount}₽</div>
+        `;
+        div.addEventListener('click', () => {
+          selectedMethod = method;
+          renderMethods();
+          const detailsLabel = document.getElementById('detailsLabel');
+          const detailsInput = document.getElementById('withdrawDetails');
+          if (detailsLabel) detailsLabel.innerText = method.detailsLabel;
+          if (detailsInput) detailsInput.placeholder = method.placeholder;
+          updateCommission();
+          validateWithdraw();
+        });
+        container.appendChild(div);
+      });
+    }
+    
+    function updateCommission() {
+      const amountInput = document.getElementById('withdrawAmount');
+      const amount = parseFloat(amountInput?.value);
+      const commissionSpan = document.getElementById('commissionValue');
+      const totalSpan = document.getElementById('totalWithdraw');
+      if (isNaN(amount) || amount <= 0) {
+        if (commissionSpan) commissionSpan.innerText = '0 ₽';
+        if (totalSpan) totalSpan.innerText = '0 ₽';
+        return;
+      }
+      const commission = amount * selectedMethod.commission;
+      const total = amount + commission;
+      if (commissionSpan) commissionSpan.innerText = commission.toFixed(2) + ' ₽';
+      if (totalSpan) totalSpan.innerText = total.toFixed(2) + ' ₽';
+    }
+    
+    function validateWithdraw() {
+      const amountInput = document.getElementById('withdrawAmount');
+      const detailsInput = document.getElementById('withdrawDetails');
+      const submitBtn = document.getElementById('submitWithdrawBtn');
+      const amount = parseFloat(amountInput?.value);
+      const details = detailsInput?.value.trim();
+      const isValid = !isNaN(amount) && amount >= selectedMethod.minAmount && amount <= currentBalance && details && details.length >= 3;
+      if (submitBtn) submitBtn.disabled = !isValid;
+    }
+    
+    function requestWithdraw() {
+      const amountInput = document.getElementById('withdrawAmount');
+      const detailsInput = document.getElementById('withdrawDetails');
+      const amount = parseFloat(amountInput?.value);
+      const details = detailsInput?.value.trim();
+      
+      if (isNaN(amount) || amount < selectedMethod.minAmount) {
+        alert(`Минимальная сумма: ${selectedMethod.minAmount} ₽`);
+        return;
+      }
+      if (amount > currentBalance) {
+        alert(`Недостаточно средств. Доступно: ${currentBalance.toFixed(2)} ₽`);
+        return;
+      }
+      if (!details) {
+        alert('Введите реквизиты');
+        return;
+      }
+      
+      const commission = amount * selectedMethod.commission;
+      const total = amount + commission;
+      
+      const requests = JSON.parse(localStorage.getItem('apex_withdraw_requests') || '[]');
+      requests.push({
+        id: Date.now(),
+        date: new Date().toLocaleString(),
+        userName: currentUser,
+        method: selectedMethod.name,
+        amount: amount,
+        commission: commission,
+        total: total,
+        details: details,
+        status: 'pending'
+      });
+      localStorage.setItem('apex_withdraw_requests', JSON.stringify(requests));
+      
+      const newBalance = currentBalance - total;
+      const profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+      profile.balance = newBalance;
+      localStorage.setItem('apex_profile', JSON.stringify(profile));
+      currentBalance = newBalance;
+      const balanceEl = document.getElementById('withdrawBalanceAmount');
+      if (balanceEl) balanceEl.innerText = newBalance.toFixed(2) + ' ₽';
+      
+      alert(`✅ Заявка на вывод ${amount} ₽ создана! Ожидайте подтверждения.`);
+      amountInput.value = '';
+      detailsInput.value = '';
+      updateCommission();
+      validateWithdraw();
+    }
+    
+    function initWithdrawPage() {
+      loadBalance();
+      renderMethods();
+      const detailsLabel = document.getElementById('detailsLabel');
+      const detailsInput = document.getElementById('withdrawDetails');
+      if (detailsLabel) detailsLabel.innerText = selectedMethod.detailsLabel;
+      if (detailsInput) detailsInput.placeholder = selectedMethod.placeholder;
+      
+      const amountInput = document.getElementById('withdrawAmount');
+      if (amountInput) {
+        amountInput.addEventListener('input', () => { updateCommission(); validateWithdraw(); });
+      }
+      const detailsField = document.getElementById('withdrawDetails');
+      if (detailsField) {
+        detailsField.addEventListener('input', validateWithdraw);
+      }
+      const submitBtn = document.getElementById('submitWithdrawBtn');
+      if (submitBtn) {
+        const newBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+        newBtn.addEventListener('click', requestWithdraw);
+      }
+      updateCommission();
+      validateWithdraw();
+    }
+    
+    window.initWithdrawPage = initWithdrawPage;
+    
+    // Переключение между страницами
+    document.addEventListener('DOMContentLoaded', function() {
+      const topupBtn = document.getElementById('switchToTopupBtn');
+      const withdrawBtn = document.getElementById('switchToWithdrawBtn');
+      
+      if (topupBtn) {
+        topupBtn.addEventListener('click', function() {
+          if (typeof window.showPage === 'function') {
+            window.showPage('topupPage');
+            // Инициализируем страницу пополнения, если она существует
+            setTimeout(() => {
+              if (typeof window.initTopupPage === 'function') window.initTopupPage();
+            }, 50);
+          }
+        });
+      }
+      if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', function() {
+          if (typeof window.showPage === 'function') window.showPage('withdrawPage');
+          withdrawBtn.classList.add('active');
+          if (topupBtn) topupBtn.classList.remove('active');
+          setTimeout(initWithdrawPage, 50);
+        });
+      }
+    });
+  })();
+
+
+    // ========== ЛОГИКА СТРАНИЦЫ ПОПОЛНЕНИЯ ==========
+  (function() {
+    let selectedAmount = 500;
+    let selectedMethod = 'card';
+    
+    function updateTopupBalance() {
+      const profile = JSON.parse(localStorage.getItem('apex_profile') || '{"balance": 0}');
+      const balanceEl = document.getElementById('topupBalanceAmount');
+      if (balanceEl) balanceEl.textContent = (profile.balance || 0).toLocaleString('ru-RU') + ' ₽';
+    }
+    
+    function initTopupPage() {
+      updateTopupBalance();
+      // Выбор суммы
+      document.querySelectorAll('#topupPage .amount-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('#topupPage .amount-card').forEach(c => c.style.background = 'rgba(255,255,255,0.05)');
+          card.style.background = 'rgba(34,197,94,0.2)';
+          selectedAmount = parseInt(card.dataset.amount);
+          document.getElementById('customTopupAmount').value = '';
+        });
+      });
+      // Своя сумма
+      const customInput = document.getElementById('customTopupAmount');
+      if (customInput) {
+        customInput.addEventListener('input', () => {
+          let val = parseInt(customInput.value);
+          if (val >= 100) {
+            selectedAmount = val;
+            document.querySelectorAll('#topupPage .amount-card').forEach(c => c.style.background = 'rgba(255,255,255,0.05)');
+          }
+        });
+      }
+      // Способ оплаты
+      document.querySelectorAll('#topupPage .payment-method').forEach(m => {
+        m.addEventListener('click', () => {
+          document.querySelectorAll('#topupPage .payment-method').forEach(p => p.style.background = 'rgba(255,255,255,0.05)');
+          m.style.background = 'rgba(59,130,246,0.2)';
+          selectedMethod = m.dataset.method;
+        });
+      });
+      // Кнопка пополнения
+      const submitBtn = document.getElementById('topupSubmitBtn');
+      if (submitBtn) {
+        const newBtn = submitBtn.cloneNode(true);
+        submitBtn.parentNode.replaceChild(newBtn, submitBtn);
+        newBtn.addEventListener('click', async () => {
+          const token = localStorage.getItem('auth_token');
+          const user = localStorage.getItem('apex_user');
+          if (!token || !user || user === 'Гость') {
+            alert('Войдите в аккаунт для пополнения');
+            return;
+          }
+          if (selectedAmount < 100) {
+            alert('Минимальная сумма 100 ₽');
+            return;
+          }
+          newBtn.disabled = true;
+          newBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обработка...';
+          try {
+            const response = await fetch('/api/user/topup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({ amount: selectedAmount, method: selectedMethod })
+            });
+            const data = await response.json();
+            if (response.ok) {
+              const profile = JSON.parse(localStorage.getItem('apex_profile') || '{}');
+              profile.balance = data.balance;
+              localStorage.setItem('apex_profile', JSON.stringify(profile));
+              updateTopupBalance();
+              alert(`Баланс пополнен на ${selectedAmount} ₽`);
+            } else {
+              alert(data.error || 'Ошибка');
+            }
+          } catch(e) {
+            alert('Ошибка соединения');
+          } finally {
+            newBtn.disabled = false;
+            newBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Пополнить';
+          }
+        });
+      }
+    }
+    window.initTopupPage = initTopupPage;
+  })();
 </script>
 
 </body>
