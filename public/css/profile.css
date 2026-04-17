@@ -58,14 +58,7 @@
   }
 }
 
-.profile-card:hover {
-  box-shadow: 
-    inset 0 2px 12px rgba(255, 255, 255, 0.03),
-    0 35px 60px -25px #000000,
-    0 0 0 1px rgba(139, 92, 246, 0.15),
-    0 0 40px -10px rgba(139, 92, 246, 0.2);
-  transform: translateY(-4px);
-}
+
 
 /* ===== АВАТАР С ВРАЩАЮЩИМСЯ КОЛЬЦОМ ===== */
 .avatar-wrapper {
@@ -328,8 +321,7 @@
   background: rgba(139, 92, 246, 0.1);
   border-color: #a78bfa;
   color: white;
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.25);
-  transform: translateY(-3px);
+
 }
 
 .btn-logout {
@@ -350,11 +342,7 @@
   margin-top: 8px;
 }
 
-.btn-logout:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: #ef4444;
-  color: #fca5a5;
-}
+
 
 /* ===== ОСНОВНАЯ ОБЛАСТЬ ===== */
 .profile-main {
@@ -379,14 +367,7 @@
   box-shadow: inset 0 1px 4px rgba(255,255,255,0.02), 0 20px 30px -15px #000000;
 }
 
-.balance-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 25px 40px -15px #000000,
-    0 0 40px -5px rgba(16, 185, 129, 0.3),
-    inset 0 0 0 1px rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.2);
-}
+
 
 .balance-left {
   display: flex;
@@ -447,11 +428,7 @@
   transition: all 0.3s;
 }
 
-.balance-card:hover .balance-chevron {
-  transform: translateX(6px);
-  opacity: 1;
-  color: var(--accent-emerald);
-}
+
 
 /* ===== СЕТКА СТАТИСТИКИ ===== */
 .stats-grid {
@@ -483,11 +460,6 @@
   pointer-events: none;
 }
 
-.stat-card:hover {
-  transform: translateY(-6px);
-  background: rgba(20, 20, 40, 0.55);
-  border-color: rgba(255, 255, 255, 0.12);
-}
 
 .stat-card.products:hover {
   box-shadow: 0 0 40px -8px var(--accent-violet), inset 0 0 0 1px rgba(139, 92, 246, 0.3);
