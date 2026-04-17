@@ -728,3 +728,33 @@ body {
     font-size: 1.2rem;
   }
 }
+
+
+
+
+/* Листающая полоска снизу для блоков ИГРЫ и ПРИЛОЖЕНИЯ */
+.games-scroll-container {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.1) !important;
+  padding-bottom: 12px !important;
+}
+
+.games-scroll-container::-webkit-scrollbar {
+  height: 4px !important;
+}
+
+.games-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+}
+
+.games-scroll-container::-webkit-scrollbar-thumb {
+  background: #3b82f6 !important;
+  border-radius: 10px !important;
+}
+
+.games-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #60a5fa !important;
+}

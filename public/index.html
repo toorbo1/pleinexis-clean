@@ -744,9 +744,7 @@ body::after {
 }
 
 /* Остановка при наведении */
-.smooth-carousel:hover .smooth-carousel-track {
-    animation-play-state: paused;
-}
+
 
 .smooth-slide {
     flex: 0 0 auto;
@@ -814,6 +812,24 @@ body::after {
   .header .nav-links,
 .header .nav-links * {
   border-radius: 11px !important;
+}
+
+
+
+/* Отключаем все анимации на проблемных страницах */
+.page#chat.active,
+.page#products-manage.active,
+.page#profile.active {
+  animation: none !important;
+  transition: none !important;
+}
+
+.page#chat .guest-screen,
+.page#products-manage .guest-screen,
+.page#profile .guest-screen {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
 }
 </style>
 </head>

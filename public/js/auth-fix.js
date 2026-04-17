@@ -694,14 +694,24 @@ async fetchCurrentUser() {
         });
     }
 
-    replacePageContent(pageId, guestContent) {
-        const page = document.getElementById(pageId);
-        if (!page) return;
-        if (!page.dataset.originalContent) {
-            page.dataset.originalContent = page.innerHTML;
-        }
-        page.innerHTML = guestContent;
+replacePageContent(pageId, guestContent) {
+    const page = document.getElementById(pageId);
+    if (!page) return;
+    
+    // Сохраняем оригинальное содержимое
+    if (!page.dataset.originalContent) {
+        page.dataset.originalContent = page.innerHTML;
     }
+    
+    // Заменяем на гостевой экран БЕЗ АНИМАЦИИ
+    page.innerHTML = guestContent;
+    page.style.minHeight = '500px'; // фиксируем высоту
+    
+    // Добавляем обработчики
+    page.querySelectorAll('.guest-login-btn, .guest-register-btn').forEach(btn => {
+        btn.addEventListener('click', () => this.showAuthModal());
+    });
+}
 
     createGuestChatScreen() {
         return `

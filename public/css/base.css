@@ -293,3 +293,16 @@ select:focus {
 .products-list-container {
   border-radius: var(--radius-2xl) !important;
 }
+
+
+/* Убираем стрелки у поля Сумма */
+#amountInput::-webkit-outer-spin-button,
+#amountInput::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+#amountInput {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
