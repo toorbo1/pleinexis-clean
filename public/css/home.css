@@ -732,17 +732,37 @@ body {
 
 
 
-/* Листающая полоска снизу для блоков ИГРЫ и ПРИЛОЖЕНИЯ */
+/* Принудительный скролл для блоков игр и приложений */
 .games-scroll-container {
   overflow-x: auto !important;
   overflow-y: hidden !important;
   scrollbar-width: thin !important;
-  scrollbar-color: #3b82f6 rgba(255, 255, 255, 0.1) !important;
-  padding-bottom: 12px !important;
+  -webkit-overflow-scrolling: touch !important;
+  white-space: nowrap !important;
 }
 
+#gamesScrollWrapper,
+#appsScrollWrapper {
+  display: inline-block !important;
+  white-space: nowrap !important;
+}
+
+#gamesScrollWrapper .horizontal-scroll-container,
+#appsScrollWrapper .horizontal-scroll-container {
+  display: inline-flex !important;
+  gap: 16px !important;
+  white-space: nowrap !important;
+}
+
+/* Всегда показываем скроллбар */
+.games-scroll-container {
+  overflow-x: scroll !important;
+}
+
+/* Стили скроллбара */
 .games-scroll-container::-webkit-scrollbar {
-  height: 4px !important;
+  height: 6px !important;
+  display: block !important;
 }
 
 .games-scroll-container::-webkit-scrollbar-track {
@@ -753,8 +773,4 @@ body {
 .games-scroll-container::-webkit-scrollbar-thumb {
   background: #3b82f6 !important;
   border-radius: 10px !important;
-}
-
-.games-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #60a5fa !important;
 }
