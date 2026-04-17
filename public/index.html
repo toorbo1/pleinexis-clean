@@ -858,6 +858,51 @@ body::after {
     overflow-x: auto !important;
     padding-bottom: 15px !important;
   }
+
+
+
+
+
+
+    /* Убираем фон у всех блоков на странице вывода */
+  #withdrawPage .balance-card,
+  #withdrawPage .section-card,
+  #withdrawPage .withdraw-container .balance-card,
+  #withdrawPage .methods-grid .method-item {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  #withdrawPage .balance-card {
+    border: 1px solid rgba(34, 197, 94, 0.2) !important;
+  }
+
+  #withdrawPage .section-card {
+    background: transparent !important;
+    padding: 20px;
+    border-radius: 24px;
+    margin-bottom: 20px;
+  }
+
+  #withdrawPage .method-item {
+    background: rgba(255, 255, 255, 0.02) !important;
+    backdrop-filter: none !important;
+  }
+
+  #withdrawPage .withdraw-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: none;
+    margin-top: 20px;
+  }
+
+  /* Активная кнопка переключения */
+  .mode-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    border: none !important;
+  }
 </style>
 </head>
 
@@ -1295,7 +1340,7 @@ body::after {
     </main>
   </div>
 </div>
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ + ПОПОЛНЕНИЕ ==================== -->
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ОБНОВЛЕННАЯ) ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
@@ -1303,34 +1348,23 @@ body::after {
     </button>
     <h1><i class="fas fa-money-bill-wave"></i> Вывод средств</h1>
   </div>
-  
-  <div class="withdraw-container">
-    <!-- БАЛАНС -->
-    <div class="balance-card">
-      <div class="balance-label">Доступно для вывода</div>
-      <div class="balance-amount" id="withdrawBalanceAmount">0 ₽</div>
-      <div class="balance-hint">Минимальная сумма вывода: 100 ₽</div>
-    </div>
 
-    <!-- === НОВЫЙ БЛОК ПОПОЛНЕНИЯ (ПРЯМО НА СТРАНИЦЕ) === -->
-    <div class="section-card" style="margin-bottom: 20px; border: 1px solid rgba(34,197,94,0.3);">
-      <div class="section-title">
-        <i class="fas fa-plus-circle" style="color: #22c55e;"></i> Пополнить баланс
-      </div>
-      <div class="topup-simple">
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-          <button class="topup-amount" data-amount="100" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">100 ₽</button>
-          <button class="topup-amount" data-amount="500" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">500 ₽</button>
-          <button class="topup-amount" data-amount="1000" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">1000 ₽</button>
-          <button class="topup-amount" data-amount="5000" style="flex:1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid #3b82f6; border-radius: 40px; color: white; cursor: pointer;">5000 ₽</button>
-        </div>
-        <div class="custom-amount" style="margin-bottom: 15px;">
-          <input type="number" id="customTopupAmount" placeholder="Своя сумма (от 100 ₽)" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.6); border: 1px solid #3b82f6; border-radius: 40px; color: white; outline: none;">
-        </div>
-        <button id="doTopupBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer;">
-          <i class="fas fa-wallet"></i> Пополнить
-        </button>
-      </div>
+  <!-- ДВЕ КНОПКИ: ПОПОЛНЕНИЕ / ВЫВОД -->
+  <div class="withdraw-mode-switch" style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
+    <button id="switchToTopupBtn" class="mode-btn" style="padding: 12px 28px; border-radius: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      <i class="fas fa-plus-circle"></i> Пополнение
+    </button>
+    <button id="switchToWithdrawBtn" class="mode-btn active" style="padding: 12px 28px; border-radius: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      <i class="fas fa-money-bill-wave"></i> Вывод
+    </button>
+  </div>
+
+  <div class="withdraw-container">
+    <!-- БАЛАНС (каждый элемент на новой строке) -->
+    <div class="balance-card" style="text-align: center; padding: 24px 20px;">
+      <div class="balance-label" style="font-size: 0.9rem; color: #aaa; margin-bottom: 8px;">Доступно для вывода</div>
+      <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 12px;">0 ₽</div>
+      <div class="balance-hint" style="font-size: 0.75rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
     <!-- СПОСОБ ВЫВОДА -->
@@ -4141,6 +4175,33 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
         setTimeout(initTopupOnWithdraw, 200);
     }
 })();
+
+  // Переключение между страницами пополнения и вывода
+  document.addEventListener('DOMContentLoaded', function() {
+    const topupBtn = document.getElementById('switchToTopupBtn');
+    const withdrawBtn = document.getElementById('switchToWithdrawBtn');
+
+    if (topupBtn) {
+      topupBtn.addEventListener('click', function() {
+        if (typeof window.showPage === 'function') {
+          window.showPage('topupPage');
+        } else {
+          alert('Страница пополнения будет доступна в следующем обновлении');
+        }
+      });
+    }
+
+    if (withdrawBtn) {
+      withdrawBtn.addEventListener('click', function() {
+        if (typeof window.showPage === 'function') {
+          window.showPage('withdrawPage');
+        }
+        // Подсветка активной кнопки
+        withdrawBtn.classList.add('active');
+        if (topupBtn) topupBtn.classList.remove('active');
+      });
+    }
+  });
 </script>
 
 </body>
