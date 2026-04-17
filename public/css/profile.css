@@ -1337,39 +1337,3 @@
   }
 }
 
-/* Запрещаем исчезновение блоков при наведении в профиле */
-#profile *:hover {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-#profile .product-card:hover,
-#profile .stat-card:hover,
-#profile .balance-card:hover,
-#profile .profile-card:hover,
-#profile .product-item:hover,
-#profile .review-card:hover,
-#profile .product-btn:hover,
-#profile .edit-product-btn:hover,
-#profile .delete-product-btn:hover,
-#profile .profile-tab-btn:hover {
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-  background: inherit !important;
-}
-
-/* Особенно для кнопок */
-#profile button:hover {
-  opacity: 1 !important;
-  visibility: visible !important;
-  background: inherit !important;
-}
-
-/* Для любых скрывающихся элементов */
-#profile [class*="hover"]:hover,
-#profile [class*="fade"]:hover {
-  opacity: 1 !important;
-  display: block !important;
-}
