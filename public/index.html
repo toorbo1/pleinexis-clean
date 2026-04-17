@@ -975,6 +975,32 @@ body::after {
     color: white !important;
     border: none !important;
   }
+
+
+   /* Стили для выбранной суммы */
+  .amount-card.selected {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.5) !important;
+  }
+  
+  /* Стили для выбранного способа оплаты */
+  .payment-method.selected {
+    background: rgba(59, 130, 246, 0.2) !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
+  }
+  
+  /* Активная кнопка переключения */
+  .mode-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    border: none !important;
+  }
+  
+  /* Убираем стрелки */
+  #customTopupAmount {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 </style>
 </head>
 
@@ -1480,38 +1506,82 @@ body::after {
   </div>
 </div>
 
-<!-- ==================== СТРАНИЦА ПОПОЛНЕНИЯ (ПОЛНАЯ, РАБОЧАЯ) ==================== -->
+<!-- ==================== СТРАНИЦА ПОПОЛНЕНИЯ БАЛАНСА ==================== -->
 <div class="page" id="topupPage">
-  <div class="topup-container">
-    <div class="topup-header">
-      <button class="back-btn" onclick="showPage('profile')">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h1><i class="fas fa-wallet"></i> Пополнение баланса</h1>
+  <div class="topup-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+    <button class="back-btn" onclick="showPage('profile')" style="background: rgba(255,255,255,0.05); border: none; width: 44px; height: 44px; border-radius: 50%; color: white; cursor: pointer;">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h1 style="font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #fff, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent; margin: 0;">
+      <i class="fas fa-wallet"></i> Пополнение баланса
+    </h1>
+  </div>
+
+  <!-- ДВЕ КНОПКИ: ПОПОЛНЕНИЕ / ВЫВОД -->
+  <div class="topup-mode-switch" style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
+    <button id="topupSwitchToTopupBtn" class="mode-btn active" style="padding: 12px 28px; border-radius: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: white; font-weight: 600; cursor: pointer;">
+      <i class="fas fa-plus-circle"></i> Пополнение
+    </button>
+    <button id="topupSwitchToWithdrawBtn" class="mode-btn" style="padding: 12px 28px; border-radius: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-weight: 600; cursor: pointer;">
+      <i class="fas fa-money-bill-wave"></i> Вывод
+    </button>
+  </div>
+
+  <div class="topup-container" style="max-width: 700px; margin: 0 auto; width: 100%; padding: 0 20px;">
+    
+    <!-- БЛОК БАЛАНСА: КАЖДЫЙ ЭЛЕМЕНТ НА НОВОЙ СТРОЧКЕ (как на странице вывода) -->
+    <div class="balance-card" style="text-align: center; padding: 36px 24px; background: rgba(255,255,255,0.03); border-radius: 32px; margin-bottom: 28px; width: 100%;">
+      <div class="balance-label" style="font-size: 1rem; color: #aaa; margin-bottom: 16px; letter-spacing: 0.5px;">Ваш текущий баланс</div>
+      <div class="balance-amount" id="topupBalanceAmount" style="font-size: 3.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px;">0 ₽</div>
+      <div class="balance-hint" style="font-size: 0.85rem; color: #6b7280;">Пополните баланс, чтобы покупать товары</div>
     </div>
-    <div class="balance-preview-card" style="text-align: center; margin-bottom: 24px;">
-      <div style="font-size: 0.8rem; color: #aaa;">Ваш баланс</div>
-      <div class="balance-preview-amount" id="topupBalanceAmount" style="font-size: 2rem; font-weight: 800;">0 ₽</div>
-    </div>
-    <div class="amount-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
-      <div class="amount-card" data-amount="100" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">100 ₽</div>
-      <div class="amount-card" data-amount="500" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">500 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+5%</span></div>
-      <div class="amount-card" data-amount="1000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">1000 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+10%</span></div>
-      <div class="amount-card" data-amount="5000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 16px; text-align: center; cursor: pointer;">5000 ₽ <span style="font-size: 0.7rem; color: #22c55e;">+15%</span></div>
-    </div>
-    <div class="custom-amount-section" style="margin-bottom: 24px;">
-      <input type="number" id="customTopupAmount" placeholder="Своя сумма (от 100 ₽)" style="width: 100%; padding: 14px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; color: white; outline: none;">
-    </div>
-    <div class="payment-methods-section" style="margin-bottom: 24px;">
-      <div class="section-title" style="margin-bottom: 12px;">Способ оплаты</div>
-      <div class="payment-methods-grid" style="display: flex; gap: 12px;">
-        <div class="payment-method card selected" data-method="card" style="flex: 1; background: rgba(59,130,246,0.2); border-radius: 40px; padding: 12px; text-align: center; cursor: pointer;"><i class="fas fa-credit-card"></i> Карта</div>
-        <div class="payment-method sbp" data-method="sbp" style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 40px; padding: 12px; text-align: center; cursor: pointer;"><i class="fas fa-mobile-alt"></i> СБП</div>
+
+    <!-- ВЫБОР СУММЫ - ШИРОКАЯ КАРТОЧКА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 32px; padding: 28px; margin-bottom: 28px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 24px; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-coins"></i> Сумма пополнения</div>
+      <div class="amount-grid" id="topupAmountGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px;">
+        <div class="amount-card" data-amount="100" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-weight: 700; font-size: 1.2rem;">100 ₽</div>
+        </div>
+        <div class="amount-card" data-amount="500" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-weight: 700; font-size: 1.2rem;">500 ₽</div>
+          <div style="font-size: 0.7rem; color: #22c55e; margin-top: 4px;">+5% бонус</div>
+        </div>
+        <div class="amount-card" data-amount="1000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-weight: 700; font-size: 1.2rem;">1 000 ₽</div>
+          <div style="font-size: 0.7rem; color: #22c55e; margin-top: 4px;">+10% бонус</div>
+        </div>
+        <div class="amount-card" data-amount="5000" style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);">
+          <div style="font-weight: 700; font-size: 1.2rem;">5 000 ₽</div>
+          <div style="font-size: 0.7rem; color: #22c55e; margin-top: 4px;">+15% бонус</div>
+        </div>
+      </div>
+      <div class="custom-amount-section">
+        <input type="text" id="customTopupAmount" placeholder="Или введите свою сумму (от 100 ₽)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 18px 24px; width: 100%; color: white; font-size: 1rem; -moz-appearance: textfield; appearance: textfield;">
       </div>
     </div>
-    <button id="topupSubmitBtn" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; cursor: pointer;">
+
+    <!-- СПОСОБ ОПЛАТЫ - ШИРОКАЯ КАРТОЧКА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 32px; padding: 28px; margin-bottom: 28px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 24px; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-credit-card"></i> Способ оплаты</div>
+      <div class="payment-methods-grid" id="topupPaymentMethods" style="display: flex; gap: 14px;">
+        <div class="payment-method" data-method="card" style="flex: 1; background: rgba(59,130,246,0.2); border-radius: 24px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(59,130,246,0.3);">
+          <i class="fas fa-credit-card" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
+          <span style="font-weight: 600;">Банковская карта</span>
+        </div>
+        <div class="payment-method" data-method="sbp" style="flex: 1; background: rgba(255,255,255,0.05); border-radius: 24px; padding: 18px; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.05);">
+          <i class="fas fa-mobile-alt" style="font-size: 1.5rem; display: block; margin-bottom: 8px;"></i>
+          <span style="font-weight: 600;">СБП</span>
+        </div>
+      </div>
+    </div>
+
+    <button id="topupSubmitBtn" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 8px;">
       <i class="fas fa-plus-circle"></i> Пополнить
     </button>
+    <div class="info-note" style="text-align: center; margin-top: 24px; font-size: 0.8rem; color: #6b7280;">
+      <i class="fas fa-shield-alt"></i> Безопасное пополнение • Моментальное зачисление
+    </div>
   </div>
 </div>
 
@@ -4498,8 +4568,7 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       initFullWithdrawPage();
     });
   })();
-
-    // ========== ЛОГИКА СТРАНИЦЫ ПОПОЛНЕНИЯ ==========
+ // ========== ЛОГИКА СТРАНИЦЫ ПОПОЛНЕНИЯ (единый стиль с выводом) ==========
   (function() {
     let selectedAmount = 500;
     let selectedMethod = 'card';
@@ -4510,36 +4579,44 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
       if (balanceEl) balanceEl.textContent = (profile.balance || 0).toLocaleString('ru-RU') + ' ₽';
     }
     
-    function initTopupPage() {
+    function initTopupPageUnified() {
       updateTopupBalance();
+      
       // Выбор суммы
       document.querySelectorAll('#topupPage .amount-card').forEach(card => {
         card.addEventListener('click', () => {
-          document.querySelectorAll('#topupPage .amount-card').forEach(c => c.style.background = 'rgba(255,255,255,0.05)');
-          card.style.background = 'rgba(34,197,94,0.2)';
+          document.querySelectorAll('#topupPage .amount-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
           selectedAmount = parseInt(card.dataset.amount);
-          document.getElementById('customTopupAmount').value = '';
+          const customInput = document.getElementById('customTopupAmount');
+          if (customInput) customInput.value = '';
         });
       });
+      
       // Своя сумма
       const customInput = document.getElementById('customTopupAmount');
       if (customInput) {
-        customInput.addEventListener('input', () => {
-          let val = parseInt(customInput.value);
+        customInput.addEventListener('input', function(e) {
+          let val = e.target.value.replace(/[^0-9]/g, '');
+          if (val === '') val = '';
+          else val = parseInt(val, 10);
+          e.target.value = val;
           if (val >= 100) {
             selectedAmount = val;
-            document.querySelectorAll('#topupPage .amount-card').forEach(c => c.style.background = 'rgba(255,255,255,0.05)');
+            document.querySelectorAll('#topupPage .amount-card').forEach(c => c.classList.remove('selected'));
           }
         });
       }
-      // Способ оплаты
+      
+      // Выбор способа оплаты
       document.querySelectorAll('#topupPage .payment-method').forEach(m => {
         m.addEventListener('click', () => {
-          document.querySelectorAll('#topupPage .payment-method').forEach(p => p.style.background = 'rgba(255,255,255,0.05)');
-          m.style.background = 'rgba(59,130,246,0.2)';
+          document.querySelectorAll('#topupPage .payment-method').forEach(p => p.classList.remove('selected'));
+          m.classList.add('selected');
           selectedMethod = m.dataset.method;
         });
       });
+      
       // Кнопка пополнения
       const submitBtn = document.getElementById('topupSubmitBtn');
       if (submitBtn) {
@@ -4553,7 +4630,7 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
             return;
           }
           if (selectedAmount < 100) {
-            alert('Минимальная сумма 100 ₽');
+            alert('Минимальная сумма пополнения 100 ₽');
             return;
           }
           newBtn.disabled = true;
@@ -4570,20 +4647,58 @@ console.log('✅ СКРИПТ ПОПОЛНЕНИЯ ГОТОВ');
               profile.balance = data.balance;
               localStorage.setItem('apex_profile', JSON.stringify(profile));
               updateTopupBalance();
-              alert(`Баланс пополнен на ${selectedAmount} ₽`);
+              alert(`✅ Баланс пополнен на ${selectedAmount} ₽`);
             } else {
-              alert(data.error || 'Ошибка');
+              alert(data.error || 'Ошибка пополнения');
             }
           } catch(e) {
-            alert('Ошибка соединения');
+            alert('Ошибка соединения с сервером');
           } finally {
             newBtn.disabled = false;
             newBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Пополнить';
           }
         });
       }
+      
+      // Выделяем карточку по умолчанию
+      const defaultCard = document.querySelector('#topupPage .amount-card[data-amount="500"]');
+      if (defaultCard) defaultCard.classList.add('selected');
+      const defaultMethod = document.querySelector('#topupPage .payment-method[data-method="card"]');
+      if (defaultMethod) defaultMethod.classList.add('selected');
     }
-    window.initTopupPage = initTopupPage;
+    
+    window.initTopupPage = initTopupPageUnified;
+    
+    // Переключение между страницами
+    document.addEventListener('DOMContentLoaded', function() {
+      const topupBtn = document.getElementById('topupSwitchToTopupBtn');
+      const withdrawBtn = document.getElementById('topupSwitchToWithdrawBtn');
+      
+      if (topupBtn) {
+        topupBtn.addEventListener('click', function() {
+          if (typeof window.showPage === 'function') window.showPage('topupPage');
+          topupBtn.classList.add('active');
+          if (withdrawBtn) withdrawBtn.classList.remove('active');
+          setTimeout(initTopupPageUnified, 50);
+        });
+      }
+      if (withdrawBtn) {
+        withdrawBtn.addEventListener('click', function() {
+          if (typeof window.showPage === 'function') window.showPage('withdrawPage');
+          withdrawBtn.classList.add('active');
+          if (topupBtn) topupBtn.classList.remove('active');
+          setTimeout(() => {
+            if (typeof window.initWithdrawPage === 'function') window.initWithdrawPage();
+          }, 50);
+        });
+      }
+      
+      // Инициализация, если страница активна
+      const topupPage = document.getElementById('topupPage');
+      if (topupPage && topupPage.classList.contains('active')) {
+        setTimeout(initTopupPageUnified, 50);
+      }
+    });
   })();
 </script>
 
