@@ -926,14 +926,14 @@ body::after {
     border: none !important;
   }
 
-    /* Стили для методов вывода */
+   /* Стили для методов вывода */
   .method-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
+    gap: 20px;
+    padding: 18px 24px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    border-radius: 24px;
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -947,23 +947,23 @@ body::after {
     border-color: rgba(59, 130, 246, 0.5);
   }
   .method-icon {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
   .method-icon.card { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
   .method-icon.qiwi { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
   .method-icon.crypto { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
   .method-info { flex: 1; }
-  .method-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
-  .method-desc { font-size: 0.75rem; color: #6b7280; }
-  .method-commission { font-size: 0.8rem; color: #22c55e; font-weight: 500; }
+  .method-name { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+  .method-desc { font-size: 0.8rem; color: #6b7280; }
+  .method-commission { font-size: 0.85rem; color: #22c55e; font-weight: 600; }
 
-  /* Убираем стрелки в Firefox */
+  /* Убираем стрелки в Firefox и Chrome */
   #withdrawAmount {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -1412,7 +1412,7 @@ body::after {
     </main>
   </div>
 </div>
-<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ (ФИНАЛЬНАЯ) ==================== -->
+<!-- ==================== СТРАНИЦА ВЫВОДА СРЕДСТВ ==================== -->
 <div class="page" id="withdrawPage">
   <div class="withdraw-header">
     <button class="back-btn" onclick="showPage('profile')">
@@ -1423,61 +1423,63 @@ body::after {
 
   <!-- ДВЕ КНОПКИ: ПОПОЛНЕНИЕ / ВЫВОД -->
   <div class="withdraw-mode-switch" style="display: flex; gap: 16px; margin-bottom: 24px; justify-content: center;">
-    <button id="switchToTopupBtn" class="mode-btn" style="padding: 12px 28px; border-radius: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+    <button id="switchToTopupBtn" class="mode-btn" style="padding: 12px 28px; border-radius: 60px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-weight: 600; cursor: pointer;">
       <i class="fas fa-plus-circle"></i> Пополнение
     </button>
-    <button id="switchToWithdrawBtn" class="mode-btn active" style="padding: 12px 28px; border-radius: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+    <button id="switchToWithdrawBtn" class="mode-btn active" style="padding: 12px 28px; border-radius: 60px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: white; font-weight: 600; cursor: pointer;">
       <i class="fas fa-money-bill-wave"></i> Вывод
     </button>
   </div>
 
-  <div class="withdraw-container" style="max-width: 600px; margin: 0 auto; width: 100%; padding: 0 16px;">
-    <!-- БАЛАНС - каждый элемент на новой строке, широкий -->
-    <div class="balance-card" style="text-align: center; padding: 32px 20px; background: rgba(255,255,255,0.03); border-radius: 28px; margin-bottom: 24px; width: 100%;">
-      <div class="balance-label" style="font-size: 0.9rem; color: #aaa; margin-bottom: 12px;">Доступно для вывода</div>
-      <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 16px;">0 ₽</div>
-      <div class="balance-hint" style="font-size: 0.8rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
+  <div class="withdraw-container" style="max-width: 700px; margin: 0 auto; width: 100%; padding: 0 20px;">
+    
+    <!-- БЛОК БАЛАНСА: КАЖДЫЙ ЭЛЕМЕНТ НА НОВОЙ СТРОЧКЕ, ШИРОКИЙ -->
+    <div class="balance-card" style="text-align: center; padding: 36px 24px; background: rgba(255,255,255,0.03); border-radius: 32px; margin-bottom: 28px; width: 100%;">
+      <div class="balance-label" style="font-size: 1rem; color: #aaa; margin-bottom: 16px; letter-spacing: 0.5px;">Доступно для вывода</div>
+      <div class="balance-amount" id="withdrawBalanceAmount" style="font-size: 3.5rem; font-weight: 800; background: linear-gradient(135deg, #fff, #22c55e); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 20px;">0 ₽</div>
+      <div class="balance-hint" style="font-size: 0.85rem; color: #6b7280;">Минимальная сумма вывода: 100 ₽</div>
     </div>
 
-    <!-- СПОСОБ ВЫВОДА - широкий, с карточками -->
-    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
-      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-wallet"></i> Способ вывода</div>
-      <div class="methods-grid" id="methodsList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+    <!-- СПОСОБ ВЫВОДА - ШИРОКАЯ КАРТОЧКА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 32px; padding: 28px; margin-bottom: 28px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 24px; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-wallet"></i> Способ вывода</div>
+      <div class="methods-grid" id="methodsList" style="display: flex; flex-direction: column; gap: 14px;"></div>
     </div>
 
-    <!-- РЕКВИЗИТЫ -->
-    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
-      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-address-card"></i> Реквизиты</div>
+    <!-- РЕКВИЗИТЫ - ШИРОКАЯ КАРТОЧКА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 32px; padding: 28px; margin-bottom: 28px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-address-card"></i> Реквизиты</div>
       <div class="input-group">
-        <label class="input-label" id="detailsLabel" style="display: block; margin-bottom: 8px; color: #aaa;">Номер карты / Счёт</label>
-        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 16px 20px; width: 100%; color: white; font-size: 1rem;">
+        <label class="input-label" id="detailsLabel" style="display: block; margin-bottom: 12px; color: #aaa; font-size: 0.9rem;">Номер карты / Счёт</label>
+        <input type="text" id="withdrawDetails" class="input-modern" placeholder="Введите реквизиты" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 18px 24px; width: 100%; color: white; font-size: 1rem;">
       </div>
     </div>
 
-    <!-- СУММА ВЫВОДА -->
-    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 28px; padding: 24px; margin-bottom: 24px; width: 100%;">
-      <div class="section-title" style="margin-bottom: 20px; font-size: 1.1rem; font-weight: 600;"><i class="fas fa-coins"></i> Сумма вывода</div>
+    <!-- СУММА ВЫВОДА - ШИРОКАЯ КАРТОЧКА -->
+    <div class="section-card" style="background: rgba(255,255,255,0.03); border-radius: 32px; padding: 28px; margin-bottom: 28px; width: 100%;">
+      <div class="section-title" style="margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;"><i class="fas fa-coins"></i> Сумма вывода</div>
       <div class="amount-row">
-        <input type="text" id="withdrawAmount" placeholder="Введите сумму (от 100 ₽)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 16px 20px; width: 100%; color: white; font-size: 1rem; -moz-appearance: textfield;">
+        <input type="text" id="withdrawAmount" placeholder="Введите сумму (от 100 ₽)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 60px; padding: 18px 24px; width: 100%; color: white; font-size: 1rem; -moz-appearance: textfield; appearance: textfield;">
       </div>
-      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 16px; padding: 8px 0;">
-        <span>Комиссия системы:</span>
-        <span id="commissionValue">0 ₽</span>
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 20px; padding: 12px 0;">
+        <span style="font-size: 0.95rem;">Комиссия системы:</span>
+        <span id="commissionValue" style="font-size: 0.95rem; font-weight: 600;">0 ₽</span>
       </div>
-      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 8px; padding: 8px 0;">
-        <span>Итого к списанию:</span>
-        <span id="totalWithdraw">0 ₽</span>
+      <div class="commission-info" style="display: flex; justify-content: space-between; margin-top: 8px; padding: 12px 0;">
+        <span style="font-size: 0.95rem; font-weight: 500;">Итого к списанию:</span>
+        <span id="totalWithdraw" style="font-size: 1.1rem; font-weight: 800; color: #ef4444;">0 ₽</span>
       </div>
     </div>
 
     <button class="withdraw-btn" id="submitWithdrawBtn" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 8px;">
       <i class="fas fa-paper-plane"></i> Запросить вывод
     </button>
-    <div class="warning-text" style="text-align: center; margin-top: 20px; font-size: 0.75rem; color: #6b7280;">
+    <div class="warning-text" style="text-align: center; margin-top: 24px; font-size: 0.8rem; color: #6b7280;">
       <i class="fas fa-shield-alt"></i> Вывод обрабатывается до 24 часов
     </div>
   </div>
 </div>
+
 <!-- ==================== СТРАНИЦА ПОПОЛНЕНИЯ (ПОЛНАЯ, РАБОЧАЯ) ==================== -->
 <div class="page" id="topupPage">
   <div class="topup-container">
