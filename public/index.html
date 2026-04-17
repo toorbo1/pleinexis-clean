@@ -377,7 +377,7 @@ body::after {
     background: rgba(10, 15, 30, 0.75) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    border-radius: 28px !important;
+    border-radius: 20px !important;
     padding: 20px 24px !important;
     margin-bottom: 28px !important;
     border: 1px solid rgba(59, 130, 246, 0.4) !important;
@@ -418,6 +418,7 @@ body::after {
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
+
 }
 
 .title-text {
@@ -431,13 +432,13 @@ body::after {
 
 /* STEAM тег - старый дизайн */
 .steam-tag {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(68, 64, 64, 0.364) !important;
     padding: 4px 12px !important;
-    border-radius: 30px !important;
-    font-size: 0.7rem !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
-    color: #60a5fa !important;
-    border: 1px solid rgba(96, 165, 250, 0.3) !important;
+    color: #4e9af6 !important;
+
     letter-spacing: 0.5px !important;
     text-transform: uppercase !important;
 }
@@ -456,9 +457,9 @@ body::after {
 .steam-fields-row .input-modern {
     width: 100% !important;
     padding: 14px 16px !important;
-    background: rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 18px !important;
+    background: rgba(46, 46, 46, 0.6) !important;
+    border: 1px solid rgba(59, 131, 246, 0.363) !important;
+    border-radius: 13px !important;
     color: white !important;
     font-size: 0.9rem !important;
     outline: none !important;
@@ -495,7 +496,6 @@ body::after {
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    border: 1px solid rgba(34, 197, 94, 0.3) !important;
     backdrop-filter: blur(4px) !important;
 }
 
@@ -536,7 +536,7 @@ body::after {
     border: none !important;
     background: linear-gradient(135deg, #8b5cf6, #3b82f6, #2563eb) !important;
     background-size: 200% auto !important;
-    border-radius: 60px !important;
+    border-radius: 20px !important;
     color: white !important;
     font-family: 'Source Code Pro', 'Inter', monospace !important;
     font-weight: 900 !important;
@@ -752,7 +752,7 @@ body::after {
     flex: 0 0 auto;
     width: 380px;
     aspect-ratio: 16 / 9;
-    border-radius: 24px;
+    border-radius: 17px !important;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     transition: all 0.4s ease;
@@ -800,6 +800,20 @@ body::after {
 @media (max-width: 480px) {
     .smooth-slide { width: 260px; }
     .smooth-carousel-track { gap: 15px; }
+}
+
+
+
+  /* ЖЁСТКОЕ изменение радиуса верхней панели */
+  .nav-links {
+    border-radius: 12px !important;
+  }
+  .nav-link {
+    border-radius: 30px !important;
+  }
+  .header .nav-links,
+.header .nav-links * {
+  border-radius: 11px !important;
 }
 </style>
 </head>
@@ -911,7 +925,7 @@ body::after {
         </div>
     </div>
     <div class="steam-info-row">
-        <span class="commission-badge"><i class="fas fa-percent"></i> Комиссия 5</span>
+        <span class="commission-badge">Комиссия 5%</span>
         <button class="promo-btn" id="promoCodeBtn">
             <i class="fas fa-ticket-alt"></i> Ввести промокод
         </button>

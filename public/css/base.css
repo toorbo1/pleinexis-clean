@@ -214,6 +214,82 @@ select:focus {
 .global-search-input:focus {
   outline: none !important;
   border: none !important;
-  box-shadow: none !important;
+  box-shadow: none !important; 
   background: transparent !important;
+}
+
+
+/* === ГЛОБАЛЬНОЕ ИЗМЕНЕНИЕ РАДИУСА УГЛОВ === */
+* {
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-3xl: 32px;
+}
+
+/* Карточки товаров */
+.product-card,
+.card-modern,
+.admin-card,
+.modal-content,
+.profile-card,
+.balance-card,
+.stat-card,
+.section-card,
+.withdraw-container .balance-card {
+  border-radius: var(--radius-xl) !important;
+}
+
+/* Кнопки */
+.btn-glow,
+.pay-btn-blue,
+.withdraw-btn,
+.topup-submit-btn,
+.auth-submit-btn,
+.guest-login-btn,
+.guest-register-btn {
+  border-radius: var(--radius-3xl) !important;
+}
+
+/* Поля ввода */
+.input-modern,
+.header-search,
+.steam-fields-row .input-modern {
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Хедер и навигация */
+.header,
+.bottom-nav,
+.nav-links {
+  border-radius: 0 !important;
+}
+
+/* Карусель */
+.my-carousel-slide,
+.smooth-slide,
+.mini-slider-wrapper {
+  border-radius: var(--radius-xl) !important;
+}
+
+/* Чат */
+.message-bubble,
+.chat-input-field,
+.dialog-item {
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Аватар */
+.avatar-wrapper,
+.avatar-inner,
+.profile-avatar-circle {
+  border-radius: 50% !important;
+}
+
+/* Профиль */
+.profile-card,
+.products-list-container {
+  border-radius: var(--radius-2xl) !important;
 }
