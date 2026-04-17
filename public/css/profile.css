@@ -1337,15 +1337,11 @@
   }
 }
 
-/* Отключаем все hover-эффекты в профиле */
+/* Запрещаем исчезновение блоков при наведении в профиле */
 #profile *:hover {
-  transform: none !important;
-  scale: none !important;
-  translate: none !important;
-  transition: none !important;
-  box-shadow: none !important;
-  border-color: none !important;
-  background: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 #profile .product-card:hover,
@@ -1353,39 +1349,27 @@
 #profile .balance-card:hover,
 #profile .profile-card:hover,
 #profile .product-item:hover,
-#profile .btn-gradient:hover,
-#profile .btn-glass:hover,
-#profile .profile-tab-btn:hover,
+#profile .review-card:hover,
 #profile .product-btn:hover,
 #profile .edit-product-btn:hover,
-#profile .delete-product-btn:hover {
-  transform: none !important;
-  background: none !important;
-  box-shadow: none !important;
-  border-color: none !important;
-  color: inherit !important;
+#profile .delete-product-btn:hover,
+#profile .profile-tab-btn:hover {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  background: inherit !important;
 }
 
-/* Отключаем анимацию вращения кольца аватара */
-#profile .avatar-ring {
-  animation: none !important;
+/* Особенно для кнопок */
+#profile button:hover {
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: inherit !important;
 }
 
-/* Отключаем пульсацию статуса */
-#profile .avatar-status {
-  animation: none !important;
-}
-
-/* Отключаем поднятие карточек */
-#profile .stat-card,
-#profile .balance-card,
-#profile .profile-card {
-  transition: none !important;
-}
-
-#profile .stat-card:hover,
-#profile .balance-card:hover,
-#profile .profile-card:hover {
-  transform: none !important;
-  margin-top: 0 !important;
+/* Для любых скрывающихся элементов */
+#profile [class*="hover"]:hover,
+#profile [class*="fade"]:hover {
+  opacity: 1 !important;
+  display: block !important;
 }
