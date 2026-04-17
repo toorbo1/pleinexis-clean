@@ -392,7 +392,6 @@ select.input-modern {
 .btn-primary {
   flex: 1;
   padding: 14px 24px;
-  background: linear-gradient(105deg, #3b82f6, #2563eb);
   border: none;
   border-radius: 40px;
   color: white;
@@ -406,10 +405,7 @@ select.input-modern {
   gap: 10px;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-}
+
 
 .btn-secondary {
   flex: 1;
