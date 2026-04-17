@@ -295,11 +295,59 @@ function formatDescription(text) {
     return text.replace(/\n/g, '<br>').replace(/\\n/g, '<br>');
 }
 
-// detail-page.js
+// Функция открытия чата с привязкой к сделке
+function openChatForDeal(dealId, sellerUsername, productTitle) {
+    // Используем существующую систему диалогов из chats.js
+    let dialogs = JSON.parse(localStorage.getItem('apex_dialogs') || '[]');
+    const currentUser = localStorage.getItem('apex_user');
+    
+    let dialog = dialogs.find(d => d.name === sellerUsername);
+    if (!dialog) {
+        dialog = {
+            id: Date.now().toString(),
+            name: sellerUsername,
+            avatar: '👤',
+            messages: [],
+            dealId: dealId,
+            productTitle: productTitle
+        };
+        dialogs.push(dialog);
+    } else {
+        dialog.dealId = dealId;
+        dialog.productTitle = productTitle;
+    }
+    
+    // Добавляем системное сообщение о сделке
+    dialog.messages.push({
+        user: 'System',
+        text: `🔒 Сделка #${dealId} на товар "${productTitle}" создана. Ожидайте выполнения.`,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: new Date().toISOString(),
+        system: true
+    });
+    
+    localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
+    
+    // Обновляем диалоги в памяти чатов
+    if (typeof window.refreshDialogs === 'function') {
+        window.refreshDialogs();
+    }
+    
+    // Переключаемся на чат
+    if (typeof window.showPage === 'function') {
+        window.showPage('chat');
+        setTimeout(() => {
+            if (typeof openChatWithDialog === 'function') {
+                openChatWithDialog(dialog.id);
+            }
+        }, 100);
+    }
+}
+
+// В функции buyProduct после успешного ответа от /api/deals вызываем openChatForDeal
 window.buyProduct = async function(productId) {
     const token = localStorage.getItem('auth_token');
     if (!token) {
-        // Пользователь не авторизован - показать модалку входа
         if (typeof window.auth !== 'undefined' && window.auth.showAuthModal) {
             window.auth.showAuthModal('login');
         } else {
@@ -308,7 +356,7 @@ window.buyProduct = async function(productId) {
         return;
     }
     try {
-        // 1. Проверить баланс пользователя (можно запросить /api/auth/me)
+        // 1. Проверить баланс пользователя
         const meRes = await fetch('/api/auth/me', {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
         });
@@ -346,7 +394,10 @@ window.buyProduct = async function(productId) {
         const sellerUsername = product.seller; // предполагаем, что seller - username
         openChatForDeal(deal.dealId, sellerUsername, product.title);
 
-        // 4. Показать уведомление и закрыть детальную страницу
+        // 4. Увеличить счётчик покупок
+        await incrementPurchasesCount();
+
+        // 5. Показать уведомление и закрыть детальную страницу
         showToast('Сделка создана! Перейдите в чат для обсуждения.', 'success');
         closeDetail();
         
@@ -354,54 +405,6 @@ window.buyProduct = async function(productId) {
         showToast(error.message, 'error');
     }
 };
-
-// Функция открытия чата с привязкой к сделке
-function openChatForDeal(dealId, sellerUsername, productTitle) {
-    let dialogs = JSON.parse(localStorage.getItem('apex_dialogs') || '[]');
-    const currentUser = localStorage.getItem('apex_user');
-    
-    let dialog = dialogs.find(d => d.name === sellerUsername);
-    if (!dialog) {
-        dialog = {
-            id: Date.now().toString(),
-            name: sellerUsername,
-            avatar: '👤',
-            messages: [],
-            dealId: dealId,
-            productTitle: productTitle
-        };
-        dialogs.push(dialog);
-    } else {
-        dialog.dealId = dealId;
-        dialog.productTitle = productTitle;
-    }
-    
-    // Добавляем системное сообщение о сделке
-    dialog.messages.push({
-        user: 'System',
-        text: `🔒 Сделка #${dealId} на сумму ${productTitle} создана. Ожидайте выполнения.`,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: new Date().toISOString(),
-        system: true
-    });
-    
-    localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
-    
-    // Обновляем диалоги в памяти чатов
-    if (typeof window.refreshDialogs === 'function') {
-        window.refreshDialogs();
-    }
-    
-    // Переключаемся на чат и открываем диалог
-    if (typeof window.showPage === 'function') {
-        window.showPage('chat');
-        setTimeout(() => {
-            if (typeof openChatWithDialog === 'function') {
-                openChatWithDialog(dialog.id);
-            }
-        }, 100);
-    }
-}
 // Уведомление продавцу
 function sendPurchaseNotification(sellerName, productTitle, buyerName) {
     let dialogs = JSON.parse(localStorage.getItem('apex_dialogs') || '[]');

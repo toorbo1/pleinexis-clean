@@ -1,11 +1,13 @@
-// chats.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ
+// chats.js - ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ С ФИКСАМИ ДИАЛОГОВ
 
 let dialogs = [];
 let currentUser = null;
 let currentDialogId = null;
 
 function initChats() {
+    console.log('initChats START');
     currentUser = localStorage.getItem("apex_user") || "Гость";
+    
     const savedDialogs = localStorage.getItem("apex_dialogs");
     if (savedDialogs) {
         dialogs = JSON.parse(savedDialogs);
@@ -49,6 +51,14 @@ function saveDialogs() {
     localStorage.setItem("apex_dialogs", JSON.stringify(dialogs));
 }
 
+function refreshDialogs() {
+    const saved = localStorage.getItem("apex_dialogs");
+    if (saved) {
+        dialogs = JSON.parse(saved);
+        renderDialogsList();
+    }
+}
+
 function showChatList() {
     const sidebar = document.getElementById("chatsSidebar");
     const chatWindow = document.getElementById("chatWindow");
@@ -78,9 +88,15 @@ function closeChatWindow() {
     currentDialogId = null;
 }
 
-function openChatWithDialog(dialogId) {
+async function openChatWithDialog(dialogId) {
+    // Обновляем диалоги из localStorage перед открытием
+    refreshDialogs();
+    
     const dialog = dialogs.find(d => d.id === dialogId);
-    if (!dialog) return;
+    if (!dialog) {
+        console.warn(`Диалог ${dialogId} не найден`);
+        return;
+    }
     
     // Обновляем хедер чата
     const avatarEl = document.getElementById("chatPartnerAvatar");
@@ -109,6 +125,12 @@ function openChatWithDialog(dialogId) {
     
     currentDialogId = dialogId;
     renderMessages(dialogId);
+    
+    // Если есть привязка к сделке – показываем кнопки
+    if (dialog.dealId) {
+        const deal = await loadDealInfo(dialog.dealId);
+        renderDealActions(dialogId, deal);
+    }
 }
 
 function renderDialogsList(searchTerm = '') {
@@ -187,7 +209,6 @@ function renderMessages(dialogId) {
             html += `<div class="date-divider"><span>${dateStr}</span></div>`;
         }
         
-        // Обработка текста - заменяем переносы на <br>
         let messageText = escapeHtml(msg.text);
         messageText = messageText.replace(/\n/g, '<br>');
         
@@ -274,7 +295,7 @@ function autoReply(userMessage) {
     }
     renderDialogsList();
 }
-// После открытия диалога загружаем данные сделки
+
 async function loadDealInfo(dealId) {
     try {
         const res = await fetch(`/api/deals/${dealId}`);
@@ -284,43 +305,14 @@ async function loadDealInfo(dealId) {
     }
 }
 
-// Модифицируем openChatWithDialog
-async function openChatWithDialog(dialogId) {
-    // Принудительно обновляем диалоги из localStorage
-    refreshDialogs();
-    
-    const dialog = dialogs.find(d => d.id === dialogId);
-    if (!dialog) {
-        console.warn(`Dialog ${dialogId} not found`);
-        return;
-    }
-    
-    // ... остальной код (обновление хедера, отображение окна чата) ...
-    
-    // Если есть привязка к сделке – показываем кнопки
-    if (dialog.dealId) {
-        const deal = await loadDealInfo(dialog.dealId);
-        renderDealActions(dialogId, deal);
-    }
-}
-async function openChatWithDialog(dialogId) {
-    refreshDialogs();  // <-- добавить эту строку
-    const dialog = dialogs.find(d => d.id === dialogId);
-    if (!dialog) {
-        console.warn(`Dialog ${dialogId} not found`);
-        return;
-    }}
 function renderDealActions(dialogId, deal) {
     const currentUser = localStorage.getItem('apex_user');
-    const isBuyer = (deal.buyer_username === currentUser); // нужно получить username из user_id
-    const isSeller = (deal.seller_username === currentUser);
-    
     const actionsContainer = document.getElementById('chatDealActions');
     if (!actionsContainer) return;
     
     let html = '';
     if (deal.status === 'pending') {
-        if (isSeller) {
+        if (deal.seller_username === currentUser) {
             html = `
                 <button class="deal-btn complete" onclick="sellerCompleteDeal('${deal.id}')">
                     ✅ Я выполнил работу
@@ -329,11 +321,11 @@ function renderDealActions(dialogId, deal) {
                     ❌ Отменить заказ
                 </button>
             `;
-        } else if (isBuyer) {
+        } else if (deal.buyer_username === currentUser) {
             html = `<div class="deal-info">Ожидание выполнения продавцом...</div>`;
         }
     } else if (deal.status === 'seller_completed') {
-        if (isBuyer) {
+        if (deal.buyer_username === currentUser) {
             html = `
                 <button class="deal-btn confirm" onclick="buyerConfirmDeal('${deal.id}')">
                     ✅ Подтвердить получение
@@ -350,8 +342,8 @@ function renderDealActions(dialogId, deal) {
     
     actionsContainer.innerHTML = html;
 }
-Ъ
-// Функции для кнопок
+
+// Функции для кнопок сделок
 window.sellerCompleteDeal = async (dealId) => {
     try {
         const res = await fetch(`/api/deals/${dealId}/seller-complete`, {
@@ -360,7 +352,7 @@ window.sellerCompleteDeal = async (dealId) => {
         });
         if (!res.ok) throw new Error('Ошибка');
         showToast('Статус обновлён', 'success');
-        // Обновить чат
+        refreshDialogs();
     } catch (e) {
         showToast(e.message, 'error');
     }
@@ -374,6 +366,7 @@ window.buyerConfirmDeal = async (dealId) => {
         });
         if (!res.ok) throw new Error('Ошибка');
         showToast('Сделка завершена!', 'success');
+        refreshDialogs();
     } catch (e) {
         showToast(e.message, 'error');
     }
@@ -388,10 +381,12 @@ window.cancelDeal = async (dealId) => {
         });
         if (!res.ok) throw new Error('Ошибка');
         showToast('Сделка отменена', 'success');
+        refreshDialogs();
     } catch (e) {
         showToast(e.message, 'error');
     }
 };
+
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&<>]/g, function(m) {
@@ -400,6 +395,19 @@ function escapeHtml(str) {
         if (m === '>') return '&gt;';
         return m;
     });
+}
+
+function showToast(message, type = 'success') {
+    let toast = document.querySelector('.toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        document.body.appendChild(toast);
+    }
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+    toast.classList.add('show', type);
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -427,8 +435,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 });
-
-
 
 window.initChats = initChats;
 window.openChatWithDialog = openChatWithDialog;
