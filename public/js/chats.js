@@ -5,9 +5,7 @@ let currentUser = null;
 let currentDialogId = null;
 
 function initChats() {
-    console.log('initChats START');
     currentUser = localStorage.getItem("apex_user") || "Гость";
-    
     const savedDialogs = localStorage.getItem("apex_dialogs");
     if (savedDialogs) {
         dialogs = JSON.parse(savedDialogs);
@@ -305,13 +303,13 @@ async function openChatWithDialog(dialogId) {
         renderDealActions(dialogId, deal);
     }
 }
-function refreshDialogs() {
-    const saved = localStorage.getItem('apex_dialogs');
-    if (saved) {
-        dialogs = JSON.parse(saved);
-    }
-    renderDialogsList();
-}
+async function openChatWithDialog(dialogId) {
+    refreshDialogs();  // <-- добавить эту строку
+    const dialog = dialogs.find(d => d.id === dialogId);
+    if (!dialog) {
+        console.warn(`Dialog ${dialogId} not found`);
+        return;
+    }}
 function renderDealActions(dialogId, deal) {
     const currentUser = localStorage.getItem('apex_user');
     const isBuyer = (deal.buyer_username === currentUser); // нужно получить username из user_id
@@ -352,7 +350,7 @@ function renderDealActions(dialogId, deal) {
     
     actionsContainer.innerHTML = html;
 }
-
+Ъ
 // Функции для кнопок
 window.sellerCompleteDeal = async (dealId) => {
     try {

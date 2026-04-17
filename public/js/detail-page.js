@@ -385,7 +385,7 @@ function openChatForDeal(dealId, sellerUsername, productTitle) {
         system: true
     });
     
-  localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
+    localStorage.setItem('apex_dialogs', JSON.stringify(dialogs));
     
     // Обновляем диалоги в памяти чатов
     if (typeof window.refreshDialogs === 'function') {
